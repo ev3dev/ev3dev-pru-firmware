@@ -1,0 +1,3 @@
+[submodule "pru-software-support-package"]
+	path = pru-software-support-package
+	url = git://git.ti.com/pru-software-support-package/pru-software-support-package.git

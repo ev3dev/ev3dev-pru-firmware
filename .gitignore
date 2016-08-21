@@ -1,0 +1,12 @@
+
+/* CCS6/Eclipse stuff */
+.metadata
+Debug/
+Release/
+RemoteSystemsTempFiles/
+dvt/
+*.core.resources.prefs
+
+/* Other stuff */
+*~
+*.orig
