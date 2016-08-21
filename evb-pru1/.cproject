@@ -72,6 +72,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.DEFINE.1941949006" name="Pre-define preprocessor macro _name_ to _value_ (--define)" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="PRU_CORE=1"/>
 								</option>
+								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.INITIALIZATION_MODEL.1182818610" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.INITIALIZATION_MODEL" value="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.INITIALIZATION_MODEL.RAM_MODEL" valueType="enumerated"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD_SRCS.1810380086" name="Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD2_SRCS.1757411727" name="Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD2_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__GEN_CMDS.1299554298" name="Generated Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__GEN_CMDS"/>
@@ -154,6 +155,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.DEFINE.1643457187" name="Pre-define preprocessor macro _name_ to _value_ (--define)" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="PRU_CORE=1"/>
 								</option>
+								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.INITIALIZATION_MODEL.1056498551" name="Initialization model" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.INITIALIZATION_MODEL" value="com.ti.ccstudio.buildDefinitions.PRU_2.1.linkerID.INITIALIZATION_MODEL.RAM_MODEL" valueType="enumerated"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD_SRCS.1465068943" name="Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD2_SRCS.569780460" name="Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__CMD2_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__GEN_CMDS.1381263637" name="Generated Linker Command Files" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.1.exeLinker.inputType__GEN_CMDS"/>
