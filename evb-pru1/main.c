@@ -204,6 +204,8 @@ static volatile uint32_t * const gpio_base[4] = {
 };
 
 /* TODO: would be better to get gpio pin info from device tree */
+#if defined PLAT_EVB
+
 static struct i2c_data i2c_ports[NUM_PORTS] = {
 	[PORT_1] = {
 		.name = "Input port 1",
@@ -258,6 +260,67 @@ static struct i2c_data i2c_ports[NUM_PORTS] = {
 		},
 	},
 };
+
+#elif defined PLAT_QUEST
+
+static struct i2c_data i2c_ports[NUM_PORTS] = {
+	[PORT_1] = {
+		.name = "Input port 1",
+		.gpio = {
+			[I2C_PIN_SDA] = {
+				.bank	= 1,
+				.index	= 18,
+			},
+			[I2C_PIN_SCL] = {
+				.bank	= 0,
+				.index	= 31,
+			},
+		},
+	},
+	[PORT_2] = {
+		.name = "Input port 2",
+		.gpio = {
+			[I2C_PIN_SDA] = {
+				.bank	= 0,
+				.index	= 4,
+			},
+			[I2C_PIN_SCL] = {
+				.bank	= 0,
+				.index	= 3,
+			},
+		},
+	},
+	[PORT_3] = {
+		.name = "Input port 3",
+		.gpio = {
+			[I2C_PIN_SDA] = {
+				.bank	= 0,
+				.index	= 12,
+			},
+			[I2C_PIN_SCL] = {
+				.bank	= 0,
+				.index	= 15,
+			},
+		},
+	},
+	[PORT_4] = {
+		.name = "Input port 4",
+		.gpio = {
+			[I2C_PIN_SDA] = {
+				.bank	= 1,
+				.index	= 17,
+			},
+			[I2C_PIN_SCL] = {
+				.bank	= 2,
+				.index	= 14,
+			},
+		},
+	},
+};
+
+#else
+#error Must define PLAT_EVB or PLAT_QUEST
+#endif
 
 uint8_t payload[RPMSG_BUF_SIZE];
 
