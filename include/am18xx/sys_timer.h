@@ -259,7 +259,7 @@ typedef struct {
 	}; // 0x7C
 } timer;
 
-volatile __far timer TIMER64P0 __attribute__((cregister("TIMER64P0", far), peripheral));
+volatile __far timer TIMER64P0 __attribute__((cregister("TIMER64P0", near), peripheral));
 #define TIMER64P1 (*(volatile timer *)(0x01c21000))
 #define TIMER64P2 (*(volatile timer *)(0x01f0c000))
 #define TIMER64P3 (*(volatile timer *)(0x01f0d000))
