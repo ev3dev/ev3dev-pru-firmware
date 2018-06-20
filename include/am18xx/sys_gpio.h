@@ -416,6 +416,6 @@ typedef struct {
     };
 } gpio;
 
-volatile gpio *GPIO = (void *)(0x01e26000);
+#define GPIO (*(volatile gpio *)(0x01e26000))
 
 #endif /* _AM18XX_SYS_GPIO_H_ */
