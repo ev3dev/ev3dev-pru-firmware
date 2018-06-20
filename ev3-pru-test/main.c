@@ -5,10 +5,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "gpio.h"
-#include "resource_table_empty.h"
+#include <am18xx/sys_gpio.h>
 
-static volatile gpio *GPIO = (void *)(0x01e26000);
+#include "resource_table_empty.h"
 
 int main(void) {
     while (true) {
