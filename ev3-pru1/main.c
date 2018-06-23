@@ -63,7 +63,7 @@ int main(void) {
 			// Receive all available messages, multiple messages can be sent per kick
 			while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
 				// Echo the message back
-				while (pru_rpmsg_send(&transport, dst, src, payload, len) == PRU_RPMSG_SUCCESS);
+				pru_rpmsg_send(&transport, dst, src, payload, len);
 			}
 		}
 	}
