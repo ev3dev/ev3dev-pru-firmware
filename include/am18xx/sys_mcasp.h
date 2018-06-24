@@ -978,6 +978,6 @@ typedef struct {
     }; // 0x2bc
 } mcasp;
 
-volatile __far timer MCASP0 __attribute__((cregister("MCASP0_CTL", far), peripheral));
+volatile __far mcasp MCASP0 __attribute__((cregister("MCASP0_CTL", far), peripheral));
 
 #endif /* _AM18XX_SYS_MCASP_H_ */
