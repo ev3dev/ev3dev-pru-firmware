@@ -14,7 +14,7 @@
 MEMORY
 {
       PAGE 0:
-	/* 2kB PRU0/1 Instruction RAM */
+	/* 4kB PRU0/1 Instruction RAM */
 	PRU_IMEM	: org = 0x00000000 len = 0x00001000
 
       PAGE 1:
