@@ -15,7 +15,7 @@
 
 #include "resource_table.h"
 
-#define TRIGGER_PERIOD_MS 10
+#define TRIGGER_PERIOD_MS 5
 
 /* from Linux */
 
@@ -27,11 +27,12 @@ enum ev3_pru_tacho_msg_type {
 };
 
 enum ev3_pru_tacho_iio_channel {
-	EV3_PRU_IIO_CH_TIMESTAMP,
 	EV3_PRU_IIO_CH_TACHO_A,
 	EV3_PRU_IIO_CH_TACHO_B,
 	EV3_PRU_IIO_CH_TACHO_C,
 	EV3_PRU_IIO_CH_TACHO_D,
+	EV3_PRU_IIO_CH_TIMESTAMP_LOW,
+	EV3_PRU_IIO_CH_TIMESTAMP_HIGH,
 	NUM_EV3_PRU_IIO_CH
 };
 
@@ -68,9 +69,10 @@ volatile __far uint8_t payload[RPMSG_BUF_SIZE] __attribute__((cregister("SHARED_
 int main(void) {
 	volatile uint8_t *status;
 	struct pru_rpmsg_transport transport;
+	uint64_t timestamp = 0;
+	uint32_t period_ticks, timestamp_ticks;
 	uint16_t src, dst, len;
 	uint16_t trigger_src = 0, trigger_dst = 0;
-	uint32_t start_time;
 	bool started = false;
 
 	// Set cregister index to match AM18xx_PRU.cmd
@@ -88,26 +90,33 @@ int main(void) {
 
 	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, "ev3-tacho-rpmsg", trigger_src) != PRU_RPMSG_SUCCESS);
 
-	start_time = TIMER64P0.TIM34;
+	period_ticks = timestamp_ticks = TIMER64P0.TIM34;
 
 	while (true) {
 		// wait for the ARM to kick us
 		while (!(__R31 & HOST_INT)) {
 			uint32_t now = TIMER64P0.TIM34;
 
+			// timestamp is basically converting timer from 32-bit to 64-bit
+			// REVISIT: could use an unused timer for ticks that are divisible by a power of 2
+			// then we could actually return nanoseconds so that users don't have to scale
+			timestamp += now - timestamp_ticks;
+			timestamp_ticks = now;
+
 			// send periodic updates when trigger has been started
-			if (now - start_time >= TRIGGER_PERIOD_TICKS) {
-				start_time += TRIGGER_PERIOD_TICKS;
+			if (now - period_ticks >= TRIGGER_PERIOD_TICKS) {
+				period_ticks += TRIGGER_PERIOD_TICKS;
 
 				if (started) {
 					struct ev3_pru_tacho_msg msg;
 
 					msg.type = EV3_PRU_TACHO_MSG_UPDATE;
-					msg.value[EV3_PRU_IIO_CH_TIMESTAMP] = now;
 					msg.value[EV3_PRU_IIO_CH_TACHO_A] = 1;
 					msg.value[EV3_PRU_IIO_CH_TACHO_B] = 2;
 					msg.value[EV3_PRU_IIO_CH_TACHO_C] = 3;
 					msg.value[EV3_PRU_IIO_CH_TACHO_D] = 4;
+					msg.value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
+					msg.value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
 
 					pru_rpmsg_send(&transport, trigger_src, trigger_dst, &msg, sizeof(msg));
 				}
@@ -123,11 +132,12 @@ int main(void) {
 
 			switch (msg->type) {
 			case EV3_PRU_TACHO_MSG_REQ_ONE:
-				msg->value[EV3_PRU_IIO_CH_TIMESTAMP] = TIMER64P0.TIM34;
 				msg->value[EV3_PRU_IIO_CH_TACHO_A] = 1;
 				msg->value[EV3_PRU_IIO_CH_TACHO_B] = 2;
 				msg->value[EV3_PRU_IIO_CH_TACHO_C] = 3;
 				msg->value[EV3_PRU_IIO_CH_TACHO_D] = 4;
+				msg->value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
+				msg->value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
 				pru_rpmsg_send(&transport, dst, src, msg, sizeof(*msg));
 				break;
 			case EV3_PRU_TACHO_MSG_START:
