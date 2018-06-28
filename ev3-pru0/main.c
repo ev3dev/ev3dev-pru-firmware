@@ -43,6 +43,19 @@ struct ev3_pru_tacho_msg {
 
 /* end Linux */
 
+enum tacho {
+	TACHO_A,
+	TACHO_B,
+	TACHO_C,
+	TACHO_D,
+	NUM_TACHO
+};
+
+enum direction {
+	REVERSE = -1,
+	UNKNOWN = 0,
+	FORWARD = 1
+};
 
 // system events to/from ARM
 
@@ -64,12 +77,79 @@ volatile uint32_t register __R31;
 // Only have 512B local RAM for stack/data, so this won't fit there. Use shared RAM instead.
 volatile __far uint8_t payload[RPMSG_BUF_SIZE] __attribute__((cregister("SHARED_RAM", far), peripheral));
 
-#define LED (GPIO.OUT_DATA67_bit.GP6P7)
+#define INTA GPIO.IN_DATA45_bit.GP5P11	// GPIO 5[11]
+#define INTB GPIO.IN_DATA45_bit.GP5P8	// GPIO 5[8]
+#define INTC GPIO.IN_DATA45_bit.GP5P13	// GPIO 5[13]
+#define INTD GPIO.IN_DATA67_bit.GP6P9	// GPIO 6[9]
+
+#define DIRA GPIO.IN_DATA01_bit.GP0P4	// GPIO 0[4]
+#define DIRB GPIO.IN_DATA23_bit.GP2P9	// GPIO 2[9]
+#define DIRC GPIO.IN_DATA23_bit.GP3P14	// GPIO 3[14]
+#define DIRD GPIO.IN_DATA23_bit.GP2P8	// GPIO 2[8]
+
+#define TACHO_STATE(x) ((INT##x << 1) | DIR##x)
+
+static uint64_t timestamp;
+
+static uint8_t tacho_state[NUM_TACHO];
+static uint32_t tacho_counts[NUM_TACHO];
+
+static void update_tacho_state(enum tacho idx, uint8_t new_state)
+{
+	uint8_t current_state = tacho_state[idx] & 0x3;
+	enum direction new_dir = UNKNOWN;
+
+	switch (current_state) {
+		case 0x0:
+			if (new_state == 0x1) {
+				new_dir = REVERSE;
+			} else if (new_state == 0x2) {
+				new_dir = FORWARD;
+			}
+			break;
+
+		case 0x1:
+			if (new_state == 0x3) {
+				new_dir = REVERSE;
+			} else if (new_state == 0x0) {
+				new_dir = FORWARD;
+			}
+			break;
+
+		case 0x3:
+			if (new_state == 0x2) {
+				new_dir = REVERSE;
+			} else if (new_state == 0x1) {
+				new_dir = FORWARD;
+			}
+			break;
+
+		case 0x2:
+			if (new_state == 0x0) {
+				new_dir = REVERSE;
+			} else if (new_state == 0x3) {
+				new_dir = FORWARD;
+			}
+			break;
+	}
+
+	tacho_state[idx] = new_state;
+	tacho_counts[idx] += new_dir;
+}
+
+static void fill_msg_value(struct ev3_pru_tacho_msg *msg)
+{
+	msg->value[EV3_PRU_IIO_CH_TACHO_A] = tacho_counts[TACHO_A];
+	msg->value[EV3_PRU_IIO_CH_TACHO_B] = tacho_counts[TACHO_B];
+	msg->value[EV3_PRU_IIO_CH_TACHO_C] = tacho_counts[TACHO_C];
+	msg->value[EV3_PRU_IIO_CH_TACHO_D] = tacho_counts[TACHO_D];
+	msg->value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
+	msg->value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
+}
 
 int main(void) {
 	volatile uint8_t *status;
 	struct pru_rpmsg_transport transport;
-	uint64_t timestamp = 0;
 	uint32_t period_ticks, timestamp_ticks;
 	uint16_t src, dst, len;
 	uint16_t trigger_src = 0, trigger_dst = 0;
@@ -103,6 +183,11 @@ int main(void) {
 			timestamp += now - timestamp_ticks;
 			timestamp_ticks = now;
 
+			update_tacho_state(TACHO_A, TACHO_STATE(A));
+			update_tacho_state(TACHO_B, TACHO_STATE(B));
+			update_tacho_state(TACHO_C, TACHO_STATE(C));
+			update_tacho_state(TACHO_D, TACHO_STATE(D));
+
 			// send periodic updates when trigger has been started
 			if (now - period_ticks >= TRIGGER_PERIOD_TICKS) {
 				period_ticks += TRIGGER_PERIOD_TICKS;
@@ -111,12 +196,7 @@ int main(void) {
 					struct ev3_pru_tacho_msg msg;
 
 					msg.type = EV3_PRU_TACHO_MSG_UPDATE;
-					msg.value[EV3_PRU_IIO_CH_TACHO_A] = 1;
-					msg.value[EV3_PRU_IIO_CH_TACHO_B] = 2;
-					msg.value[EV3_PRU_IIO_CH_TACHO_C] = 3;
-					msg.value[EV3_PRU_IIO_CH_TACHO_D] = 4;
-					msg.value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
-					msg.value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
+					fill_msg_value(&msg);
 
 					pru_rpmsg_send(&transport, trigger_src, trigger_dst, &msg, sizeof(msg));
 				}
@@ -132,12 +212,7 @@ int main(void) {
 
 			switch (msg->type) {
 			case EV3_PRU_TACHO_MSG_REQ_ONE:
-				msg->value[EV3_PRU_IIO_CH_TACHO_A] = 1;
-				msg->value[EV3_PRU_IIO_CH_TACHO_B] = 2;
-				msg->value[EV3_PRU_IIO_CH_TACHO_C] = 3;
-				msg->value[EV3_PRU_IIO_CH_TACHO_D] = 4;
-				msg->value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
-				msg->value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
+				fill_msg_value(msg);
 				pru_rpmsg_send(&transport, dst, src, msg, sizeof(*msg));
 				break;
 			case EV3_PRU_TACHO_MSG_START:
