@@ -74,8 +74,10 @@ enum direction {
 
 volatile uint32_t register __R31;
 
-// Only have 512B local RAM for stack/data, so this won't fit there. Use shared RAM instead.
-volatile __far uint8_t payload[RPMSG_BUF_SIZE] __attribute__((cregister("SHARED_RAM", far), peripheral));
+// To be extra safe, this should be 512B (RPMSG_BUF_SIZE), but we dont' have
+// that much RAM to spare. For now, only message type is struct ev3_pru_tacho_msg,
+// so 64 bytes should be enough.
+static uint8_t payload[64];
 
 #define INTA GPIO.IN_DATA45_bit.GP5P11	// GPIO 5[11]
 #define INTB GPIO.IN_DATA45_bit.GP5P8	// GPIO 5[8]
@@ -154,9 +156,6 @@ int main(void) {
 	uint16_t src, dst, len;
 	uint16_t trigger_src = 0, trigger_dst = 0;
 	bool started = false;
-
-	// Set cregister index to match AM18xx_PRU.cmd
-	PRU0_CTRL.CONTABPROPTR1_bit.C30 = 0x1fc;
 
 	// Clear the status of the PRU-system event that the ARM will use to 'kick' us
 	PRU_INTC.STATIDXCLR_bit.INDEX = EVENT_FROM_ARM;

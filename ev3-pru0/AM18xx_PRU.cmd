@@ -45,11 +45,6 @@ MEMORY
 	USB0		: org = 0x01E00000 len = 0x00000100	CREGISTER=13
 	MCASP0_CTL	: org = 0x01D00000 len = 0x00001000	CREGISTER=25 /* indexed */
 
-	// IMPORTANT: PRU0_CTRL.CONTABPROPTR1_bit.C30 needs to be set to match
-	// this address before using it. We are only using a 512B region in the
-	// last 1K for the rpmsg buffer.
-	SHARED_RAM	: org = 0x8001FC00 len - 0x00000200	CREGISTER=30 /* indexed */
-
 	RSVD9		: org = 0x01D06000 len = 0x00000100	CREGISTER=9
 	RSVD10		: org = 0x01D0A000 len = 0x00000100	CREGISTER=10
 	RSVD16		: org = 0x01E12000 len = 0x00000100	CREGISTER=16
