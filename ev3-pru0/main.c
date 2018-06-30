@@ -27,10 +27,14 @@ enum ev3_pru_tacho_msg_type {
 };
 
 enum ev3_pru_tacho_iio_channel {
-	EV3_PRU_IIO_CH_TACHO_A,
-	EV3_PRU_IIO_CH_TACHO_B,
-	EV3_PRU_IIO_CH_TACHO_C,
-	EV3_PRU_IIO_CH_TACHO_D,
+	EV3_PRU_IIO_CH_TACHO_A_COUNT,
+	EV3_PRU_IIO_CH_TACHO_B_COUNT,
+	EV3_PRU_IIO_CH_TACHO_C_COUNT,
+	EV3_PRU_IIO_CH_TACHO_D_COUNT,
+	EV3_PRU_IIO_CH_TACHO_A_COUNT_TIME,
+	EV3_PRU_IIO_CH_TACHO_B_COUNT_TIME,
+	EV3_PRU_IIO_CH_TACHO_C_COUNT_TIME,
+	EV3_PRU_IIO_CH_TACHO_D_COUNT_TIME,
 	EV3_PRU_IIO_CH_TIMESTAMP_LOW,
 	EV3_PRU_IIO_CH_TIMESTAMP_HIGH,
 	NUM_EV3_PRU_IIO_CH
@@ -94,7 +98,9 @@ static uint8_t payload[64];
 static uint64_t timestamp;
 
 static uint8_t tacho_state[NUM_TACHO];
+static uint32_t tacho_prev_timestamp[NUM_TACHO];
 static uint32_t tacho_counts[NUM_TACHO];
+static uint32_t tacho_count_times[NUM_TACHO];
 
 static void update_tacho_state(enum tacho idx, uint8_t new_state)
 {
@@ -137,14 +143,23 @@ static void update_tacho_state(enum tacho idx, uint8_t new_state)
 
 	tacho_state[idx] = new_state;
 	tacho_counts[idx] += new_dir;
+
+	if (new_dir && new_state == 0x00 && !(tacho_counts[idx] & 0x4)) {
+		uint32_t now = TIMER64P0.TIM34;
+
+		tacho_count_times[idx] = now - tacho_prev_timestamp[idx];
+		tacho_prev_timestamp[idx] = now;
+	}
 }
 
 static void fill_msg_value(struct ev3_pru_tacho_msg *msg)
 {
-	msg->value[EV3_PRU_IIO_CH_TACHO_A] = tacho_counts[TACHO_A];
-	msg->value[EV3_PRU_IIO_CH_TACHO_B] = tacho_counts[TACHO_B];
-	msg->value[EV3_PRU_IIO_CH_TACHO_C] = tacho_counts[TACHO_C];
-	msg->value[EV3_PRU_IIO_CH_TACHO_D] = tacho_counts[TACHO_D];
+	int i;
+
+	for (i = TACHO_A; i < NUM_TACHO; i++) {
+		msg->value[EV3_PRU_IIO_CH_TACHO_A_COUNT + i] = tacho_counts[i];
+		msg->value[EV3_PRU_IIO_CH_TACHO_A_COUNT_TIME+ i] = tacho_count_times[i];
+	}
 	msg->value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
 	msg->value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
 }
