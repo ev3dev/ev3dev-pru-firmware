@@ -151,7 +151,7 @@ int main(void) {
 	uint16_t src, dst, len;
 
 	// Clear the status of the PRU-system event that the ARM will use to 'kick' us
-	PRU_INTC.STATIDXCLR_bit.INDEX = EVENT_FROM_ARM;
+	PRU_INTC.STATIDXCLR = EVENT_FROM_ARM;
 
 	// Wait until Linux gives us the OK that the driver is loaded
 	status = &resource_table.rpmsg_vdev.status;
@@ -172,7 +172,7 @@ int main(void) {
 		}
 
 		// clear the interrupt
-		PRU_INTC.STATIDXCLR_bit.INDEX = EVENT_FROM_ARM;
+		PRU_INTC.STATIDXCLR = EVENT_FROM_ARM;
 
 		// Receive all available messages, multiple messages can be sent per kick
 		while (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) {
