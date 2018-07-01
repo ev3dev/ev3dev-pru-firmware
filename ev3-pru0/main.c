@@ -15,42 +15,18 @@
 
 #include "resource_table.h"
 
-#define TRIGGER_PERIOD_MS 5
-
 /* from Linux */
 
 #define EV3_PRU_TACHO_RING_BUF_SIZE 1024 /* must be power of 2! */
 
 enum ev3_pru_tacho_msg_type {
-	/* Host > PRU: tell PRU to start sending update messages */
-	EV3_PRU_TACHO_MSG_START,
-	/* Host > PRU: tell PRU to stop sending update messages */
-	EV3_PRU_TACHO_MSG_STOP,
-	/* Host >< PRU: request updated values from PRU */
-	EV3_PRU_TACHO_MSG_REQ_ONE,
-	/* Host < PRU: receive updated values from PRU */
-	EV3_PRU_TACHO_MSG_UPDATE,
 	/* Host >< PRU: request memory map address of ring buffer data */
 	EV3_PRU_TACHO_MSG_DATA_ADDR,
 };
 
-enum ev3_pru_tacho_iio_channel {
-	EV3_PRU_IIO_CH_TACHO_A_COUNT,
-	EV3_PRU_IIO_CH_TACHO_B_COUNT,
-	EV3_PRU_IIO_CH_TACHO_C_COUNT,
-	EV3_PRU_IIO_CH_TACHO_D_COUNT,
-	EV3_PRU_IIO_CH_TACHO_A_COUNT_TIME,
-	EV3_PRU_IIO_CH_TACHO_B_COUNT_TIME,
-	EV3_PRU_IIO_CH_TACHO_C_COUNT_TIME,
-	EV3_PRU_IIO_CH_TACHO_D_COUNT_TIME,
-	EV3_PRU_IIO_CH_TIMESTAMP_LOW,
-	EV3_PRU_IIO_CH_TIMESTAMP_HIGH,
-	NUM_EV3_PRU_IIO_CH
-};
-
 struct ev3_pru_tacho_msg {
 	uint32_t type;
-	uint32_t value[NUM_EV3_PRU_IIO_CH];
+	uint32_t value;
 };
 
 enum ev3_pru_tacho {
@@ -90,9 +66,6 @@ enum direction {
 //#define EVENT_FROM_ARM	34
 //#define EVENT_TO_ARM	35
 
-// clock is 24MHz, so 24000 ticks/msec
-#define TRIGGER_PERIOD_TICKS (TRIGGER_PERIOD_MS * 24000)
-
 volatile uint32_t register __R31;
 
 // This is 512B (RPMSG_BUF_SIZE), so it won't fit in PRU RAM, so put it in shared RAM
@@ -110,12 +83,9 @@ volatile uint32_t register __R31;
 
 #define TACHO_STATE(x) ((INT##x << 1) | DIR##x)
 
-static uint64_t timestamp;
-
 static uint8_t tacho_state[NUM_EV3_PRU_TACHO];
 static uint32_t tacho_prev_timestamp[NUM_EV3_PRU_TACHO];
 static uint32_t tacho_counts[NUM_EV3_PRU_TACHO];
-static uint32_t tacho_count_times[NUM_EV3_PRU_TACHO];
 
 static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state)
 {
@@ -167,7 +137,6 @@ static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state)
 	if (new_dir || elapsed > (50 * 1000000 * 3 / 125)) {
 		uint32_t new_head = (REMOTE_DATA.head[idx] + 1) & (EV3_PRU_TACHO_RING_BUF_SIZE - 1);
 
-		tacho_count_times[idx] = elapsed;
 		tacho_prev_timestamp[idx] = now;
 
 		REMOTE_DATA.position[idx][new_head] = tacho_counts[idx];
@@ -176,25 +145,10 @@ static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state)
 	}
 }
 
-static void fill_msg_value(struct ev3_pru_tacho_msg *msg)
-{
-	int i;
-
-	for (i = EV3_PRU_TACHO_A; i < NUM_EV3_PRU_TACHO; i++) {
-		msg->value[EV3_PRU_IIO_CH_TACHO_A_COUNT + i] = tacho_counts[i];
-		msg->value[EV3_PRU_IIO_CH_TACHO_A_COUNT_TIME+ i] = tacho_count_times[i];
-	}
-	msg->value[EV3_PRU_IIO_CH_TIMESTAMP_LOW] = timestamp & 0xffffffff;
-	msg->value[EV3_PRU_IIO_CH_TIMESTAMP_HIGH] = timestamp >> 32;
-}
-
 int main(void) {
 	volatile uint8_t *status;
 	struct pru_rpmsg_transport transport;
-	uint32_t period_ticks, timestamp_ticks;
 	uint16_t src, dst, len;
-	uint16_t trigger_src = 0, trigger_dst = 0;
-	bool started = false;
 
 	// Clear the status of the PRU-system event that the ARM will use to 'kick' us
 	PRU_INTC.STATIDXCLR_bit.INDEX = EVENT_FROM_ARM;
@@ -206,39 +160,15 @@ int main(void) {
 	// TODO: should probably check return value here
 	pru_rpmsg_init(&transport, &resource_table.vring0, &resource_table.vring1, EVENT_TO_ARM, EVENT_FROM_ARM);
 
-	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, "ev3-tacho-rpmsg", trigger_src) != PRU_RPMSG_SUCCESS);
-
-	period_ticks = timestamp_ticks = TIMER64P0.TIM34;
+	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, "ev3-tacho-rpmsg", 0) != PRU_RPMSG_SUCCESS);
 
 	while (true) {
 		// wait for the ARM to kick us
 		while (!(__R31 & HOST_INT)) {
-			uint32_t now = TIMER64P0.TIM34;
-
-			// timestamp is basically converting timer from 32-bit to 64-bit
-			// REVISIT: could use an unused timer for ticks that are divisible by a power of 2
-			// then we could actually return nanoseconds so that users don't have to scale
-			timestamp += now - timestamp_ticks;
-			timestamp_ticks = now;
-
 			update_tacho_state(EV3_PRU_TACHO_A, TACHO_STATE(A));
 			update_tacho_state(EV3_PRU_TACHO_B, TACHO_STATE(B));
 			update_tacho_state(EV3_PRU_TACHO_C, TACHO_STATE(C));
 			update_tacho_state(EV3_PRU_TACHO_D, TACHO_STATE(D));
-
-			// send periodic updates when trigger has been started
-			if (now - period_ticks >= TRIGGER_PERIOD_TICKS) {
-				period_ticks += TRIGGER_PERIOD_TICKS;
-
-				if (started) {
-					struct ev3_pru_tacho_msg msg;
-
-					msg.type = EV3_PRU_TACHO_MSG_UPDATE;
-					fill_msg_value(&msg);
-
-					pru_rpmsg_send(&transport, trigger_src, trigger_dst, &msg, sizeof(msg));
-				}
-			}
 		}
 
 		// clear the interrupt
@@ -249,20 +179,8 @@ int main(void) {
 			struct ev3_pru_tacho_msg *msg = payload;
 
 			switch (msg->type) {
-			case EV3_PRU_TACHO_MSG_REQ_ONE:
-				fill_msg_value(msg);
-				pru_rpmsg_send(&transport, dst, src, msg, sizeof(*msg));
-				break;
-			case EV3_PRU_TACHO_MSG_START:
-				started = true;
-				trigger_src = dst;
-				trigger_dst = src;
-				break;
-			case EV3_PRU_TACHO_MSG_STOP:
-				started = false;
-				break;
 			case EV3_PRU_TACHO_MSG_DATA_ADDR:
-				msg->value[0] = REMOTE_DATA_ADDR;
+				msg->value = REMOTE_DATA_ADDR;
 				pru_rpmsg_send(&transport, dst, src, msg, sizeof(*msg));
 				break;
 			}
