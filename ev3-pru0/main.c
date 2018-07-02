@@ -157,8 +157,8 @@ int main(void) {
 	status = &resource_table.rpmsg_vdev.status;
 	while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK));
 
-	// TODO: should probably check return value here
-	pru_rpmsg_init(&transport, &resource_table.vring0, &resource_table.vring1, EVENT_TO_ARM, EVENT_FROM_ARM);
+	pru_virtqueue_init(&transport.virtqueue0, &resource_table.vring0, EVENT_TO_ARM, EVENT_FROM_ARM);
+	pru_virtqueue_init(&transport.virtqueue1, &resource_table.vring1, EVENT_TO_ARM, EVENT_FROM_ARM);
 
 	while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, "ev3-tacho-rpmsg", 0) != PRU_RPMSG_SUCCESS);
 
