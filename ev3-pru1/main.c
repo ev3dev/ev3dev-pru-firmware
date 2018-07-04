@@ -2111,7 +2111,7 @@ PRU_TO_HOST_INTERRUPT:
 // 	This routine performs the basic initialization and clearing of various registers for RX and loads the configuration info
 // 	from PRU RAM to registers for RX channel that is being serviced. It calculates and saves serializer and r_buf address mapped
 // 	to RX channel to RX context area so that each time it is not calculated again and is being directly read from TX Context Area
-//	and activates the RX serilizer if it is disabled.
+//	and activates the RX serializer if it is disabled.
 //========================================================================================================================================
 
 RxServiceRequestHndlr:
@@ -2265,7 +2265,7 @@ RxInterruptServiceRequestHndlr:
 //	LDI 	suart_ch_info.rx_context_addr, 0x90
 		suart_ch_info->rx_context_addr = 0x90;
 	}
-	// Search for the channel corresponding to serilizer number in scratch_reg4
+	// Search for the channel corresponding to serializer number in scratch_reg4
 //SERCH_ACTIVE_RX_CHN_RX:
 	do {
 //        ADD     scratch_reg1, suart_ch_info.curr_ch_offset, SUART_CH_TXRXCHNSTATUS_OFFSET
@@ -2760,7 +2760,7 @@ INCR_RCVD_CTRS:
 	suart_ch_regs->Chn_TxRxRepeatDoneCtr = 0;
 	*(uint16_t *)(suart_ch_info->curr_ch_base_addr + SUART_CH_TXRXREPEATDONECTR_OFFSET) = suart_ch_regs->Chn_TxRxRepeatDoneCtr;
 
-	// Read Bit Per Charater
+	// Read Bit Per Character
 //	AND    	scratch_reg2, suart_ch_regs.Chn_Config2, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK //0xF
 	scratch_reg2 = suart_ch_regs->Chn_Config2 & SUART_CH_CONFIG2_BITS_PER_CHAR_MASK;
 

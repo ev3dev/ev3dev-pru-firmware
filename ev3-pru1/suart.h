@@ -1,47 +1,10 @@
-//******************************************************************************
-//+--------------------------------------------------------------------------+**
-//|                            ****                                          |**
-//|                            ****                                          |**
-//|                            ******o***                                    |**
-//|                      ********_///_****                                   |**
-//|                      ***** /_//_/ ****                                   |**
-//|                       ** ** (__/ ****                                    |**
-//|                           *********                                      |**
-//|                            ****                                          |**
-//|                            ***                                           |**
-//|                                                                          |**
-//|         Copyright (c) 1998-2010 Texas Instruments Incorporated           |**
-//|                        ALL RIGHTS RESERVED                               |**
-//|                                                                          |**
-//| Permission is hereby granted to licensees of Texas Instruments           |**
-//| Incorporated (TI) products to use this computer program for the sole     |**
-//| purpose of implementing a licensee product based on TI products.         |**
-//| No other rights to reproduce, use, or disseminate this computer          |**
-//| program, whether in part or in whole, are granted.                       |**
-//|                                                                          |**
-//| TI makes no representation or warranties with respect to the             |**
-//| performance of this computer program, and specifically disclaims         |**
-//| any responsibility for any damages, special or consequential,            |**
-//| connected with the use of this program.                                  |**
-//|                                                                          |**
-//+--------------------------------------------------------------------------+**
-//*****************************************************************************/
-
-// file:   suart_pru_emu.hp
 //
-// brief:  Soft UART emulation using PRU/McASP0>
-//
-//
+// Based on: suart_pru_emu.hp
 //  (C) Copyright 2010, Texas Instruments, Inc
-//
-//  author     Jitendra Kumar
-//
-//  version    0.1     Created
-//
 
 
 //===========================================================================
-//		SUART MEMORY MAP FOR SINGLE PRU EMULATING 4 SOFT UART
+//	SUART MEMORY MAP FOR SINGLE PRU EMULATING 4 SOFT UART
 //===========================================================================
 
 
@@ -75,100 +38,34 @@
 //N O T E : IN ALL THE SECTION SOME OF THE BYTES ARE RESERVED FOR FUTURE PLACEHOLDER IF ANY
 
 //Data RAM Memory Scratch Context Area information
-//							START_ADDRESS		END_ADDRESS		SIZE
+//						START_ADDRESS	END_ADDRESS	SIZE
 //----------------------------------------------------------------------------------
 //CH0 @ (TX)
-//		Formated data saved at			0x090			0x0AF			32 Bytes
-//		Context information saved at		0x0B0			0x0BF			16 Bytes
+//		Formated data saved at		0x090		0x0AF		32 Bytes
+//		Context information saved at	0x0B0		0x0BF		16 Bytes
 //CH1 @ (RX)
-//		Context information saved at		0x0C0			0x0DF			32 Bytes
+//		Context information saved at	0x0C0		0x0DF		32 Bytes
 //CH2 @ (TX)
-//		Formated data saved at			0x0E0			0x0FF			32 Bytes
-//		Context information saved at		0x100			0x10F			16 Bytes
+//		Formated data saved at		0x0E0		0x0FF		32 Bytes
+//		Context information saved at	0x100		0x10F		16 Bytes
 //CH3 @ (RX)
-//		Context information saved at		0x110			0x12F			32 Bytes
+//		Context information saved at	0x110		0x12F		32 Bytes
 //CH4 @ (TX)
-//		Formated data saved at			0x130			0x14F			32 Bytes
-//		Context information saved at		0x150			0x15F			16 Bytes
+//		Formated data saved at		0x130		0x14F		32 Bytes
+//		Context information saved at	0x150		0x15F		16 Bytes
 //CH5 @ (RX)
-//		Context information saved at		0x160			0x17F			32 Bytes
+//		Context information saved at	0x160		0x17F		32 Bytes
 //CH6 @ (TX)
-//		Formated data saved at			0x180			0x19F			32 Bytes
-//		Context information saved at		0x1A0			0x1AF			16 Bytes
+//		Formated data saved at		0x180		0x19F		32 Bytes
+//		Context information saved at	0x1A0		0x1AF		16 Bytes
 //CH7 @ (RX)
-//		Context information saved at		0x1B0			0x1CF			32 Bytes
+//		Context information saved at	0x1B0		0x1CF		32 Bytes
 //
 // C A U T I O N:
 // This context information should be flush after completion of service request
 
-#ifndef _PRU_SUART_HP_
-#define _PRU_SUART_HP_
-
-//===========================================================================
-// *      Global Macro definitions       *
-//===========================================================================
-
-//
-// Macro definitions
-//
-
-#define CONST_PRUSSINTC C0
-#define CONST_PRUDRAM   C3
-#define CONST_HPI       C15
-#define CONST_DSPL2     C28
-#define CONST_L3RAM     C30
-#define CONST_DDR       C31
-
-#ifdef MCASP0
-#define MCASP_CONTROL  C25
-#endif
-
-#ifdef MCASP1
-#define MCASP_CONTROL	C26
-#endif
-
-// Address for the Constant table Programmable Pointer Register 0(CTPPR_0)
-#define CTPPR_0         0x7028
-// Address for the Constant table Programmable Pointer Register 1(CTPPR_1)
-#define CTPPR_1         0x702C
-
-//.macro  MOV32
-//.mparam dst, src
-//    LDI     dst.w0, src & 0xFFFF
-//    LDI     dst.w2, src >> 16
-//.endm
-//
-//.macro  LD32
-//.mparam dst,src
-//    LBBO    dst,src,#0x00,4
-//.endm
-//
-//.macro  LD16
-//.mparam dst,src
-//   LBBO    dst,src,#0x00,2
-//   //LBCO   dst, CONST_L3RAM, src, 2
-//.endm
-//
-//.macro  LD8
-//.mparam dst,src
-//    LBBO    dst,src,#0x00,1
-//.endm
-//
-//.macro ST32
-//.mparam src,dst
-//    SBBO    src,dst,#0x00,4
-//.endm
-//
-//.macro ST16
-//.mparam src,dst
-//    SBBO    src,dst,#0x00,2
-//.endm
-//
-//.macro ST8
-//.mparam src,dst
-//    SBBO    src,dst,#0x00,1
-//.endm
-
+#ifndef _PRU_SUART_H_
+#define _PRU_SUART_H_
 
 //===========================================================================
 // *     Global Register Assignments     *
@@ -225,125 +122,10 @@
 #define SYS_EVT_48			48
 #define SYS_EVT_49			49
 
-//===========================================================================
-// McASP Registers
-//===========================================================================
-#define MCASP_PFUNC		0x10
-#define MCASP_PDIR		0x14
-#define MCASP_PDOUT		0x18
-#define MCASP_PDIN		0x1c
-#define MCASP_PDSET		0x1c
-#define MCASP_PDCLR		0x20
-#define MCASP_GBLCTL		0x44
-
-#define MCASP_XGBLCTL		0xA0
-#define MCASP_XMASK		0xa4
-#define MCASP_XFMT		0xa8
-#define MCASP_AFSXCTL		0xac
-#define MCASP_ACLKXCTL  	0xb0
-#define MCASP_AHCLKXCTL 	0xb4
-#define MCASP_XTDM		0xb8
-#define MCASP_XINTCTL		0xBC
-#define MCASP_XSTAT		0xc0
-
-#define MCASP_RGBLCTL		0x60
-#define MCASP_RMASK		0x64
-#define MCASP_RFMT		0x68
-#define MCASP_AFSRCTL		0x6c
-#define MCASP_ACLKRCTL  	0x70
-#define MCASP_AHCLKRCTL 	0x74
-#define MCASP_RTDM		0x78
-#define MCASP_RINTCTL		0x7C
-#define MCASP_RSTAT		0x80
-
-#ifdef MCASP0
-#define MCASP_SRCTL_BASE	(0x01D00180)
-#endif
-
-#ifdef MCASP1
-#define MCASP_SRCTL_BASE	(0x01D04180)  // mcasp 1 omapl137
-#endif
-
-#define MCASP_SRCTL0		0x00
-#define MCASP_SRCTL1		0x04
-#define MCASP_SRCTL2		0x08
-#define MCASP_SRCTL3		0x0C
-#define MCASP_SRCTL4		0x10
-#define MCASP_SRCTL5		0x14
-#define MCASP_SRCTL6		0x18
-#define MCASP_SRCTL7		0x1C
-#define MCASP_SRCTL8		0x20
-#define MCASP_SRCTL9		0x24
-#define MCASP_SRCTL10		0x28
-#define MCASP_SRCTL11		0x2C
-#define MCASP_SRCTL12		0x30
-#define MCASP_SRCTL13		0x34
-#define MCASP_SRCTL14		0x38
-#define MCASP_SRCTL15		0x3C
-
-
-#ifdef MCASP0
-#define MCASP_XBUF_BASE		(0x01D00200)
-#endif
-
-#ifdef MCASP1
-#define MCASP_XBUF_BASE		(0x01D04200)   //mcasp 1 omapl137
-#endif
-
-#define MCASP_XBUF0			0x00
-#define MCASP_XBUF1			0x04
-#define MCASP_XBUF2			0x08
-#define MCASP_XBUF3			0x0C
-#define MCASP_XBUF4			0x10
-#define MCASP_XBUF5			0x14
-#define MCASP_XBUF6			0x18
-#define MCASP_XBUF7			0x1C
-#define MCASP_XBUF8			0x20
-#define MCASP_XBUF9			0x24
-#define MCASP_XBUF10			0x28
-#define MCASP_XBUF11			0x2C
-#define MCASP_XBUF12			0x30
-#define MCASP_XBUF13			0x34
-#define MCASP_XBUF14			0x38
-#define MCASP_XBUF15			0x3C
-
-#ifdef MCASP0
-#define MCASP_RBUF_BASE		(0x01D00280)
-#endif
-
-#ifdef MCASP1
-#define MCASP_RBUF_BASE		(0x01D04280)   // mcasp1 omapl137
-#endif
-
-#define MCASP_RBUF0			0x00
-#define MCASP_RBUF1			0x04
-#define MCASP_RBUF2			0x08
-#define MCASP_RBUF3			0x0C
-#define MCASP_RBUF4			0x10
-#define MCASP_RBUF5			0x14
-#define MCASP_RBUF6			0x18
-#define MCASP_RBUF7			0x1C
-#define MCASP_RBUF8			0x20
-#define MCASP_RBUF9			0x24
-#define MCASP_RBUF10			0x28
-#define MCASP_RBUF11			0x2C
-#define MCASP_RBUF12			0x30
-#define MCASP_RBUF13			0x34
-#define MCASP_RBUF14			0x38
-#define MCASP_RBUF15			0x3C
-
 //McASP SRCTL registers
 #define ASP_SRCTL_XRDY_BIT		4
 #define ASP_SRCTL_RRDY_BIT		5
 #define SUART_CTRL_SRCTL_BIT_SHIFT 	2
-
-//McASP XTAT registers
-#define ASP_XSTAT_XERR_BIT		8
-#define ASP_XSTAT_XUNDRN_BIT		0
-
-//McASP RTAT registers
-#define ASP_RSTAT_ROVRN_BIT		0
-#define ASP_RSTAT_RERR_BIT		8
 
 //===========================================================================
 //SUART Channel Registers
@@ -507,40 +289,6 @@
 #define PRE_SCALAR_16				0x10
 #define PRE_SCALAR_24				0x18
 
-//*************************** BIT INIEX *****************
-#define BIT_0              			0
-#define BIT_1              			1
-#define BIT_2              			2
-#define BIT_3              			3
-#define BIT_4              			4
-#define BIT_5              			5
-#define BIT_6              			6
-#define BIT_7              			7
-#define BIT_8              			8
-#define BIT_9              			9
-#define BIT_10              			10
-#define BIT_11             			11
-#define BIT_12              			12
-#define BIT_13             			13
-#define BIT_14             			14
-#define BIT_15             			15
-#define BIT_16             			16
-#define BIT_17             			17
-#define BIT_18              			18
-#define BIT_19              			19
-#define BIT_20              			20
-#define BIT_21              			21
-#define BIT_22              			22
-#define BIT_23             			23
-#define BIT_24              			24
-#define BIT_25              			25
-#define BIT_26              			26
-#define BIT_27             			27
-#define BIT_28              			28
-#define BIT_29              			29
-#define BIT_30              			30
-#define BIT_31              			31
-
 // Error interrupt mask
 #define  GLOBAL_ERR_INTR                    	9
 #define  FE_ERR_INTR_MASK			12
@@ -576,16 +324,8 @@
 // ***************************************
 
 //===========================================================================
-//				SUART GLOBAL CHANNEL STRUCTURE
+//		SUART GLOBAL CHANNEL STRUCTURE
 //===========================================================================
-//.struct Suart_Global
-//    .u16 intrMask
-//    .u16 intrStatus
-//    .u8  pru_id
-//    .u8  pru_rx_tx_mode
-//    .u8  pru_delay_cnt
-//    .u8  reserved
-//.ends
 
 typedef struct {
 	uint16_t intrMask;
@@ -598,19 +338,8 @@ typedef struct {
 
 
 //===========================================================================
-//				STRUCTURE TO SUART CHANNEL SPECIFIC REGISTER
+//		STRUCTURE TO SUART CHANNEL SPECIFIC REGISTER
 //===========================================================================
-//.struct Suart_Ch_Struct
-//    .u16 Chn_Cntrl
-//    .u16 Chn_Config1
-//    .u16 Chn_Config2
-//    .u8  Chn_TxRxStatus
-//    .u8  Chn_Status
-//    .u32 ch_TxRxData
-//    .u8  Chn_TxRxBytesDoneCtr
-//    .u8  Chn_TxRxBitsDoneCtr
-//    .u16  Chn_TxRxRepeatDoneCtr
-//.ends
 
 typedef struct {
 	uint16_t Chn_Cntrl;
@@ -625,14 +354,8 @@ typedef struct {
 } Suart_Ch_Struct;
 
 //===========================================================================
-//				CHANNEL INFORMATION STRUCTURE
+//		CHANNEL INFORMATION STRUCTURE
 //===========================================================================
-//.struct Suart_Ch_Info
-//    .u32 curr_ch_base_addr	//Making galata with 16bit, need to do something @NG use scratch register
-//    .u32 rx_context_addr
-//    .u16 curr_ch_offset
-//    .u8  ch_num
-//.ends
 
 typedef struct {
 	uint32_t curr_ch_base_addr;
@@ -642,15 +365,8 @@ typedef struct {
 } Suart_Ch_Info;
 
 //===========================================================================
-//				TX CONTEXT STRUCTURE
+//		TX CONTEXT STRUCTURE
 //===========================================================================
-//.struct Suart_Tx_Context
-//    .u32 asp_xsrctl_reg		//NG: avoid recalculation, save cycles ;-)
-//    .u32 asp_xbuf_reg		//NG: avoid recalculation, save cycles ;-)
-//    .u16 buff_addr		 //Formatted data base address: data RAM address
-//    .u8  buff_size		//Number of data format in the data RAM
-//    .u8  bitsLoaded
-//.ends
 
 typedef struct {
 	uint32_t asp_xsrctl_reg;		//NG: avoid recalculation, save cycles ;-)
@@ -661,26 +377,14 @@ typedef struct {
 } Suart_Tx_Context;
 
 //===========================================================================
-//				RX CONTEXT STRUCTURE
+//		RX CONTEXT STRUCTURE
 //===========================================================================
-//.struct Suart_Rx_Context
-//    .u32 asp_rbuf_reg
-//    .u32 asp_rsrctl_reg
-//    .u8  mcasp_shitf_correction
-//    .u8  reserved     //rxdata_buf		//to store the extracted data
-//    .u16 Chn_RxDataHoldReg;
-//    .u32 Chn_RxDataBitsHoldRegLow;
-//    .u32 Chn_RxDataBitsHoldRegHigh;
-//    .u16 rx_timeout_cntr
-//    .u8  sampling_bit_pos;
-//    .u8  false_start_flag
-//.ends
 
 typedef struct {
 	uint32_t asp_rbuf_reg;
 	uint32_t asp_rsrctl_reg;
-	uint8_t  mcasp_shitf_correction;
-	uint8_t  reserved;     //rxdata_buf		//to store the extracted data
+	uint8_t  reserved0;
+	uint8_t  reserved1;     //rxdata_buf		//to store the extracted data
 	uint16_t Chn_RxDataHoldReg;
 	uint32_t Chn_RxDataBitsHoldRegLow;
 	uint32_t Chn_RxDataBitsHoldRegHigh;
@@ -695,4 +399,4 @@ typedef struct {
 #define MCASP_TXRX_EVENT       	31
 #define PRU0_TO_PRU1_EVENT     	50
 
-#endif // _PRU_SUART_HP_
+#endif // _PRU_SUART_H_
