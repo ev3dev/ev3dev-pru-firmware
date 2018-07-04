@@ -689,45 +689,6 @@ typedef struct {
 	uint8_t  false_start_flag;
 } Suart_Rx_Context;
 
-//===========================================================================
-//				PRU Registers allocation
-//===========================================================================
-
-//.assign Suart_Global,	 	r2, r3, suart_global
-//.assign Suart_Ch_Struct, 	r4, *, suart_ch_regs
-//.assign Suart_Ch_Struct, 	r4, *, suart_tx_ch
-//.assign Suart_Ch_Info, 	r8, *, suart_ch_info
-//.assign Suart_Tx_Context, 	r11, *, tx_context
-//.assign Suart_Rx_Context, 	r11, *, rx_context
-
-//#define mcasp_rbuf_val		r19
-//#define	pZERO   		r20
-
-//#define	scratch_8bit_reg1	r21.b0
-//#define	scratch_8bit_reg2	r21.b1
-//#define	scratch_8bit_reg3	r21.b2
-//#define	scratch_8bit_reg4	r21.b3
-
-//Sharing - starts
-//#define scratch_reg1		r22
-//#define scratch_reg2		r23
-//#define scratch_reg3		r24
-//#define scratch_reg4		r25
-//#define scratch_reg5            r26
-//#define scratch_reg6            r27
-//#define scratch_reg7            r29
-
-//#define regVal			r24	//scratch_reg3
-//#define regOffset		r25	//scratch_reg4
-//Sharing - ends
-
-//#define MAX_RX_TIMEOUT_TRIES   	r1.w0
-
-//r28 used to hold the data
-//#define TX_DATA_reg	 	r28
-
-//#define hostEventStatus		r31
-#define hostEventStatus		__R31
 
 #define ARM_TO_PRU0_INT		30
 #define ARM_TO_PRU1_INT		31

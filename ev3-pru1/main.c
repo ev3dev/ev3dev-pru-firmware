@@ -1877,7 +1877,7 @@ CORE_LOOP:
 //CORE_LOOP_PRU0:
         // wait for the hostEventStatus to get set. Loop till then
 //        WBS     hostEventStatus, ARM_TO_PRU0_INT
-		while (!(hostEventStatus & (1U << ARM_TO_PRU0_INT))) { }
+		while (!(__R31 & (1U << ARM_TO_PRU0_INT))) { }
 
         // Read the PRUINTC register to know if the event is from ARM/DSP. If yes, then branch
 //        MOV   scratch_reg2, SRSR2_OFFSET
@@ -1897,7 +1897,7 @@ CORE_LOOP:
 //        WBS     hostEventStatus, ARM_TO_PRU1_INT
 //	LBCO 	scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4
 //	QBBC    CHN_SEARCH, scratch_reg1, BIT_5
-		while (!(hostEventStatus & (1U << ARM_TO_PRU1_INT))) { }
+		while (!(__R31 & (1U << ARM_TO_PRU1_INT))) { }
 		if (!MCASP0.XSTAT_bit.XDATA) goto CHN_SEARCH;
 
 	// Clear the event here and go to Transmit processing
