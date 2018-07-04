@@ -722,11 +722,9 @@ typedef struct {
 //Sharing - ends
 
 //#define MAX_RX_TIMEOUT_TRIES   	r1.w0
-uint16_t MAX_RX_TIMEOUT_TRIES;
 
 //r28 used to hold the data
 //#define TX_DATA_reg	 	r28
-uint16_t TX_DATA_reg;
 
 //#define hostEventStatus		r31
 #define hostEventStatus		__R31

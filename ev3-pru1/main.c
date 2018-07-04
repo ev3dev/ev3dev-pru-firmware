@@ -127,7 +127,7 @@ void locate_sr_xbuf_srctl(Suart_Ch_Struct *suart_ch_regs, Suart_Ch_Struct *suart
 // 	formats data the TX Data obtained from ARM/DSP by adding start and stop bit.
 //======================================================================================================================================
 //CHK_TX_DATA_FORMAT:
-void chk_tx_data_format(Suart_Ch_Struct *suart_ch_regs, Suart_Ch_Struct *suart_tx_ch, Suart_Tx_Context *tx_context)
+void chk_tx_data_format(Suart_Ch_Struct *suart_ch_regs, Suart_Ch_Struct *suart_tx_ch, Suart_Tx_Context *tx_context, uint32_t *TX_DATA_reg)
 {
 	uint32_t scratch_reg1;
 	uint32_t scratch_reg2;
@@ -208,15 +208,15 @@ void chk_tx_data_format(Suart_Ch_Struct *suart_ch_regs, Suart_Ch_Struct *suart_t
 	do {
 	//Load the data from the data pointer
 //	LD16	TX_DATA_reg, suart_tx_ch.ch_TXRXData
-		TX_DATA_reg = suart_tx_ch->ch_TxRxData;
+		*TX_DATA_reg = suart_tx_ch->ch_TxRxData;
 //        QBEQ    FORMAT_START_STOP, scratch_reg4, 0
 		if (!scratch_reg4) {
 
 //        AND     scratch_reg6, TX_DATA_reg, 0x1
 //        MOV     scratch_reg7, TX_DATA_reg
 //        MOV     scratch_reg5, scratch_8bit_reg1
-			scratch_reg6 = TX_DATA_reg & 0x1;
-			scratch_reg7 = TX_DATA_reg;
+			scratch_reg6 = *TX_DATA_reg & 0x1;
+			scratch_reg7 = *TX_DATA_reg;
 			scratch_reg5 = scratch_8bit_reg1;
 
 //PARITY_CALC:
@@ -241,25 +241,25 @@ void chk_tx_data_format(Suart_Ch_Struct *suart_ch_regs, Suart_Ch_Struct *suart_t
 //        QBEQ    SET_PARITY, scratch_reg6, 1
 			if (scratch_reg6 != 1) {
 //        CLR     TX_DATA_reg, TX_DATA_reg, scratch_8bit_reg1
-				TX_DATA_reg &= ~(1U << scratch_8bit_reg1);
+				*TX_DATA_reg &= ~(1U << scratch_8bit_reg1);
 //        JMP     FORMAT_START_STOP
 
 //SET_PARITY:
 			} else {
 //        SET     TX_DATA_reg, TX_DATA_reg, scratch_8bit_reg1
-				TX_DATA_reg |= (1U << scratch_8bit_reg1);
+				*TX_DATA_reg |= (1U << scratch_8bit_reg1);
 
 //FORMAT_START_STOP:
 			}
 		}
 //	LSL	    TX_DATA_reg, TX_DATA_reg, 1
 //	OR	    TX_DATA_reg, TX_DATA_reg, scratch_reg1
-		TX_DATA_reg <<= 1;
-		TX_DATA_reg |= scratch_reg1;
+		*TX_DATA_reg <<= 1;
+		*TX_DATA_reg |= scratch_reg1;
 
 	//store formated data into DATA RAM
 //	SBBO	TX_DATA_reg.w0, scratch_reg3, scratch_reg2, 2
-		*(uint16_t *)(scratch_reg3 + scratch_reg2) = TX_DATA_reg;
+		*(uint16_t *)(scratch_reg3 + scratch_reg2) = *TX_DATA_reg;
 
 	//Increment the formatted buffer address offset
 //	ADD 	scratch_reg2, scratch_reg2, 2
@@ -382,7 +382,7 @@ void load_tx_format_address(Suart_Ch_Info *suart_ch_info, Suart_Tx_Context *tx_c
 // This routine Prescales data bit to be transmitted into the TX_DATA_reg.w0 register
 //======================================================================================================================================
 
-void byte_loop(Suart_Ch_Struct *suart_ch_regs, uint32_t scratch_reg2, uint32_t scratch_reg3, uint8_t scratch_8bit_reg2)
+void byte_loop(Suart_Ch_Struct *suart_ch_regs, uint32_t scratch_reg2, uint32_t scratch_reg3, uint8_t scratch_8bit_reg2, uint32_t *TX_DATA_reg)
 {
 	uint32_t scratch_reg1;
 	uint32_t scratch_reg4;
@@ -400,7 +400,7 @@ BITS_LOOP:
 //	LSL 	scratch_reg4, scratch_reg4, scratch_8bit_reg2
 			scratch_reg4 <<= scratch_8bit_reg2;
 //	OR      TX_DATA_reg.w0, TX_DATA_reg.w0, scratch_reg4
-			TX_DATA_reg |= scratch_reg4;
+			*TX_DATA_reg |= scratch_reg4;
 //	ADD	    scratch_8bit_reg2, scratch_8bit_reg2, 1
 			scratch_8bit_reg2++;
 //	SUB     scratch_reg2, scratch_reg2, 1  				//INC Bytes loop counter
@@ -416,7 +416,7 @@ BITS_LOOP:
 }
 
 //PRESACLE_TX_DATA:
-void prescale_tx_data(Suart_Ch_Struct *suart_ch_regs, uint32_t scratch_reg3)
+void prescale_tx_data(Suart_Ch_Struct *suart_ch_regs, uint32_t scratch_reg3, uint32_t *TX_DATA_reg)
 {
 	uint32_t scratch_reg2;
 	uint8_t scratch_8bit_reg2;
@@ -426,9 +426,9 @@ void prescale_tx_data(Suart_Ch_Struct *suart_ch_regs, uint32_t scratch_reg3)
 //	XOR 	TX_DATA_reg.w0,TX_DATA_reg.w0,TX_DATA_reg.w0    //Clear TX_DATA_reg.w0
 	scratch_8bit_reg2 = 0;
 	scratch_reg2 = 16;
-	TX_DATA_reg = 0;
+	*TX_DATA_reg = 0;
 
-	byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2);
+	byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2, TX_DATA_reg);
 //.ret  // Return to PRESACLE_TX_DATA
 }
 
@@ -443,7 +443,7 @@ void prescale_tx_data(Suart_Ch_Struct *suart_ch_regs, uint32_t scratch_reg3)
 //======================================================================================================================================
 
 //TRANSMIT_PRESCALED_DATA:
-void transmit_prescaled_data(Suart_Tx_Context *tx_context)
+void transmit_prescaled_data(Suart_Tx_Context *tx_context, uint32_t *TX_DATA_reg)
 {
 	// Clear the under run error
 //	LBCO	scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4
@@ -458,7 +458,7 @@ void transmit_prescaled_data(Suart_Tx_Context *tx_context)
 	}
 	// Write Byte to X_BUF
 //	SBBO  	TX_DATA_reg.w0, tx_context.asp_xbuf_reg, #00, 4
-	tx_context->asp_xbuf_reg = TX_DATA_reg;
+	tx_context->asp_xbuf_reg = *TX_DATA_reg;
 
 //.ret   // return from Transmit Prescaled Data
 }
@@ -514,12 +514,14 @@ void load_rx_context_address(Suart_Ch_Info *suart_ch_info)
 
 // SUART_EMULATION:
 int main(void) {
+	uint16_t MAX_RX_TIMEOUT_TRIES;
 	Suart_Global suart_global;
 	Suart_Ch_Struct *suart_ch_regs;
 	Suart_Ch_Struct *suart_tx_ch;
 	Suart_Ch_Info *suart_ch_info;
 	Suart_Tx_Context *tx_context;
 	Suart_Rx_Context *rx_context;
+	uint8_t scratch_8bit_reg2;
 	uint32_t scratch_reg1;
 	uint32_t scratch_reg2;
 	uint32_t scratch_reg3;
@@ -528,7 +530,7 @@ int main(void) {
 	uint32_t scratch_reg6;
 	uint32_t scratch_reg7;
 	uint32_t mcasp_rbuf_val;
-	uint8_t scratch_8bit_reg2;
+	uint32_t TX_DATA_reg;
 
 	// Clear the ZERO Register r20
 	// XOR    pZERO, pZERO, pZERO
@@ -852,7 +854,7 @@ TxServiceReqHndlLoop:
 		TX_DATA_reg = scratch_reg3;
 
 //	CALL    TRANSMIT_PRESCALED_DATA
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 	// Increment the Chn_TxRxBytesDoneCtr bye one
 //	ADD 	suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1
@@ -879,10 +881,10 @@ TxServiceReqHndlLoop:
 			scratch_reg3 >>= 8;
 
 //	CALL    PRESACLE_TX_DATA
-			prescale_tx_data(suart_ch_regs, scratch_reg3);
+			prescale_tx_data(suart_ch_regs, scratch_reg3, &TX_DATA_reg);
 
 //	CALL 	TRANSMIT_PRESCALED_DATA
-			transmit_prescaled_data(tx_context);
+			transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	JMP     TX_DONE
 			goto TX_DONE;
@@ -892,10 +894,10 @@ TxServiceReqHndlLoop:
 //	AND 	scratch_reg3, scratch_reg3, 0x00FF
 //	CALL	PRESACLE_TX_DATA
 		scratch_reg3 &= 0xff;
-		prescale_tx_data(suart_ch_regs, scratch_reg3);
+		prescale_tx_data(suart_ch_regs, scratch_reg3, &TX_DATA_reg);
 
 //	CALL    TRANSMIT_PRESCALED_DATA
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 	// Write To RAM number of Bits Transmitted
 //	ADD		suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 8  	//8 bits transmitted
@@ -1082,7 +1084,7 @@ TxServiceReqHndlLoop:
         //if (bitsLoaded = 16),  TX_DATA_reg full
 //	CALL 	TRANSMIT_PRESCALED_DATA				  // TX_DATA_reg is full, transmit the data
 //	JMP     TxInterruptServiceRequestHndlr
-			transmit_prescaled_data(tx_context);
+			transmit_prescaled_data(tx_context, &TX_DATA_reg);
 			goto TxInterruptServiceRequestHndlr;
 
 	// transmit the bits from start bit that can be transmitted from present character that is to transmitted
@@ -1100,7 +1102,7 @@ TxServiceReqHndlLoop:
 //	CALL	BYTE_LOOP
 		TX_DATA_reg = 0;
 		scratch_8bit_reg2 = 0;
-		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2);
+		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2, &TX_DATA_reg);
 
 //	MOV	    scratch_reg1, 0x1  				// Repeat last bit by 1 time
 //                                                                // NOTE: OPTIMIZE THIS FOR NO REPEAT LATER
@@ -1126,7 +1128,7 @@ TxServiceReqHndlLoop:
 		} while (scratch_reg1 >= 1);
 
 //	CALL    TRANSMIT_PRESCALED_DATA
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	ADD 	suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 5    //Updating number of bits written
 //                                                                                           // 5 were completely written, 1 partial
@@ -1173,8 +1175,8 @@ TxServiceReqHndlLoop:
 
 //	CALL	PRESACLE_TX_DATA
 //        CALL    TRANSMIT_PRESCALED_DATA
-				prescale_tx_data(suart_ch_regs, scratch_reg3);
-				transmit_prescaled_data(tx_context);
+				prescale_tx_data(suart_ch_regs, scratch_reg3, &TX_DATA_reg);
+				transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	JMP 	CHK_TX_DONE
 
@@ -1186,10 +1188,10 @@ TxServiceReqHndlLoop:
 				scratch_reg3 &= 0xf;
 
 //	CALL	PRESACLE_TX_DATA
-				prescale_tx_data(suart_ch_regs, scratch_reg3);
+				prescale_tx_data(suart_ch_regs, scratch_reg3, &TX_DATA_reg);
 
 // 	CALL    TRANSMIT_PRESCALED_DATA
-				transmit_prescaled_data(tx_context);
+				transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 	// Check all bits have been transmitted
 //CHK_TX_DONE:
@@ -1217,8 +1219,8 @@ TxServiceReqHndlLoop:
 //	CALL	PRESACLE_TX_DATA
 //   	CALL    TRANSMIT_PRESCALED_DATA
 		scratch_reg3 &= 0xf;
-		prescale_tx_data(suart_ch_regs, scratch_reg3);
-		transmit_prescaled_data(tx_context);
+		prescale_tx_data(suart_ch_regs, scratch_reg3, &TX_DATA_reg);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 	//Updating number of bits written
 //	ADD 	suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 4
@@ -1388,7 +1390,7 @@ SET_BIT_BIT:
 			} while (tx_context->bitsLoaded < 16);
 //	CALL 	TRANSMIT_PRESCALED_DATA				  // TX_DATA_reg is full, transmit the data
 //	JMP     TxInterruptServiceRequestHndlr
-			transmit_prescaled_data(tx_context);
+			transmit_prescaled_data(tx_context, &TX_DATA_reg);
 			goto TxInterruptServiceRequestHndlr;
 
 	// transmit the bits from start bit that can be transmitted from present character that is to transmitted
@@ -1403,7 +1405,7 @@ SET_BIT_BIT:
 		scratch_reg2 = 12;
 		TX_DATA_reg = 0;
 		scratch_8bit_reg2 = 0;
-		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2);
+		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2, &TX_DATA_reg);
 
 //	MOV	    scratch_reg1, 0x4  				// Repeat last bit by 4 times
 		scratch_reg1 = 0x4;
@@ -1427,7 +1429,7 @@ SET_BIT_BIT:
 		} while (scratch_reg1 >= 1);
 
 //	CALL    TRANSMIT_PRESCALED_DATA
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	ADD 	suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 2    //Updating number of bits written
 	// Write To RAM number of Bits Transmitted
@@ -1466,7 +1468,7 @@ SET_BIT_BIT:
 //	XOR     scratch_8bit_reg2, scratch_8bit_reg2, scratch_8bit_reg2
 		scratch_8bit_reg2 = 0;
 //	CALL	BYTE_LOOP
-		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2);
+		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2, &TX_DATA_reg);
 
 //	AND     scratch_reg2, scratch_reg2, 0x1				//copy the next bit to prescaled
 		scratch_reg2 = scratch_reg2 & 0x1;
@@ -1486,7 +1488,7 @@ SET_BIT_BIT:
 		} while (scratch_reg1 >= 1);
 
 //   	CALL 	TRANSMIT_PRESCALED_DATA
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	ADD 	suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1    //Updating number of bits written
 	// Write To RAM number of Bits Transmitted
@@ -1527,10 +1529,10 @@ SET_BIT_BIT:
 //        XOR     scratch_8bit_reg2, scratch_8bit_reg2, scratch_8bit_reg2
 		scratch_8bit_reg2 = 0;
 //	CALL	BYTE_LOOP
-		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2);
+		byte_loop(suart_ch_regs, scratch_reg2, scratch_reg3, scratch_8bit_reg2, &TX_DATA_reg);
 
 //	CALL 	TRANSMIT_PRESCALED_DATA
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	ADD 	suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1   //Updating number of bits written
 	// Write To RAM number of Bits Transmitted
@@ -1603,7 +1605,7 @@ SET_BIT_BIT:
 
 
 //	CALL 	TRANSMIT_PRESCALED_DATA
-			transmit_prescaled_data(tx_context);
+			transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 	// Write To RAM number of Bits Transmitted
 //	SBBO    suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, SIZE (suart_ch_regs.Chn_TxRxBitsDoneCtr)
@@ -1626,7 +1628,7 @@ SET_BIT_BIT:
 		scratch_reg2 = 0x10;
 		scratch_8bit_reg2 = 0;
 		bits_loop();
-		transmit_prescaled_data(tx_context);
+		transmit_prescaled_data(tx_context, &TX_DATA_reg);
 
 //	ADD 	suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 16 // Update number of bits written
 	// Write To RAM number of Bits Repeated
@@ -1673,7 +1675,7 @@ LOAD_TX_COMMON_INFO:
 //LOCATE_SR_XBUF_SRCTL_DONE:
 	// Format the data if required
 //	JMP    	CHK_TX_DATA_FORMAT
-	chk_tx_data_format(suart_ch_regs, suart_tx_ch, tx_context);
+	chk_tx_data_format(suart_ch_regs, suart_tx_ch, tx_context, &TX_DATA_reg);
 
 //CHK_TX_DATA_FORMAT_DONE:
 //	JMP     ENABLE_TX_SERIALIZER
