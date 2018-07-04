@@ -214,18 +214,18 @@ typedef struct {
     union {
         volatile uint32_t GBLCTL;
         struct {
-            unsigned RCLKRST : 1;
-            unsigned RHCLKRST : 1;
-            unsigned RSRCLR : 1;
-            unsigned RSMRST : 1;
-            unsigned RFRST : 1;
-            unsigned RESERVED_5 : 3;
-            unsigned XCLKRST : 1;
-            unsigned XHCLKRST : 1;
-            unsigned XSRCLR : 1;
-            unsigned XSMRST : 1;
-            unsigned XFRST : 1;
-            unsigned RESERVED_13 : 19;
+            unsigned RCLKRST : 1;	// bit 0
+            unsigned RHCLKRST : 1;	// bit 1
+            unsigned RSRCLR : 1;	// bit 2
+            unsigned RSMRST : 1;	// bit 3
+            unsigned RFRST : 1;		// bit 4
+            unsigned RESERVED_5 : 3;	// bit 5-7
+            unsigned XCLKRST : 1;	// bit 8
+            unsigned XHCLKRST : 1;	// bit 9
+            unsigned XSRCLR : 1;	// bit 10
+            unsigned XSMRST : 1;	// bit 11
+            unsigned XFRST : 1;		// bit 12
+            unsigned RESERVED_13 : 19;	// bit 13-32
         } GBLCTL_bit;
     }; // 0x44
     union {
@@ -269,18 +269,18 @@ typedef struct {
     union {
         volatile uint32_t RGBLCTL;
         struct {
-            unsigned RCLKRST : 1;
-            unsigned RHCLKRST : 1;
-            unsigned RSRCLR : 1;
-            unsigned RSMRST : 1;
-            unsigned RFRST : 1;
-            unsigned RESERVED_5 : 3;
-            unsigned XCLKRST : 1;
-            unsigned XHCLKRST : 1;
-            unsigned XSRCLR : 1;
-            unsigned XSMRST : 1;
-            unsigned XFRST : 1;
-            unsigned RESERVED_13 : 19;
+            unsigned RCLKRST : 1;	// bit 0
+            unsigned RHCLKRST : 1;	// bit 1
+            unsigned RSRCLR : 1;	// bit 2
+            unsigned RSMRST : 1;	// bit 3
+            unsigned RFRST : 1;		// bit 4
+            unsigned RESERVED_5 : 3;	// bit 5-7
+            unsigned XCLKRST : 1;	// bit 8
+            unsigned XHCLKRST : 1;	// bit 9
+            unsigned XSRCLR : 1;	// bit 10
+            unsigned XSMRST : 1;	// bit 11
+            unsigned XFRST : 1;		// bit 12
+            unsigned RESERVED_13 : 19;	// bit 13-32
         } RGBLCTL_bit;
     }; // 0x60
     union {
@@ -419,16 +419,16 @@ typedef struct {
     union {
         volatile uint32_t RSTAT;
         struct {
-            unsigned ROVRN : 1;
-            unsigned RSYNCERR : 1;
-            unsigned RCKFAIL : 1;
-            unsigned RTDMSLOT : 1;
-            unsigned RLAST : 1;
-            unsigned RDATA : 1;
-            unsigned RSTAFRM : 1;
-            unsigned RDMAERR : 1;
-            unsigned RERR : 1;
-            unsigned RESERVED_9 : 23;
+            unsigned ROVRN : 1;		// bit 0
+            unsigned RSYNCERR : 1;	// bit 1
+            unsigned RCKFAIL : 1;	// bit 2
+            unsigned RTDMSLOT : 1;	// bit 3
+            unsigned RLAST : 1;		// bit 4
+            unsigned RDATA : 1;		// bit 5
+            unsigned RSTAFRM : 1;	// bit 6
+            unsigned RDMAERR : 1;	// bit 7
+            unsigned RERR : 1;		// bit 8
+            unsigned RESERVED_9 : 23;	// bit 9-32
         } RSTAT_bit;
     }; // 0x80
     union {
@@ -459,18 +459,18 @@ typedef struct {
     union {
         volatile uint32_t XGBLCTL;
         struct {
-            unsigned RCLKRST : 1;
-            unsigned RHCLKRST : 1;
-            unsigned RSRCLR : 1;
-            unsigned RSMRST : 1;
-            unsigned RFRST : 1;
-            unsigned RESERVED_5 : 3;
-            unsigned XCLKRST : 1;
-            unsigned XHCLKRST : 1;
-            unsigned XSRCLR : 1;
-            unsigned XSMRST : 1;
-            unsigned XFRST : 1;
-            unsigned RESERVED_13 : 19;
+            unsigned RCLKRST : 1;	// bit 0
+            unsigned RHCLKRST : 1;	// bit 1
+            unsigned RSRCLR : 1;	// bit 2
+            unsigned RSMRST : 1;	// bit 3
+            unsigned RFRST : 1;		// bit 4
+            unsigned RESERVED_5 : 3;	// bit 5-7
+            unsigned XCLKRST : 1;	// bit 8
+            unsigned XHCLKRST : 1;	// bit 9
+            unsigned XSRCLR : 1;	// bit 10
+            unsigned XSMRST : 1;	// bit 11
+            unsigned XFRST : 1;		// bit 12
+            unsigned RESERVED_13 : 19;	// bit 13-32
         } XGBLCTL_bit;
     }; // 0xa0
     union {
@@ -608,16 +608,16 @@ typedef struct {
     union {
         volatile uint32_t XSTAT;
         struct {
-            unsigned XUNDRN : 1;
-            unsigned XSYNCERR : 1;
-            unsigned XCKFAIL : 1;
-            unsigned XTDMSLOT : 1;
-            unsigned XLAST : 1;
-            unsigned XDATA : 1;
-            unsigned XSTAFRM : 1;
-            unsigned XDMAERR : 1;
-            unsigned XERR : 1;
-            unsigned RESERVED_9 : 23;
+            unsigned XUNDRN : 1;	// bit 0
+            unsigned XSYNCERR : 1;	// bit 1
+            unsigned XCKFAIL : 1;	// bit 2
+            unsigned XTDMSLOT : 1;	// bit 3
+            unsigned XLAST : 1;		// bit 4
+            unsigned XDATA : 1;		// bit 5
+            unsigned XSTAFRM : 1;	// bit 6
+            unsigned XDMAERR : 1;	// bit 7
+            unsigned XERR : 1;		// bit 8
+            unsigned RESERVED_9 : 23;	// bit 9-32
         } XSTAT_bit;
     }; // 0xc0
     union {
