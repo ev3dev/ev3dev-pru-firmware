@@ -121,7 +121,7 @@ struct pru1_resource_table resourceTable = {
 	},
 
 	.pru_ints = {
-		.type = TYPE_CUSTOM,
+		.type = TYPE_POSTLOAD_VENDOR,
 		.sub_type = TYPE_PRU_INTS,
 		.rsc_size = sizeof(struct fw_rsc_custom_ints),
 		.rsc.pru_ints = {
