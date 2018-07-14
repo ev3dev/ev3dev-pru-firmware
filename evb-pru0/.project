@@ -3,6 +3,7 @@
 	<name>evb-pru0</name>
 	<comment></comment>
 	<projects>
+		<project>rpmsg_lib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
