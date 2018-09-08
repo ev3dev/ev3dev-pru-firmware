@@ -37,10 +37,19 @@ enum ev3_pru_tacho {
 	NUM_EV3_PRU_TACHO
 };
 
+enum ev3_pru_pwm {
+	EV3_PRU_PWM_0,
+	EV3_PRU_PWM_1,
+	EV3_PRU_PWM_2,
+	EV3_PRU_PWM_3,
+	NUM_EV3_PRU_PWM
+};
+
 struct ev3_pru_tacho_remote_data {
 	uint32_t position[NUM_EV3_PRU_TACHO][EV3_PRU_TACHO_RING_BUF_SIZE];
 	uint32_t timestamp[NUM_EV3_PRU_TACHO][EV3_PRU_TACHO_RING_BUF_SIZE];
 	uint32_t head[NUM_EV3_PRU_TACHO];
+	uint8_t pwm[NUM_EV3_PRU_PWM];
 };
 
 /* end Linux */
@@ -88,11 +97,11 @@ static uint8_t tacho_state[NUM_EV3_PRU_TACHO];
 static uint32_t tacho_prev_timestamp[NUM_EV3_PRU_TACHO];
 static uint32_t tacho_counts[NUM_EV3_PRU_TACHO];
 
-static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state)
+static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state, uint32_t now)
 {
 	uint8_t current_state = tacho_state[idx] & 0x3;
 	enum direction new_dir = UNKNOWN;
-	uint32_t now, elapsed;
+	uint32_t elapsed;
 
 	switch (current_state) {
 		case 0x0:
@@ -131,7 +140,6 @@ static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state)
 	tacho_state[idx] = new_state;
 	tacho_counts[idx] += new_dir;
 
-	now = TIMER64P0.TIM34;
 	elapsed = now - tacho_prev_timestamp[idx];
 
 	// if there was a change in count or if count hasn't changed for 50ms
@@ -146,7 +154,18 @@ static void update_tacho_state(enum ev3_pru_tacho idx, uint8_t new_state)
 	}
 }
 
-int main(void) {
+static void update_pwm(enum ev3_pru_pwm pwm, uint8_t pwm_count, uint32_t gpio_flags)
+{
+	if (pwm_count < REMOTE_DATA.pwm[pwm]) {
+		GPIO.SET_DATA67 = gpio_flags;
+	}
+	else {
+		GPIO.CLR_DATA67 = gpio_flags;
+	}
+}
+
+int main(void)
+{
 	volatile uint8_t *status;
 	struct pru_rpmsg_transport transport;
 	uint16_t src, dst, len;
@@ -166,10 +185,23 @@ int main(void) {
 	while (true) {
 		// wait for the ARM to kick us
 		while (!(__R31 & HOST_INT)) {
-			update_tacho_state(EV3_PRU_TACHO_A, TACHO_STATE(A));
-			update_tacho_state(EV3_PRU_TACHO_B, TACHO_STATE(B));
-			update_tacho_state(EV3_PRU_TACHO_C, TACHO_STATE(C));
-			update_tacho_state(EV3_PRU_TACHO_D, TACHO_STATE(D));
+			uint32_t now = TIMER64P0.TIM34;
+			uint8_t pwm_count;
+
+			update_tacho_state(EV3_PRU_TACHO_A, TACHO_STATE(A), now);
+			update_tacho_state(EV3_PRU_TACHO_B, TACHO_STATE(B), now);
+			update_tacho_state(EV3_PRU_TACHO_C, TACHO_STATE(C), now);
+			update_tacho_state(EV3_PRU_TACHO_D, TACHO_STATE(D), now);
+
+			// this gives us a PWM period of 366Hz with a max duty
+			// cycle of 256 counts (24MHz / 256 / 256)
+			pwm_count = now >> 8;
+
+			// update PWM outputs
+			update_pwm(EV3_PRU_PWM_0, pwm_count, 1 << 13);	// LED0, GPIO 6[13]
+			update_pwm(EV3_PRU_PWM_1, pwm_count, 1 << 7);	// LED1, GPIO 6[7]
+			update_pwm(EV3_PRU_PWM_2, pwm_count, 1 << 14);	// LED2, GPIO 6[14]
+			update_pwm(EV3_PRU_PWM_3, pwm_count, 1 << 12);	// LED3, GPIO 6[12]
 		}
 
 		// clear the interrupt
