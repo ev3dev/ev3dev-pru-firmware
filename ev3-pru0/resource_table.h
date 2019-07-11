@@ -83,14 +83,14 @@ struct custom_resource_table resource_table = {
 		.reserved = { 0, 0 },
 	},
 	.vring0 = {
-		.da       = 0,	//will be populated by host
+		.da       = FW_RSC_ADDR_ANY, //will be populated by host
 		.align    = 16,
 		.num      = 16,	// must be power of 2
 		.notifyid = 0,	//will be populated by host
 		.reserved = 0,
 	},
 	.vring1 = {
-		.da       = 0,	//will be populated by host
+		.da       = FW_RSC_ADDR_ANY, //will be populated by host
 		.align    = 16,
 		.num      = 16,	// must be power of 2
 		.notifyid = 0,	//will be populated by host

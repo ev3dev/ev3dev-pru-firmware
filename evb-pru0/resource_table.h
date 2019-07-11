@@ -106,14 +106,14 @@ struct pru0_resource_table resource_table = {
 	},
 	/* the two vrings */
 	.rpmsg_vring0 = {
-		.da       = 0,                      //will be populated by host, can't pass it in
+		.da       = FW_RSC_ADDR_ANY,        //will be populated by host, can't pass it in
 		.align    = 16,                     //(bytes),
 		.num      = PRU_RPMSG_VQ0_SIZE,     //num of descriptors
 		.notifyid = 0,                      //will be populated, can't pass right now
 		.reserved = 0,
 	},
 	.rpmsg_vring1 = {
-		.da       = 0,                      //will be populated by host, can't pass it in
+		.da       = FW_RSC_ADDR_ANY,        //will be populated by host, can't pass it in
 		.align    = 16,                     //(bytes),
 		.num      = PRU_RPMSG_VQ1_SIZE,     //num of descriptors
 		.notifyid = 0,                      //will be populated, can't pass right now
