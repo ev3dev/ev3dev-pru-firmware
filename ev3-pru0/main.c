@@ -124,11 +124,12 @@
 // Address for the Constant table Programmable Pointer Register 1(CTPPR_1)
 #define CTPPR_1         0x702C
 
-// .macro  MOV32
-// .mparam dst, src
-//     LDI     dst.w0, src & 0xFFFF
-//     LDI     dst.w2, src >> 16
-// .endm
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
+#define MOV32(dst, src) \
+	asm(" LDI " STR(dst) ".w0, " STR(src) " & 0xFFFF"); \
+	asm(" LDI " STR(dst) ".w2, " STR(src) " >> 16")
 
 // .macro  LD32
 // .mparam dst,src
@@ -651,8 +652,7 @@ int main(void) {
 	asm(" QBBC     tx_asp_init3, r22, 8");
 
 	// Before starting, clear the respective transmitter and receiver status registers by writing 0xffff
-	asm(" LDI      r23.w0, 0xffff & 0xFFFF");
-	asm(" LDI      r23.w2, 0xffff >> 16");
+	MOV32(r23, 0xffff);
 	asm(" SBCO     &r23, C25, 0xc0, 2");
 
 	// Activate serializer, XSRCLR
@@ -1363,16 +1363,14 @@ int main(void) {
 	asm(" LDI      r25, 0x20");
 
 	// Calculating the specific SRCTL register offset
-	asm(" LDI      R11.w0, (0x01D00180) & 0xFFFF");
-	asm(" LDI      R11.w2, (0x01D00180) >> 16");
+	MOV32(R11, 0x01D00180);
 	asm(" ADD      R11, R11, r22");
 
 	asm(" ADD      r23, r25, 0");
 	asm(" SBBO     &R11, r24, r23,  4");
 
 	// Calculating the specific xbuf register offset
-	asm(" LDI      R12.w0, (0x01D00200) & 0xFFFF");
-	asm(" LDI      R12.w2, (0x01D00200) >> 16");
+	MOV32(R12, 0x01D00200);
 	asm(" ADD      R12, R12, r22");
 
 	asm(" ADD      r23, r25, 4");
@@ -1726,14 +1724,12 @@ int main(void) {
 	asm(" WBS      r31, 30");
 
 	// Read the PRUINTC register to know if the event is from ARM/DSP. If yes, then branch
-	asm(" LDI      r23.w0, 0x204 & 0xFFFF");
-	asm(" LDI      r23.w2, 0x204 >> 16");
+	MOV32(r23, 0x204);
 	asm(" LBCO     &r22, C0, r23, 4");
 	asm(" QBBS     CHN_SEARCH, r22, 0");
 
 	// Else it is McASP Event. So before proceeding, clear it
-	asm(" LDI      r22.w0, 31 & 0xFFFF");
-	asm(" LDI      r22.w2, 31 >> 16");
+	MOV32(r22, 31);
 	asm(" SBCO     &r22, C0, 0x24, 4");
 
 	asm(" JMP      MCASP_EVENT");
@@ -1746,8 +1742,7 @@ int main(void) {
 	asm(" QBBC     CHN_SEARCH, r22, 5");
 
 	// Clear the event here and go to Transmit processing
-	asm(" LDI      r22.w0, 50 & 0xFFFF");
-	asm(" LDI      r22.w2, 50 >> 16");
+	MOV32(r22, 50);
 	asm(" SBCO     &r22, C0, 0x24, 4");
 	asm(" JMP      TxInterruptServiceRequestHndlr");
 
@@ -1760,8 +1755,7 @@ int main(void) {
 	asm(" QBNE     RX_TX_PROCESS, R3.b1, 0x2");
 	asm(" LBCO     &r22, C25, 0xc0, 4");
 	asm(" QBBC     RX_TX_PROCESS, r22, 5");
-	asm(" LDI      r22.w0, 50 & 0xFFFF");
-	asm(" LDI      r22.w2, 50 >> 16");
+	MOV32(r22, 50);
 	asm(" SBCO     &r22, C0, 0x20, 4");
 
 	asm("RX_TX_PROCESS:");
@@ -1789,11 +1783,9 @@ int main(void) {
 //========================================================================================================================================
 
 	asm("CHN_SEARCH:");
-	asm(" LDI      r24.w0, 0x00000001 & 0xFFFF");
-	asm(" LDI      r24.w2, 0x00000001 >> 16");
+	MOV32(r24, 0x1);
 	asm(" LSL      r24, r24, R3.b0");
-	asm(" LDI      r22.w0, 0x284 & 0xFFFF");
-	asm(" LDI      r22.w2, 0x284 >> 16");
+	MOV32(r22, 0x284);
 	asm(" SBCO     &r24, C0, r22, 4");
 
 	// Read Global control register
@@ -1955,16 +1947,14 @@ int main(void) {
 	asm(" AND      r22, R4.b1, 0x0F");
 	asm(" LSL      r22, r22, 2");
 	// Storing SRCTL register address in RX Context Area Region
-	asm(" LDI      R12.w0, (0x01D00180) & 0xFFFF");
-	asm(" LDI      R12.w2, (0x01D00180) >> 16");
+	MOV32(R12, 0x01D00180);
 	asm(" ADD      R12, R12, r22");
 
 	//storing asp_rsrctl_reg in RX Context Address Region
 	asm(" SBBO     &R12, R9, 4,  4");
 
 	// Store RBuf Address in RX Context Region
-	asm(" LDI      R11.w0, (0x01D00280) & 0xFFFF");
-	asm(" LDI      R11.w2, (0x01D00280) >> 16");
+	MOV32(R11, 0x01D00280);
 	asm(" ADD      R11, R11, r22");
 
 	// storing asp_rbuf_reg in RX context  adress region
@@ -1983,14 +1973,12 @@ int main(void) {
 	// Check if Serializer is Already Active as Rx if ,yes skip activation
 	asm(" QBEQ     CLR_RSTAT, r23, 0x2");
 	//  Activate serializer as Receiver
-	asm(" LDI      r23.w0, 0x000E & 0xFFFF");
-	asm(" LDI      r23.w2, 0x000E >> 16");
+	MOV32(r23, 0x000E);
 	asm(" SBBO     &r23, R12, 0, 4");
 
 	asm("CLR_RSTAT:");
 	// Clear the RSTAT  (Overrun, etc)
-	asm(" LDI      r22.w0, 0xFFFF & 0xFFFF");
-	asm(" LDI      r22.w2, 0xFFFF >> 16");
+	MOV32(r22, 0xFFFF);
 	asm(" SBCO     &r22, C25, 0x80, 4");
 
 	asm(" JMP      MCASP_EVENT");
@@ -2078,8 +2066,7 @@ int main(void) {
 	asm(" LBCO     &r22, C25, 0x80, 4");
 	asm(" QBBC     RX_PROCESSING_INIT, r22, 8");
 
-	asm(" LDI      r22.w0, 0xFFFF & 0xFFFF");
-	asm(" LDI      r22.w2, 0xFFFF >> 16");
+	MOV32(r22, 0xFFFF);
 	asm(" SBCO     &r22, C25, 0x80, 4");
 
 	//  Start receving DATA from MAC_ASP's R-Buf corresponding to channel
@@ -2574,8 +2561,7 @@ int main(void) {
 	asm(" SET      R5.b2, R5.b2, 1");
 
 	asm("CHK_RX_OVERRUN:");
-	asm(" LDI      r23.w0, 0x284 & 0xFFFF");
-	asm(" LDI      r23.w2, 0x284 >> 16");
+	MOV32(r23, 0x284);
 	asm(" LBCO     &r22, C0, r23, 4");
 	asm(" ADD      r23, R10.b2, 2");
 	asm(" ADD      r23, R10.b2, 2");
