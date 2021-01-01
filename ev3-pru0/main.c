@@ -47,164 +47,162 @@
 
 
 int main(void) {
-	asm (
-			"SUART_EMULATION:                                                    \n"
-			// Clear the ZERO Register r20
-			"    XOR      r20, r20, r20                                          \n"
+	asm("SUART_EMULATION:");
+	// Clear the ZERO Register r20
+	asm(" XOR      r20, r20, r20");
 
-			//--------------------- McASP TX Initialization - Starts ----------------
+	//--------------------- McASP TX Initialization - Starts ----------------
 
-			// activate clocks, serializers, state machine and frame sync
-			"tx_asp_init1:                                                       \n"
-			// Activate the high-transmit clock XHCLKRST
-			"    LBCO     &r22, C25, 0xA0, 4                                     \n"
-			"    SET      r22, r22, 9                                            \n"
-			"    SBCO     &r22, C25, 0xA0, 4                                     \n"
+	// activate clocks, serializers, state machine and frame sync
+	asm("tx_asp_init1:");
+	// Activate the high-transmit clock XHCLKRST
+	asm(" LBCO     &r22, C25, 0xA0, 4");
+	asm(" SET      r22, r22, 9");
+	asm(" SBCO     &r22, C25, 0xA0, 4");
 
-			"tx_asp_init2:                                                       \n"
-			"    LBCO     &r22, C25, 0xA0, 4                                     \n"
-			"    QBBC     tx_asp_init2, r22, 9                                   \n"
+	asm("tx_asp_init2:");
+	asm(" LBCO     &r22, C25, 0xA0, 4");
+	asm(" QBBC     tx_asp_init2, r22, 9");
 
-			//Activate the transmit frequency clock XCLKRST
-			"    SET      r22, r22, 8                                            \n"
-			"    SBCO     &r22, C25, 0xA0, 4                                     \n"
+	//Activate the transmit frequency clock XCLKRST
+	asm(" SET      r22, r22, 8");
+	asm(" SBCO     &r22, C25, 0xA0, 4");
 
-			"tx_asp_init3:                                                       \n"
-			"    LBCO     &r22, C25, 0xA0, 4                                     \n"
-			"    QBBC     tx_asp_init3, r22, 8                                   \n"
+	asm("tx_asp_init3:");
+	asm(" LBCO     &r22, C25, 0xA0, 4");
+	asm(" QBBC     tx_asp_init3, r22, 8");
 
-			// Before starting, clear the respective transmitter and receiver status registers by writing 0xffff
-			"    LDI      r23.w0, 0xffff & 0xFFFF                                \n"
-			"    LDI      r23.w2, 0xffff >> 16                                   \n"
-			"    SBCO     &r23, C25, 0xc0, 2                                     \n"
+	// Before starting, clear the respective transmitter and receiver status registers by writing 0xffff
+	asm(" LDI      r23.w0, 0xffff & 0xFFFF");
+	asm(" LDI      r23.w2, 0xffff >> 16");
+	asm(" SBCO     &r23, C25, 0xc0, 2");
 
-			// Activate serializer, XSRCLR
-			"    SET      r22, r22, 10                                           \n"
-			"    SBCO     &r22, C25, 0xA0, 4                                     \n"
+	// Activate serializer, XSRCLR
+	asm(" SET      r22, r22, 10");
+	asm(" SBCO     &r22, C25, 0xA0, 4");
 
-			"tx_asp_init4:                                                       \n"
-			"    LBCO     &r22, C25, 0xA0, 4                                     \n"
-			"    QBBC     tx_asp_init4, r22, 10                                  \n"
+	asm("tx_asp_init4:");
+	asm(" LBCO     &r22, C25, 0xA0, 4");
+	asm(" QBBC     tx_asp_init4, r22, 10");
 
-			// Till now no serializer is activated for TX, so no need to service all active XBUF
-			// to avoid underrun errors to be done
+	// Till now no serializer is activated for TX, so no need to service all active XBUF
+	// to avoid underrun errors to be done
 
-			// Actiavte the McASP state machine
-			"    SET      r22, r22, 11                                           \n"
-			"    SBCO     &r22, C25, 0xA0, 4                                     \n"
+	// Actiavte the McASP state machine
+	asm(" SET      r22, r22, 11");
+	asm(" SBCO     &r22, C25, 0xA0, 4");
 
-			"tx_asp_init5:                                                       \n"
-			"    LBCO     &r22, C25, 0xA0, 4                                     \n"
-			"    QBBC     tx_asp_init5, r22, 11                                  \n"
+	asm("tx_asp_init5:");
+	asm(" LBCO     &r22, C25, 0xA0, 4");
+	asm(" QBBC     tx_asp_init5, r22, 11");
 
-			// Activate the MCASP Frame sync
-			"    SET      r22, r22, 12                                           \n"
-			"    SBCO     &r22, C25, 0xA0, 4                                     \n"
+	// Activate the MCASP Frame sync
+	asm(" SET      r22, r22, 12");
+	asm(" SBCO     &r22, C25, 0xA0, 4");
 
-			"tx_asp_init6:                                                       \n"
-			"    LBCO     &r22, C25, 0xA0, 4                                     \n"
-			"    QBBC     tx_asp_init6, r22, 12                                  \n"
+	asm("tx_asp_init6:");
+	asm(" LBCO     &r22, C25, 0xA0, 4");
+	asm(" QBBC     tx_asp_init6, r22, 12");
 
-			//----------------------- McASP TX Initialization - Ends ------------------
+	//----------------------- McASP TX Initialization - Ends ------------------
 
-			//--------------------- McASP RX Initialization - Starts ----------------
+	//--------------------- McASP RX Initialization - Starts ----------------
 
-			// activate Clocks,Serializers,state machine and frame sync
-			"rx_asp_init1:                                                       \n"
-			// Activate the high-transmit clock RHCLKRST
-			"    LBCO     &r22, C25, 0x60, 4                                     \n"
-			"    SET      r22, r22, 1                                            \n"
-			"    SBCO     &r22, C25, 0x60, 4                                     \n"
+	// activate Clocks,Serializers,state machine and frame sync
+	asm("rx_asp_init1:");
+	// Activate the high-transmit clock RHCLKRST
+	asm(" LBCO     &r22, C25, 0x60, 4");
+	asm(" SET      r22, r22, 1");
+	asm(" SBCO     &r22, C25, 0x60, 4");
 
-			"rx_asp_init2:                                                       \n"
-			"    LBCO     &r22, C25, 0x60, 4                                     \n"
-			"    QBBC     rx_asp_init2, r22, 1                                   \n"
+	asm("rx_asp_init2:");
+	asm(" LBCO     &r22, C25, 0x60, 4");
+	asm(" QBBC     rx_asp_init2, r22, 1");
 
-			//Activate the transmit frequency clock RCLKRST
-			"    SET      r22, r22, 0                                            \n"
-			"    SBCO     &r22, C25, 0x60, 4                                     \n"
+	//Activate the transmit frequency clock RCLKRST
+	asm(" SET      r22, r22, 0");
+	asm(" SBCO     &r22, C25, 0x60, 4");
 
-			"rx_asp_init3:                                                       \n"
-			"    LBCO     &r22, C25, 0x60, 4                                     \n"
-			"    QBBC     rx_asp_init3, r22, 0                                   \n"
+	asm("rx_asp_init3:");
+	asm(" LBCO     &r22, C25, 0x60, 4");
+	asm(" QBBC     rx_asp_init3, r22, 0");
 
-			// Clear RSTAT
-			"    LDI      r23, 0xffff                                            \n"
-			"    SBCO     &r23, C25, 0x80, 2                                     \n"
+	// Clear RSTAT
+	asm(" LDI      r23, 0xffff");
+	asm(" SBCO     &r23, C25, 0x80, 2");
 
-			// Activate serializer, RSRCLR
-			"    SET      r22, r22, 2                                            \n"
-			"    SBCO     &r22, C25, 0x60, 4                                     \n"
+	// Activate serializer, RSRCLR
+	asm(" SET      r22, r22, 2");
+	asm(" SBCO     &r22, C25, 0x60, 4");
 
-			"rx_asp_init4:                                                       \n"
-			"    LBCO     &r22, C25, 0x60, 4                                     \n"
-			"    QBBC     rx_asp_init4, r22, 2                                   \n"
+	asm("rx_asp_init4:");
+	asm(" LBCO     &r22, C25, 0x60, 4");
+	asm(" QBBC     rx_asp_init4, r22, 2");
 
-			// Activate the McASP state machine
-			"    SET      r22, r22, 3                                            \n"
-			"    SBCO     &r22, C25, 0x60, 4                                     \n"
+	// Activate the McASP state machine
+	asm(" SET      r22, r22, 3");
+	asm(" SBCO     &r22, C25, 0x60, 4");
 
-			"rx_asp_init5:                                                       \n"
-			"    LBCO     &r22, C25, 0x60, 4                                     \n"
-			"    QBBC     rx_asp_init5, r22, 3                                   \n"
+	asm("rx_asp_init5:");
+	asm(" LBCO     &r22, C25, 0x60, 4");
+	asm(" QBBC     rx_asp_init5, r22, 3");
 
-			// Activate the MCASP Frame sync
-			"    SET      r22, r22, 4                                            \n"
-			"    SBCO     &r22, C25, 0x60, 4                                     \n"
+	// Activate the MCASP Frame sync
+	asm(" SET      r22, r22, 4");
+	asm(" SBCO     &r22, C25, 0x60, 4");
 
-			"rx_asp_init6:                                                       \n"
-			"    LBCO     &r22, C25, 0x60, 4                                     \n"
-			"    QBBC     rx_asp_init6, r22, 4                                   \n"
+	asm("rx_asp_init6:");
+	asm(" LBCO     &r22, C25, 0x60, 4");
+	asm(" QBBC     rx_asp_init6, r22, 4");
 
-			//----------------------- McASP RX Initialization - Ends ------------------
+	//----------------------- McASP RX Initialization - Ends ------------------
 
-			"LOCAL_INIT:                                                         \n"
-			//Read the PRU ID
-			"    LBBO     &r23, r20, 0x084, 4                                    \n"
-			"    MOV      R3.b0, r23.b0                                          \n"
+	asm("LOCAL_INIT:");
+	//Read the PRU ID
+	asm(" LBBO     &r23, r20, 0x084, 4");
+	asm(" MOV      R3.b0, r23.b0");
 
-			// Read the PRU mode
-			"    MOV      R3.b1, r23.b1                                          \n"
+	// Read the PRU mode
+	asm(" MOV      R3.b1, r23.b1");
 
-			//PRU Delay Count in CORE_LOOP
-			"    MOV      R3.b2, r23.b2                                          \n"
+	//PRU Delay Count in CORE_LOOP
+	asm(" MOV      R3.b2, r23.b2");
 
-			//Clear RSTAT
-			"    LDI      r23, 0xffff                                            \n"
-			"    SBCO     &r23, C25, 0x80, 4                                     \n"
+	//Clear RSTAT
+	asm(" LDI      r23, 0xffff");
+	asm(" SBCO     &r23, C25, 0x80, 4");
 
-			//Clear XSTAT
-			"    LDI      r23, 0xffff                                            \n"
-			"    SBCO     &r23, C25, 0xc0, 4                                     \n"
+	//Clear XSTAT
+	asm(" LDI      r23, 0xffff");
+	asm(" SBCO     &r23, C25, 0xc0, 4");
 
-			"    QBEQ     CORE_LOOP, R3.b1, 0x1                                  \n"
+	asm(" QBEQ     CORE_LOOP, R3.b1, 0x1");
 
-			// This Block the Sampling Point with invalid value in RX Context Area
-			"    LDI      r23, 0xFF                                              \n"
-			"    XOR      r24, r24, r24                                          \n"
+	// This Block the Sampling Point with invalid value in RX Context Area
+	asm(" LDI      r23, 0xFF");
+	asm(" XOR      r24, r24, r24");
 
-			"    QBEQ     PRUxxxx_MODE_RX_ONLY, R3.b1, 0x2                       \n"
+	asm(" QBEQ     PRUxxxx_MODE_RX_ONLY, R3.b1, 0x2");
 
-			"    LDI      r22, 0x0C0                                             \n"
-			"    LDI      r25, 0x50                                              \n"
-			"    LDI      r24, 0x1B0                                             \n"
-			"    JMP      INIT_SAMPLE_PNT                                        \n"
+	asm(" LDI      r22, 0x0C0");
+	asm(" LDI      r25, 0x50");
+	asm(" LDI      r24, 0x1B0");
+	asm(" JMP      INIT_SAMPLE_PNT");
 
-			"PRUxxxx_MODE_RX_ONLY:                                               \n"
-			"    LDI      r22, 0x90                                              \n"
-			"    LDI      r25, 0x20                                              \n"
-			"    LDI      r24, 0x170                                             \n"
+	asm("PRUxxxx_MODE_RX_ONLY:");
+	asm(" LDI      r22, 0x90");
+	asm(" LDI      r25, 0x20");
+	asm(" LDI      r24, 0x170");
 
-			"INIT_SAMPLE_PNT:                                                    \n"
-			"    SBBO     &r23, r22, 22, 1                                       \n"
-			"    SBBO     &r20.b0, r22, 23, 1                                    \n"
+	asm("INIT_SAMPLE_PNT:");
+	asm(" SBBO     &r23, r22, 22, 1");
+	asm(" SBBO     &r20.b0, r22, 23, 1");
 
-			"    ADD      r22, r22, r25                                          \n"
-			"    QBGE     INIT_SAMPLE_PNT, r22, r24                              \n"
+	asm(" ADD      r22, r22, r25");
+	asm(" QBGE     INIT_SAMPLE_PNT, r22, r24");
 
-			// JUMP  to CORE_LOOP
-			"    JMP      CORE_LOOP                                              \n"
-
+	// JUMP  to CORE_LOOP
+	asm(" JMP      CORE_LOOP");
 
 //=====================================================================================================================================
 
@@ -222,47 +220,46 @@ int main(void) {
 // to TX channel to TX context area so that each time it is not calculated again and is being directly read from TX Context Area.
 //=====================================================================================================================================
 
+	asm("TxServiceRequestHndlr:");
+	//read interrupt status regsiter
+	asm(" LBBO     &R2.w2, r20, 0x082, 2");
 
-			"TxServiceRequestHndlr:                                              \n"
-			//read interrupt status regsiter
-			"    LBBO     &R2.w2, r20, 0x082, 2                                  \n"
+	// clear the channel interrupt status bit
+	asm(" CLR      R2.w2, R2.w2, R10.b2");
 
-			// clear the channel interrupt status bit
-			"    CLR      R2.w2, R2.w2, R10.b2                                   \n"
+	//update interrupt status regsiter
+	asm(" SBBO     &R2.w2, r20, 0x082, 2");
 
-			//update interrupt status regsiter
-			"    SBBO     &R2.w2, r20, 0x082, 2                                  \n"
+	//Clear Service Request
+	asm(" CLR      R4.w0, R4.w0, 0x2");
+	asm(" SBBO     &R4.w0, R8, 0,  2");
 
-			//Clear Service Request
-			"    CLR      R4.w0, R4.w0, 0x2                                      \n"
-			"    SBBO     &R4.w0, R8, 0,  2                                      \n"
+	// Set the TXRX_READY_BIT
+	asm(" SET      R5.b2, R5.b2, 0");
+	asm(" SBBO     &R5.b2, R8, 6,  1");
 
-			// Set the TXRX_READY_BIT
-			"    SET      R5.b2, R5.b2, 0                                        \n"
-			"    SBBO     &R5.b2, R8, 6,  1                                      \n"
+	// Set SUART_CH_TXRXCHNSTATUS_BIT bit in channel status to indicate the channel active
+	asm(" SET      R5.b3, R5.b3, 7");
+	asm(" SBBO     &R5.b3, R8, 7,  1");
 
-			// Set SUART_CH_TXRXCHNSTATUS_BIT bit in channel status to indicate the channel active
-			"    SET      R5.b3, R5.b3, 7                                        \n"
-			"    SBBO     &R5.b3, R8, 7,  1                                      \n"
+	// New Tx Request received initialize the Channel specific data and save it in memory
+	asm(" XOR      R7.b0, R7.b0, R7.b0");
+	asm(" SBBO     &R7.b0, R8, 12,  1");
 
-			// New Tx Request received initialize the Channel specific data and save it in memory
-			"    XOR      R7.b0, R7.b0, R7.b0                                    \n"
-			"    SBBO     &R7.b0, R8, 12,  1                                     \n"
+	// Load channel specific serializer, xbuf, srctl register mapped active channel
+	asm(" JMP      LOAD_TX_COMMON_INFO");
 
-			// Load channel specific serializer, xbuf, srctl register mapped active channel
-			"    JMP      LOAD_TX_COMMON_INFO                                    \n"
+	asm("ENABLE_TX_SERIALIZER:");
+	//Change the MCASP AXR[n] pin from GPIO mode to MCASP mode of operation
+	asm(" LBCO     &r23, C25, 0x10, 4");
+	asm(" AND      r22, R4.b1, 0x0F");
+	asm(" CLR      r23, r23, r22");
+	asm(" SBCO     &r23, C25, 0x10, 4");
 
-			"ENABLE_TX_SERIALIZER:                                               \n"
-			//Change the MCASP AXR[n] pin from GPIO mode to MCASP mode of operation
-			"    LBCO     &r23, C25, 0x10, 4                                     \n"
-			"    AND      r22, R4.b1, 0x0F                                       \n"
-			"    CLR      r23, r23, r22                                          \n"
-			"    SBCO     &r23, C25, 0x10, 4                                     \n"
-
-			"CLEAR_XSTAT:                                                        \n"
-			"    LDI      r22, 0xFFFF                                            \n"
-			"    SBCO     &r22, C25, 0xc0, 4                                     \n"
-			"    JMP      MCASP_EVENT                                            \n"
+	asm("CLEAR_XSTAT:");
+	asm(" LDI      r22, 0xFFFF");
+	asm(" SBCO     &r22, C25, 0xc0, 4");
+	asm(" JMP      MCASP_EVENT");
 
 //******************************************** TxServiceRequestHndlr Ends ************************************
 
@@ -276,23 +273,23 @@ int main(void) {
 // 	that prescalar label. This is getting called from TX interrupt handler or when is there new service request for TX.
 //=====================================================================================================================================
 
-			"TxServiceReqHndlLoop:                                               \n"
-			// Read the Formated byte to transmitted
-			"    JAL      r30.w0, READ_TX_DATA                                   \n"
+	asm("TxServiceReqHndlLoop:");
+	// Read the Formated byte to transmitted
+	asm(" JAL      r30.w0, READ_TX_DATA");
 
-			"    XOR      r28.w0, r28.w0, r28.w0                                 \n"
+	asm(" XOR      r28.w0, r28.w0, r28.w0");
 
-			// Branch According to Pre-Scalar Value
-			"    LDI      r22, 0x03FF                                            \n"
-			"    AND      r22, r22, R4.w2                                        \n"
+	// Branch According to Pre-Scalar Value
+	asm(" LDI      r22, 0x03FF");
+	asm(" AND      r22, r22, R4.w2");
 
-			"    QBEQ     PRE_SCALAR1, r22, 0x1                                  \n"
-			"    QBEQ     PRE_SCALAR2, r22, 0x2                                  \n"
-			"    QBEQ     PRE_SCALAR4, r22, 0x4                                  \n"
-			"    QBEQ     PRE_SCALAR6, r22, 0x6                                  \n"
-			"    QBEQ     PRE_SCALAR12, r22, 0xC                                 \n"
-			"    QBEQ     PRE_SCALAR16, r22, 0x10                                \n"
-			"    QBLE     PRE_SCALAR24, r22, 0x18                                \n"
+	asm(" QBEQ     PRE_SCALAR1, r22, 0x1");
+	asm(" QBEQ     PRE_SCALAR2, r22, 0x2");
+	asm(" QBEQ     PRE_SCALAR4, r22, 0x4");
+	asm(" QBEQ     PRE_SCALAR6, r22, 0x6");
+	asm(" QBEQ     PRE_SCALAR12, r22, 0xC");
+	asm(" QBEQ     PRE_SCALAR16, r22, 0x10");
+	asm(" QBLE     PRE_SCALAR24, r22, 0x18");
 
 //******************************************** TxServiceReqHndlLoop ENDS *************************************
 
@@ -300,17 +297,17 @@ int main(void) {
 
 //******************************************** PRE_SCALAR1 Starts ********************************************
 
-			"PRE_SCALAR1:                                                        \n"
-			// copy data to RAM TX_DATA_reg.w0 register from scratch_reg3
-			"    MOV      r28.w0, r24                                            \n"
+	asm("PRE_SCALAR1:");
+	// copy data to RAM TX_DATA_reg.w0 register from scratch_reg3
+	asm(" MOV      r28.w0, r24");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Increament the Chn_TxRxBytesDoneCtr bye one
-			"    ADD      R7.b0, R7.b0, 1                                        \n"
-			"    SBBO     &R7.b0, R8, 12,  1                                     \n"
+	// Increament the Chn_TxRxBytesDoneCtr bye one
+	asm(" ADD      R7.b0, R7.b0, 1");
+	asm(" SBBO     &R7.b0, R8, 12,  1");
 
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** PRE_SCALAR1 Ends **********************************************
 
@@ -318,37 +315,37 @@ int main(void) {
 
 //******************************************** PRE_SCALAR2 Starts ********************************************
 
-			"PRE_SCALAR2:                                                        \n"
-			"    MOV      r22, R7.b1                                             \n"
-			"    QBGT     XMIT_FISRT_8BIT, R7.b1, 1                              \n"
+	asm("PRE_SCALAR2:");
+	asm(" MOV      r22, R7.b1");
+	asm(" QBGT     XMIT_FISRT_8BIT, R7.b1, 1");
 
-			"XMIT_LAST_8BIT:                                                     \n"
-			//Last 8 bits to transmitted
-			"    LSR      r24, r24, 8                                            \n"
+	asm("XMIT_LAST_8BIT:");
+	//Last 8 bits to transmitted
+	asm(" LSR      r24, r24, 8");
 
-			"    JAL      r30.w0, PRESACLE_TX_DATA                               \n"
+	asm(" JAL      r30.w0, PRESACLE_TX_DATA");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			"    JMP      TX_DONE                                                \n"
+	asm(" JMP      TX_DONE");
 
-			"XMIT_FISRT_8BIT:                                                    \n"
-			"    AND      r24, r24, 0x00FF                                       \n"
-			"    JAL      r30.w0, PRESACLE_TX_DATA                               \n"
+	asm("XMIT_FISRT_8BIT:");
+	asm(" AND      r24, r24, 0x00FF");
+	asm(" JAL      r30.w0, PRESACLE_TX_DATA");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Write To RAM number of Bits Transmitted
-			// 8 bits transmitted
-			"    ADD      R7.b1, R7.b1, 8                                        \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Write To RAM number of Bits Transmitted
+	// 8 bits transmitted
+	asm(" ADD      R7.b1, R7.b1, 8");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			// If bit per character less than 8  // added with start and stop bit in bits per channel
-			"    MOV      r22, R5.w0                                             \n"
-			"    AND      r22, r22, 0xF                                          \n"
-			//check  (Chn_Config2.BitsPerChar <= 8)
-			"    QBGE     TX_DONE, r22, 0x8                                      \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	// If bit per character less than 8  // added with start and stop bit in bits per channel
+	asm(" MOV      r22, R5.w0");
+	asm(" AND      r22, r22, 0xF");
+	//check  (Chn_Config2.BitsPerChar <= 8)
+	asm(" QBGE     TX_DONE, r22, 0x8");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** PRE_SCALAR2 ENDs **********************************************
 
@@ -356,63 +353,63 @@ int main(void) {
 
 //******************************************** PRE_SCALAR4 Starts ********************************************
 
-			"PRE_SCALAR4:                                                        \n"
-			"    MOV      r22, R7.b1                                             \n"
-			"    QBGT     XMIT_FIRST_4BIT, r22, 1                                \n"
+	asm("PRE_SCALAR4:");
+	asm(" MOV      r22, R7.b1");
+	asm(" QBGT     XMIT_FIRST_4BIT, r22, 1");
 
-			"XMIT_NXT_4BIT:                                                      \n"
-			//Chn_Config2.BitsPerChar - Chn_TxRxBitsDoneCntr
-			"    AND      r23, R5.w0, 0xF                                        \n"
-			"    SUB      r23, r23, R7.b1                                        \n"
+	asm("XMIT_NXT_4BIT:");
+	//Chn_Config2.BitsPerChar - Chn_TxRxBitsDoneCntr
+	asm(" AND      r23, R5.w0, 0xF");
+	asm(" SUB      r23, r23, R7.b1");
 
-			// (Chn_Config2.BitsPerChar - Chn_TxRxBitsDoneCntr) > 4, more bits to be transmitted
-			"    QBLT     MORE_DATA4, r23, 4                                     \n"
+	// (Chn_Config2.BitsPerChar - Chn_TxRxBitsDoneCntr) > 4, more bits to be transmitted
+	asm(" QBLT     MORE_DATA4, r23, 4");
 
-			//transmit last remaining 4 bits
-			"    LSR      r24, r24, r22                                          \n"
-			"    AND      r24, r24, 0xF                                          \n"
+	//transmit last remaining 4 bits
+	asm(" LSR      r24, r24, r22");
+	asm(" AND      r24, r24, 0xF");
 
-			"    JAL      r30.w0, PRESACLE_TX_DATA                               \n"
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, PRESACLE_TX_DATA");
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			"    JMP      CHK_TX_DONE                                            \n"
+	asm(" JMP      CHK_TX_DONE");
 
-			"MORE_DATA4:                                                         \n"
-			//transmit next 4 bit of present byte being transmitted
-			"    LSR      r24, r24, r22                                          \n"
-			"    AND      r24, r24, 0xF                                          \n"
+	asm("MORE_DATA4:");
+	//transmit next 4 bit of present byte being transmitted
+	asm(" LSR      r24, r24, r22");
+	asm(" AND      r24, r24, 0xF");
 
-			"    JAL      r30.w0, PRESACLE_TX_DATA                               \n"
+	asm(" JAL      r30.w0, PRESACLE_TX_DATA");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Check all bits have been transmitted
-			"CHK_TX_DONE:                                                        \n"
-			// Updating number of bits written
-			"    ADD      R7.b1, R7.b1, 4                                        \n"
+	// Check all bits have been transmitted
+	asm("CHK_TX_DONE:");
+	// Updating number of bits written
+	asm(" ADD      R7.b1, R7.b1, 4");
 
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			"    AND      r23, R5.w0, 0xF                                        \n"
+	asm(" AND      r23, R5.w0, 0xF");
 
-			// check if all bits have been transmitted
-			"    QBGE     TX_DONE, r23, R7.b1                                    \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	// check if all bits have been transmitted
+	asm(" QBGE     TX_DONE, r23, R7.b1");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
-			// transmit first 4 bit of formated data
-			"XMIT_FIRST_4BIT:                                                    \n"
-			"    AND      r24, r24, 0xF                                          \n"
-			"    JAL      r30.w0, PRESACLE_TX_DATA                               \n"
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	// transmit first 4 bit of formated data
+	asm("XMIT_FIRST_4BIT:");
+	asm(" AND      r24, r24, 0xF");
+	asm(" JAL      r30.w0, PRESACLE_TX_DATA");
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			//Updating number of bits written
-			"    ADD      R7.b1, R7.b1, 4                                        \n"
+	//Updating number of bits written
+	asm(" ADD      R7.b1, R7.b1, 4");
 
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** PRE_SCALAR4 Ends **********************************************
 
@@ -420,167 +417,167 @@ int main(void) {
 
 //******************************************** PRE_SCALAR6 Starts ********************************************
 
-			"PRE_SCALAR6:                                                        \n"
-			// transmit first 3 bit of formated data
-			"    QBGT     XMIT_FIRST_3BIT, R7.b1, 1                              \n"
+	asm("PRE_SCALAR6:");
+	// transmit first 3 bit of formated data
+	asm(" QBGT     XMIT_FIRST_3BIT, R7.b1, 1");
 
-			"GENERIC_TRANSMIT_BLOCK:                                             \n"
-			// initialize the register
-			"    LDI      R13.b3, 0x0                                            \n"
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
+	asm("GENERIC_TRANSMIT_BLOCK:");
+	// initialize the register
+	asm(" LDI      R13.b3, 0x0");
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
 
-			"LOAD_BITS_LOOP_FOR6:                                                \n"
-			"    AND      r23, R5.w0, 0xF                                        \n"
+	asm("LOAD_BITS_LOOP_FOR6:");
+	asm(" AND      r23, R5.w0, 0xF");
 
-			// transmit the next bits if (ChnTxRxBitsDoneCntr < Chn_Config2.BitsPerChar)
-			"    QBLT     XMIT_NXT_3BIT, r23, R7.b1                              \n"
+	// transmit the next bits if (ChnTxRxBitsDoneCntr < Chn_Config2.BitsPerChar)
+	asm(" QBLT     XMIT_NXT_3BIT, r23, R7.b1");
 
-			// transmit the last remaining bits of the present byte if any and updated counters as below
-			"XMIT_MORE_BITS:                                                     \n"
-			// update the bytes done counter and reset the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
-			"    ADD      R7.b0, R7.b0, 1                                        \n"
-			"    SBBO     &R7.b0, R8, 12,  1                                     \n"
+	// transmit the last remaining bits of the present byte if any and updated counters as below
+	asm("XMIT_MORE_BITS:");
+	// update the bytes done counter and reset the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
+	asm(" ADD      R7.b0, R7.b0, 1");
+	asm(" SBBO     &R7.b0, R8, 12,  1");
 
-			"    XOR      R7.b1, R7.b1, R7.b1                                    \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	asm(" XOR      R7.b1, R7.b1, R7.b1");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			"    XOR      R7.w2, R7.w2, R7.w2                                    \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
+	asm(" XOR      R7.w2, R7.w2, R7.w2");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
 
-			// set the remaining bits to one, if there are no more bits in formated data to send
-			// and still there is space in TX_DATA_reg.
-			// 16 - bitsLoaded
-			"    RSB      r22, R13.b3, 16                                        \n"
-			// Load the remaining (16 - bitsLoaded) bits with logic High
-			"    XOR      r24, r24, r24                                          \n"
-			"    NOT      r24, r24                                               \n"
+	// set the remaining bits to one, if there are no more bits in formated data to send
+	// and still there is space in TX_DATA_reg.
+	// 16 - bitsLoaded
+	asm(" RSB      r22, R13.b3, 16");
+	// Load the remaining (16 - bitsLoaded) bits with logic High
+	asm(" XOR      r24, r24, r24");
+	asm(" NOT      r24, r24");
 
-			// calculate the bit position from where one is to be inserted
-			"    RSB      r21.b1, r22, 16                                        \n"
-			// CLR scratch_reg2
-			"    XOR      r23, r23, r23                                          \n"
-			// COPY 1 bit to scratch_reg2 from scratch_reg3
-			"    AND      r23, r24, 0x1                                          \n"
-			"    LSL      r23, r23, r21.b1                                       \n"
+	// calculate the bit position from where one is to be inserted
+	asm(" RSB      r21.b1, r22, 16");
+	// CLR scratch_reg2
+	asm(" XOR      r23, r23, r23");
+	// COPY 1 bit to scratch_reg2 from scratch_reg3
+	asm(" AND      r23, r24, 0x1");
+	asm(" LSL      r23, r23, r21.b1");
 
-			// Now, set the remaining bits to one in TX_DATA_reg
-			"SET_BIT_BIT:                                                        \n"
-			"    OR       r28.w0, r28.w0, r23                                    \n"
-			"    LSL      r23, r23, 1                                            \n"
-			"    SUB      r22, r22, 1                                            \n"
-			"    QBLE     SET_BIT_BIT, r22, 1                                    \n"
+	// Now, set the remaining bits to one in TX_DATA_reg
+	asm("SET_BIT_BIT:");
+	asm(" OR       r28.w0, r28.w0, r23");
+	asm(" LSL      r23, r23, 1");
+	asm(" SUB      r22, r22, 1");
+	asm(" QBLE     SET_BIT_BIT, r22, 1");
 
-			"    LDI      R13.b3, 16                                             \n"
-			"    JMP      CHK_MORE_PRESCALAR                                     \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" LDI      R13.b3, 16");
+	asm(" JMP      CHK_MORE_PRESCALAR");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
-			"XMIT_NXT_3BIT:                                                      \n"
-			// if the bitsLoaded in TX_DATA_reg is less than 16 load the next bits
-			// (bitsLoaded < 16)
-			"    QBLT     CHK_MORE_PRESCALAR, R13.b3, 16                         \n"
+	asm("XMIT_NXT_3BIT:");
+	// if the bitsLoaded in TX_DATA_reg is less than 16 load the next bits
+	// (bitsLoaded < 16)
+	asm(" QBLT     CHK_MORE_PRESCALAR, R13.b3, 16");
 
-			"BIT_LOAD16:                                                         \n"
-			// Read Prescalar value
-			"    LDI      r23, 0x03FF                                            \n"
-			"    AND      r22, r23, R4.w2                                        \n"
+	asm("BIT_LOAD16:");
+	// Read Prescalar value
+	asm(" LDI      r23, 0x03FF");
+	asm(" AND      r22, r23, R4.w2");
 
-			// (16 - bitsLoaded)
-			"    RSB      r23, R13.b3, 16                                        \n"
-			// (Chn_Config1.PreScaller - ChnTxRxRepeatDoneCntr)
-			"    SUB      r22, r22, R7.w2                                        \n"
-			"    MIN      r22, r22, r23                                          \n"
+	// (16 - bitsLoaded)
+	asm(" RSB      r23, R13.b3, 16");
+	// (Chn_Config1.PreScaller - ChnTxRxRepeatDoneCntr)
+	asm(" SUB      r22, r22, R7.w2");
+	asm(" MIN      r22, r22, r23");
 
-			// Read Next Bit
-			"    JAL      r30.w0, READ_TX_DATA                                   \n"
-			"    LSR      r24, r24, R7.b1                                        \n"
+	// Read Next Bit
+	asm(" JAL      r30.w0, READ_TX_DATA");
+	asm(" LSR      r24, r24, R7.b1");
 
-			// copy bit to transmitted to scratch_reg2
-			"    AND      r23, r24, 0x1                                          \n"
-			// move repeat count to scratch_reg4
-			"    MOV      r25, r22                                               \n"
-			// shift the bit to be transmitted to expected position
-			"    LSL      r23, r23, R13.b3                                       \n"
+	// copy bit to transmitted to scratch_reg2
+	asm(" AND      r23, r24, 0x1");
+	// move repeat count to scratch_reg4
+	asm(" MOV      r25, r22");
+	// shift the bit to be transmitted to expected position
+	asm(" LSL      r23, r23, R13.b3");
 
-			// prescale the bit to transmitted
-			"PRESCALE_NXT_BIT:                                                   \n"
-			"    OR       r28.w0, r28.w0, r23                                    \n"
-			"    LSL      r23, r23, 1                                            \n"
-			"    SUB      r22, r22, 1                                            \n"
-			"    QBLE     PRESCALE_NXT_BIT, r22, 1                               \n"
+	// prescale the bit to transmitted
+	asm("PRESCALE_NXT_BIT:");
+	asm(" OR       r28.w0, r28.w0, r23");
+	asm(" LSL      r23, r23, 1");
+	asm(" SUB      r22, r22, 1");
+	asm(" QBLE     PRESCALE_NXT_BIT, r22, 1");
 
-			// write back to memory
-			"    ADD      R13.b3, R13.b3, r25                                    \n"
+	// write back to memory
+	asm(" ADD      R13.b3, R13.b3, r25");
 
-			"    ADD      R7.w2, R7.w2, r25                                      \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
+	asm(" ADD      R7.w2, R7.w2, r25");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
 
-			// get the prescalar value
-			"    LDI      r23, 0x03FF                                            \n"
-			"    AND      r22, r23, R4.w2                                        \n"
+	// get the prescalar value
+	asm(" LDI      r23, 0x03FF");
+	asm(" AND      r22, r23, R4.w2");
 
-			//if bit has been transmitted prescaler times, fall through and updated the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
-			"    QBGT     CHK_MORE_PRESCALAR, R7.w2, r22                         \n"
+	//if bit has been transmitted prescaler times, fall through and updated the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
+	asm(" QBGT     CHK_MORE_PRESCALAR, R7.w2, r22");
 
-			// rename to TX_BIT_DONE_CNTR
-			"TX_DONE_CNTR6:                                                      \n"
-			// Write Chn_TxRxBitsDoneCtr
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// rename to TX_BIT_DONE_CNTR
+	asm("TX_DONE_CNTR6:");
+	// Write Chn_TxRxBitsDoneCtr
+	asm(" ADD      R7.b1, R7.b1, 1");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			// Write Chn_TxRxRepeatDoneCtr
-			"    XOR      R7.w2, R7.w2, R7.w2                                    \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
+	// Write Chn_TxRxRepeatDoneCtr
+	asm(" XOR      R7.w2, R7.w2, R7.w2");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
 
-			//rename this label to CHK_TX_DATA_REG_FULL
-			"CHK_MORE_PRESCALAR:                                                 \n"
-			// if (bitsLoaded < 16), next bit can be loaded in TX_DATA_reg
-			"    QBGT     LOAD_BITS_LOOP_FOR6, R13.b3, 0x10                      \n"
-			// TX_DATA_reg is full, transmit the data
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	//rename this label to CHK_TX_DATA_REG_FULL
+	asm("CHK_MORE_PRESCALAR:");
+	// if (bitsLoaded < 16), next bit can be loaded in TX_DATA_reg
+	asm(" QBGT     LOAD_BITS_LOOP_FOR6, R13.b3, 0x10");
+	// TX_DATA_reg is full, transmit the data
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
-			// transmit the bits from start bit that can be transmitted from present character that is to transmitted
-			"XMIT_FIRST_3BIT:                                                    \n"
-			// copy the first 3 bits to be transmitted
-			"    AND      r24, r24, 0x7                                          \n"
-			// number of times the byte loop is to be looped
-			"    LDI      r23, 12                                                \n"
-			// Clear TX_DATA_reg.w0
-			"    XOR      r28.w0, r28.w0, r28.w0                                 \n"
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-			"    JAL      r30.w0, BYTE_LOOP                                      \n"
+	// transmit the bits from start bit that can be transmitted from present character that is to transmitted
+	asm("XMIT_FIRST_3BIT:");
+	// copy the first 3 bits to be transmitted
+	asm(" AND      r24, r24, 0x7");
+	// number of times the byte loop is to be looped
+	asm(" LDI      r23, 12");
+	// Clear TX_DATA_reg.w0
+	asm(" XOR      r28.w0, r28.w0, r28.w0");
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+	asm(" JAL      r30.w0, BYTE_LOOP");
 
-			// Repeat last bit by 4 times
-			"    LDI      r22, 0x4                                               \n"
+	// Repeat last bit by 4 times
+	asm(" LDI      r22, 0x4");
 
-			// CLR scratch_reg2
-			"    XOR      r23, r23, r23                                          \n"
-			// copy the third bit to scratch_reg2
-			"    AND      r23, r24, 0x1                                          \n"
+	// CLR scratch_reg2
+	asm(" XOR      r23, r23, r23");
+	// copy the third bit to scratch_reg2
+	asm(" AND      r23, r24, 0x1");
 
-			// shift the bit to expected place i.e. bit ps 12
-			"    LSL      r23, r23, 0xc                                          \n"
+	// shift the bit to expected place i.e. bit ps 12
+	asm(" LSL      r23, r23, 0xc");
 
-			// prescale the last bit 4 times
-			"PRESCALE_LAST_4BIT:                                                 \n"
-			"    OR       r28.w0, r28.w0, r23                                    \n"
-			"    LSL      r23, r23, 1                                            \n"
-			"    SUB      r22, r22, 1                                            \n"
-			"    QBLE     PRESCALE_LAST_4BIT, r22, 1                             \n"
+	// prescale the last bit 4 times
+	asm("PRESCALE_LAST_4BIT:");
+	asm(" OR       r28.w0, r28.w0, r23");
+	asm(" LSL      r23, r23, 1");
+	asm(" SUB      r22, r22, 1");
+	asm(" QBLE     PRESCALE_LAST_4BIT, r22, 1");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Updating number of bits written
-			"    ADD      R7.b1, R7.b1, 2                                        \n"
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Updating number of bits written
+	asm(" ADD      R7.b1, R7.b1, 2");
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			// Updating number of bits written
-			"    ADD      R7.w2, R7.w2, 4                                        \n"
-			// Write To RAM Write Repeat done counter to RAM
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
+	// Updating number of bits written
+	asm(" ADD      R7.w2, R7.w2, 4");
+	// Write To RAM Write Repeat done counter to RAM
+	asm(" SBBO     &R7.w2, R8, 14,  2");
 
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** PRE_SCALAR6 ENDs **********************************************
 
@@ -588,48 +585,48 @@ int main(void) {
 
 //******************************************** PRE_SCALAR12 Starts *******************************************
 
-			"PRE_SCALAR12:                                                       \n"
-			"    QBGT     XMIT_FIRST_2BIT, R7.b1, 1                              \n"
-			"    JMP      GENERIC_TRANSMIT_BLOCK                                 \n"
+	asm("PRE_SCALAR12:");
+	asm(" QBGT     XMIT_FIRST_2BIT, R7.b1, 1");
+	asm(" JMP      GENERIC_TRANSMIT_BLOCK");
 
-			"XMIT_FIRST_2BIT:                                                    \n"
-			// copy the first two bit to be loaded in  TX_DATA_reg
-			"    AND      r24, r24, 0x3                                          \n"
-			// To left shift each copied data bit
-			"    LDI      r21.b1, 0x0                                            \n"
-			// Keep track of byte_loop loop count
-			"    LDI      r23, 12                                                \n"
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-			"    JAL      r30.w0, BYTE_LOOP                                      \n"
+	asm("XMIT_FIRST_2BIT:");
+	// copy the first two bit to be loaded in  TX_DATA_reg
+	asm(" AND      r24, r24, 0x3");
+	// To left shift each copied data bit
+	asm(" LDI      r21.b1, 0x0");
+	// Keep track of byte_loop loop count
+	asm(" LDI      r23, 12");
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+	asm(" JAL      r30.w0, BYTE_LOOP");
 
-			// CLR scratch_reg2
-			"    XOR      r23, r23, r23                                          \n"
-			// copy the next bit to prescaled
-			"    AND      r23, r24, 0x1                                          \n"
-			// counter to prescale second bit by 4
-			"    LDI      r22, 4                                                 \n"
-			// shift the bit to desired position
-			"    LSL      r23, r23, 0xC                                          \n"
+	// CLR scratch_reg2
+	asm(" XOR      r23, r23, r23");
+	// copy the next bit to prescaled
+	asm(" AND      r23, r24, 0x1");
+	// counter to prescale second bit by 4
+	asm(" LDI      r22, 4");
+	// shift the bit to desired position
+	asm(" LSL      r23, r23, 0xC");
 
-			"PRESCALE_4BIT:                                                      \n"
-			"    OR       r28.w0, r28.w0, r23                                    \n"
-			"    LSL      r23, r23, 1                                            \n"
-			"    SUB      r22, r22, 1                                            \n"
-			"    QBLE     PRESCALE_4BIT, r22, 1                                  \n"
+	asm("PRESCALE_4BIT:");
+	asm(" OR       r28.w0, r28.w0, r23");
+	asm(" LSL      r23, r23, 1");
+	asm(" SUB      r22, r22, 1");
+	asm(" QBLE     PRESCALE_4BIT, r22, 1");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Updating number of bits written
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Updating number of bits written
+	asm(" ADD      R7.b1, R7.b1, 1");
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			// Updating number of bits written
-			"    ADD      R7.w2, R7.w2, 4                                        \n"
-			// Write To RAM number of Bits Repeated
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
+	// Updating number of bits written
+	asm(" ADD      R7.w2, R7.w2, 4");
+	// Write To RAM number of Bits Repeated
+	asm(" SBBO     &R7.w2, R8, 14,  2");
 
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** PRE_SCALAR12 ENDs *********************************************
 
@@ -637,35 +634,35 @@ int main(void) {
 
 //******************************************** PRE_SCALAR16 Starts *******************************************
 
-			"PRE_SCALAR16:                                                       \n"
-			"    QBGT     XMIT_FIRST_16, R7.b1, 1                                \n"
-			"    JMP      GENERIC_TRANSMIT_BLOCK                                 \n"
+	asm("PRE_SCALAR16:");
+	asm(" QBGT     XMIT_FIRST_16, R7.b1, 1");
+	asm(" JMP      GENERIC_TRANSMIT_BLOCK");
 
-			"XMIT_FIRST_16:                                                      \n"
-			// copy the first two bit to be loaded in  TX_DATA_reg
-			"    AND      r24, r24, 0x2                                          \n"
-			// Left shift each copied data bit
-			"    LDI      r21.b1, 0x0                                            \n"
-			// Keep track of byte_loop loop count
-			"    LDI      r23, 16                                                \n"
-			// Clear TX_DATA_reg.w0
-			"    XOR      r28.w0, r28.w0, r28.w0                                 \n"
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-			"    JAL      r30.w0, BYTE_LOOP                                      \n"
+	asm("XMIT_FIRST_16:");
+	// copy the first two bit to be loaded in  TX_DATA_reg
+	asm(" AND      r24, r24, 0x2");
+	// Left shift each copied data bit
+	asm(" LDI      r21.b1, 0x0");
+	// Keep track of byte_loop loop count
+	asm(" LDI      r23, 16");
+	// Clear TX_DATA_reg.w0
+	asm(" XOR      r28.w0, r28.w0, r28.w0");
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+	asm(" JAL      r30.w0, BYTE_LOOP");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Updating number of bits written
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Updating number of bits written
+	asm(" ADD      R7.b1, R7.b1, 1");
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			// Updating number of bits written
-			"    ADD      R7.w2, R7.w2, 0                                        \n"
-			// Write To RAM number of Bits Repeated
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
+	// Updating number of bits written
+	asm(" ADD      R7.w2, R7.w2, 0");
+	// Write To RAM number of Bits Repeated
+	asm(" SBBO     &R7.w2, R8, 14,  2");
 
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** PRE_SCALAR16 ENDs *********************************************
 
@@ -673,63 +670,63 @@ int main(void) {
 
 //********************************************* PRE_SCALAR24 Starts ******************************************
 
-			"PRE_SCALAR24:                                                       \n"
-			"    QBGT     XMIT_FIRST_24, R7.b1, 1                                \n"
-			"    JMP      GENERIC_TRANSMIT_BLOCK                                 \n"
+	asm("PRE_SCALAR24:");
+	asm(" QBGT     XMIT_FIRST_24, R7.b1, 1");
+	asm(" JMP      GENERIC_TRANSMIT_BLOCK");
 
-			"XMIT_FIRST_24:                                                      \n"
-			"    LDI      r23, 0x03FF                                            \n"
-			"    AND      r22, r23, R4.w2                                        \n"
-			// Chn_TxRxConfig1.PreScaler - ChnTxRxRepeadDoneCnt
-			"    SUB      r22, r22, R7.w2                                        \n"
-			//(Chn_TxRxConfig1.PreScaler - ChnTxRxRepeadDoneCntr >= 16 )
-			"    QBLE     PRESCALE_START_BIT, r22, 16                            \n"
+	asm("XMIT_FIRST_24:");
+	asm(" LDI      r23, 0x03FF");
+	asm(" AND      r22, r23, R4.w2");
+	// Chn_TxRxConfig1.PreScaler - ChnTxRxRepeadDoneCnt
+	asm(" SUB      r22, r22, R7.w2");
+	//(Chn_TxRxConfig1.PreScaler - ChnTxRxRepeadDoneCntr >= 16 )
+	asm(" QBLE     PRESCALE_START_BIT, r22, 16");
 
-			"PRESCALE_FIRST_DATA_BIT:                                            \n"
-			// Clear Scratch reg
-			"    XOR      r24, r24, r24                                          \n"
-			// Updating number of bits written
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
+	asm("PRESCALE_FIRST_DATA_BIT:");
+	// Clear Scratch reg
+	asm(" XOR      r24, r24, r24");
+	// Updating number of bits written
+	asm(" ADD      R7.b1, R7.b1, 1");
 
-			"    JAL      r30.w0, READ_TX_DATA                                   \n"
+	asm(" JAL      r30.w0, READ_TX_DATA");
 
-			// get the bits to be transmitted
-			"    LSR      r24, r24, R7.b1                                        \n"
-			"    AND      r23, r24, 0x1                                          \n"
+	// get the bits to be transmitted
+	asm(" LSR      r24, r24, R7.b1");
+	asm(" AND      r23, r24, 0x1");
 
-			// shift the bit to desired bit position
-			"    LSL      r23, r23, r22                                          \n"
-			"    RSB      r22, r22, 16                                           \n"
-			"    MOV      R7.w2, r22                                             \n"
+	// shift the bit to desired bit position
+	asm(" LSL      r23, r23, r22");
+	asm(" RSB      r22, r22, 16");
+	asm(" MOV      R7.w2, r22");
 
-			"PRESCALE_FIRST_DAT_BIT:                                             \n"
-			"    OR       r28.w0, r28.w0, r23                                    \n"
-			"    LSL      r23, r23, 1                                            \n"
-			"    SUB      r22, r22, 1                                            \n"
-			"    QBLE     PRESCALE_FIRST_DAT_BIT, r22, 1                         \n"
+	asm("PRESCALE_FIRST_DAT_BIT:");
+	asm(" OR       r28.w0, r28.w0, r23");
+	asm(" LSL      r23, r23, 1");
+	asm(" SUB      r22, r22, 1");
+	asm(" QBLE     PRESCALE_FIRST_DAT_BIT, r22, 1");
 
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			// Write To RAM Chn_TxRxRepeatDoneCtr
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	// Write To RAM Chn_TxRxRepeatDoneCtr
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
-			"PRESCALE_START_BIT:                                                 \n"
-			"    LDI      r22, 0x10                                              \n"
-			"    LDI      r23, 0x10                                              \n"
-			// to left shift each copied data bit
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-			"    JAL      r30.w0, BITS_LOOP                                      \n"
-			"    JAL      r30.w0, TRANSMIT_PRESCALED_DATA                        \n"
+	asm("PRESCALE_START_BIT:");
+	asm(" LDI      r22, 0x10");
+	asm(" LDI      r23, 0x10");
+	// to left shift each copied data bit
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+	asm(" JAL      r30.w0, BITS_LOOP");
+	asm(" JAL      r30.w0, TRANSMIT_PRESCALED_DATA");
 
-			// Update number of bits written
-			"    ADD      R7.w2, R7.w2, 16                                       \n"
-			// Write To RAM number of Bits Repeated
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	// Update number of bits written
+	asm(" ADD      R7.w2, R7.w2, 16");
+	// Write To RAM number of Bits Repeated
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //************************************************ PRE_SCALAR24 ENDs *****************************************
 
@@ -752,21 +749,21 @@ int main(void) {
 // 	obtained from ARM/DSP specific to channel, also formats the data if it is required
 //======================================================================================================================================
 
-			"LOAD_TX_COMMON_INFO:                                                \n"
-			// Load the TX Format Address for the specific channel
-			"    QBEQ     LOAD_TX_FORMAT_ADDRESS_DONE, R3.b1, 0x1                \n"
-			"    JAL      r30.w0, LOAD_TX_FORMAT_ADDRESS                         \n"
+	asm("LOAD_TX_COMMON_INFO:");
+	// Load the TX Format Address for the specific channel
+	asm(" QBEQ     LOAD_TX_FORMAT_ADDRESS_DONE, R3.b1, 0x1");
+	asm(" JAL      r30.w0, LOAD_TX_FORMAT_ADDRESS");
 
-			"LOAD_TX_FORMAT_ADDRESS_DONE:                                        \n"
-			//  Load the mapped SR and XBUF address mapped to channel
-			"    JMP      LOCATE_SR_XBUF_SRCTL                                   \n"
+	asm("LOAD_TX_FORMAT_ADDRESS_DONE:");
+	//  Load the mapped SR and XBUF address mapped to channel
+	asm(" JMP      LOCATE_SR_XBUF_SRCTL");
 
-			"LOCATE_SR_XBUF_SRCTL_DONE:                                          \n"
-			// Format the data if required
-			"    JMP      CHK_TX_DATA_FORMAT                                     \n"
+	asm("LOCATE_SR_XBUF_SRCTL_DONE:");
+	// Format the data if required
+	asm(" JMP      CHK_TX_DATA_FORMAT");
 
-			"CHK_TX_DATA_FORMAT_DONE:                                            \n"
-			"    JMP      ENABLE_TX_SERIALIZER                                   \n"
+	asm("CHK_TX_DATA_FORMAT_DONE:");
+	asm(" JMP      ENABLE_TX_SERIALIZER");
 
 //****************************************** LOAD_TX_COMMON_INFO: ENDS ***************************************
 
@@ -778,46 +775,46 @@ int main(void) {
 // 		Subroutine to find channel specific serializer, xbuf, srctl register mapped active channel
 //======================================================================================================================================
 
-			"LOCATE_SR_XBUF_SRCTL:                                               \n"
-			// Calculating Serializer Mapped to Channel
-			"    AND      r22, R4.b1, 0x0F                                       \n"
-			"    LSL      r22, r22, 2                                            \n"
+	asm("LOCATE_SR_XBUF_SRCTL:");
+	// Calculating Serializer Mapped to Channel
+	asm(" AND      r22, R4.b1, 0x0F");
+	asm(" LSL      r22, r22, 2");
 
-			// copy the tx format address to temp regsiter
-			"    MOV      r24, R13.w0                                            \n"
-			"    LDI      r25, 0x20                                              \n"
+	// copy the tx format address to temp regsiter
+	asm(" MOV      r24, R13.w0");
+	asm(" LDI      r25, 0x20");
 
-			// Calculating the specific SRCTL register offset
-			"    LDI      R11.w0, (0x01D00180) & 0xFFFF                          \n"
-			"    LDI      R11.w2, (0x01D00180) >> 16                             \n"
-			"    ADD      R11, R11, r22                                          \n"
+	// Calculating the specific SRCTL register offset
+	asm(" LDI      R11.w0, (0x01D00180) & 0xFFFF");
+	asm(" LDI      R11.w2, (0x01D00180) >> 16");
+	asm(" ADD      R11, R11, r22");
 
-			"    ADD      r23, r25, 0                                            \n"
-			"    SBBO     &R11, r24, r23,  4                                     \n"
+	asm(" ADD      r23, r25, 0");
+	asm(" SBBO     &R11, r24, r23,  4");
 
-			// Calculating the specific xbuf register offset
-			"    LDI      R12.w0, (0x01D00200) & 0xFFFF                          \n"
-			"    LDI      R12.w2, (0x01D00200) >> 16                             \n"
-			"    ADD      R12, R12, r22                                          \n"
+	// Calculating the specific xbuf register offset
+	asm(" LDI      R12.w0, (0x01D00200) & 0xFFFF");
+	asm(" LDI      R12.w2, (0x01D00200) >> 16");
+	asm(" ADD      R12, R12, r22");
 
-			"    ADD      r23, r25, 4                                            \n"
-			"    SBBO     &R12, r24, r23,  4                                     \n"
+	asm(" ADD      r23, r25, 4");
+	asm(" SBBO     &R12, r24, r23,  4");
 
-			// Store the data length
-			"    MOV      R13.b2, R5.b1                                          \n"
+	// Store the data length
+	asm(" MOV      R13.b2, R5.b1");
 
-			"    ADD      r23, r25, 10                                           \n"
-			"    SBBO     &R13.b2, r24, r23,  1                                  \n"
+	asm(" ADD      r23, r25, 10");
+	asm(" SBBO     &R13.b2, r24, r23,  1");
 
-			//Store the data Tx FMT Context address
-			"    ADD      r23, r25, 8                                            \n"
-			"    SBBO     &R13.w0, r24, r23,  2                                  \n"
+	//Store the data Tx FMT Context address
+	asm(" ADD      r23, r25, 8");
+	asm(" SBBO     &R13.w0, r24, r23,  2");
 
-			"    LDI      R13.b3, 0x00                                           \n"
-			"    ADD      r23, r25, 11                                           \n"
-			"    SBBO     &R13.b3, r24, r23,  1                                  \n"
+	asm(" LDI      R13.b3, 0x00");
+	asm(" ADD      r23, r25, 11");
+	asm(" SBBO     &R13.b3, r24, r23,  1");
 
-			"    JMP      LOCATE_SR_XBUF_SRCTL_DONE                              \n"
+	asm(" JMP      LOCATE_SR_XBUF_SRCTL_DONE");
 
 //********************************************** TX LOCATE_SR_XBUF_SRCTL: ENDS **************************************
 
@@ -832,63 +829,63 @@ int main(void) {
 // 	formats data the TX Data obtained from ARM/DSP by adding start and stop bit.
 //======================================================================================================================================
 
-			"CHK_TX_DATA_FORMAT:                                                 \n"
-			"    QBEQ     CHK_TX_DATA_FORMAT_BITS, R7.w2, 0                      \n"
-			"    JMP      CHK_TX_DATA_FORMAT_DONE                                \n"
+	asm("CHK_TX_DATA_FORMAT:");
+	asm(" QBEQ     CHK_TX_DATA_FORMAT_BITS, R7.w2, 0");
+	asm(" JMP      CHK_TX_DATA_FORMAT_DONE");
 
-			"CHK_TX_DATA_FORMAT_BITS:                                            \n"
-			"    QBEQ     CHK_TX_DATA_FORMAT_BYTE, R7.b1, 0                      \n"
-			"    JMP      CHK_TX_DATA_FORMAT_DONE                                \n"
+	asm("CHK_TX_DATA_FORMAT_BITS:");
+	asm(" QBEQ     CHK_TX_DATA_FORMAT_BYTE, R7.b1, 0");
+	asm(" JMP      CHK_TX_DATA_FORMAT_DONE");
 
-			"CHK_TX_DATA_FORMAT_BYTE:                                            \n"
-			"    QBEQ     TX_DATA_FORMAT, R7.b0, 0                               \n"
-			"    JMP      CHK_TX_DATA_FORMAT_DONE                                \n"
+	asm("CHK_TX_DATA_FORMAT_BYTE:");
+	asm(" QBEQ     TX_DATA_FORMAT, R7.b0, 0");
+	asm(" JMP      CHK_TX_DATA_FORMAT_DONE");
 
-			"TX_DATA_FORMAT:                                                     \n"
-			// Load the TX Format Address for the specific channel
-			"    XOR      r22, r22, r22                                          \n"
-			"    NOT      r22, r22                                               \n"
+	asm("TX_DATA_FORMAT:");
+	// Load the TX Format Address for the specific channel
+	asm(" XOR      r22, r22, r22");
+	asm(" NOT      r22, r22");
 
-			"    SUB      r23, R5.b0, 1                                          \n"
+	asm(" SUB      r23, R5.b0, 1");
 
-			"    LSL      r22, r22, r23                                          \n"
-			// offset from base addr
-			"    XOR      r23, r23, r23                                          \n"
+	asm(" LSL      r22, r22, r23");
+	// offset from base addr
+	asm(" XOR      r23, r23, r23");
 
-			// to store formated data into DATA RAM
-			"    MOV      r24, R13.w0                                            \n"
+	// to store formated data into DATA RAM
+	asm(" MOV      r24, R13.w0");
 
-			// Number of Bits Per Character
-			"    AND      r21.b0, R5.b0, 0xF                                     \n"
-			"    SUB      r21.b0, r21.b0, 2                                      \n"
+	// Number of Bits Per Character
+	asm(" AND      r21.b0, R5.b0, 0xF");
+	asm(" SUB      r21.b0, r21.b0, 2");
 
-			"TX_DATA_FORMAT_LOOP:                                                \n"
-			// Load the data from the data pointer
-			"    LBBO     &r28, R6, 0x00, 2                                      \n"
-			"    LSL      r28, r28, 1                                            \n"
-			"    OR       r28, r28, r22                                          \n"
+	asm("TX_DATA_FORMAT_LOOP:");
+	// Load the data from the data pointer
+	asm(" LBBO     &r28, R6, 0x00, 2");
+	asm(" LSL      r28, r28, 1");
+	asm(" OR       r28, r28, r22");
 
-			// store formated data into DATA RAM
-			"    SBBO     &r28.w0, r24, r23, 2                                   \n"
+	// store formated data into DATA RAM
+	asm(" SBBO     &r28.w0, r24, r23, 2");
 
-			// Increment the formatted buffer address offset
-			"    ADD      r23, r23, 2                                            \n"
+	// Increment the formatted buffer address offset
+	asm(" ADD      r23, r23, 2");
 
-			"    QBGE     INC_ADDR_BY_ONE, r21.b0, 0x8                           \n"
-			// Next data buffer pointer
-			"    ADD      R6, R6, 1                                              \n"
+	asm(" QBGE     INC_ADDR_BY_ONE, r21.b0, 0x8");
+	// Next data buffer pointer
+	asm(" ADD      R6, R6, 1");
 
-			// Increamnet the tx buffer data pointer by ONE, if bit per character is less or equal to 8 including start and stop bit
-			"INC_ADDR_BY_ONE:                                                    \n"
-			// Next data buffer pointer
-			"    ADD      R6, R6, 1                                              \n"
+	// Increamnet the tx buffer data pointer by ONE, if bit per character is less or equal to 8 including start and stop bit
+	asm("INC_ADDR_BY_ONE:");
+	// Next data buffer pointer
+	asm(" ADD      R6, R6, 1");
 
-			"    QBEQ     CHK_TX_DATA_FORMAT_DONE, R13.b2, 0                     \n"
+	asm(" QBEQ     CHK_TX_DATA_FORMAT_DONE, R13.b2, 0");
 
-			//Decrement the data length .i.e no of bytes to send
-			"    SUB      R13.b2, R13.b2, 1                                      \n"
+	//Decrement the data length .i.e no of bytes to send
+	asm(" SUB      R13.b2, R13.b2, 1");
 
-			"    JMP      TX_DATA_FORMAT_LOOP                                    \n"
+	asm(" JMP      TX_DATA_FORMAT_LOOP");
 
 //******************************************** TX CHK_TX_DATA_FORMAT: ENDS************************************
 
@@ -900,17 +897,17 @@ int main(void) {
 // 	Reads the 16 bit formatted character to be transmitted from formatted data area corresponding to TX channel
 //======================================================================================================================================
 
-			"READ_TX_DATA:                                                       \n"
-			// Copy the base address of formated data
-			"    MOV      r24, R13.w0                                            \n"
+	asm("READ_TX_DATA:");
+	// Copy the base address of formated data
+	asm(" MOV      r24, R13.w0");
 
-			// Calculate the offset of formated data
-			"    LSL      r25, R7.b0, 1                                          \n"
+	// Calculate the offset of formated data
+	asm(" LSL      r25, R7.b0, 1");
 
-			// LOAD formated data from DATA RAM
-			"    LBBO     &r24, r24, r25, 2                                      \n"
+	// LOAD formated data from DATA RAM
+	asm(" LBBO     &r24, r24, r25, 2");
 
-			"    jmp      r30.w0                                                 \n"
+	asm(" jmp      r30.w0");
 
 //********************************************** TX READ_TX_DATA: ENDS ***************************************
 
@@ -922,28 +919,28 @@ int main(void) {
 //	Initializes the TX formatted data buffer address which stores the formated data with stop and start bit
 //======================================================================================================================================
 
-			"LOAD_TX_FORMAT_ADDRESS:                                             \n"
-			"    QBEQ     TX_CH0_FMT_ADDR, R10.b2, 0                             \n"
-			"    QBEQ     TX_CH2_FMT_ADDR, R10.b2, 2                             \n"
-			"    QBEQ     TX_CH4_FMT_ADDR, R10.b2, 4                             \n"
-			"    QBEQ     TX_CH6_FMT_ADDR, R10.b2, 6                             \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("LOAD_TX_FORMAT_ADDRESS:");
+	asm(" QBEQ     TX_CH0_FMT_ADDR, R10.b2, 0");
+	asm(" QBEQ     TX_CH2_FMT_ADDR, R10.b2, 2");
+	asm(" QBEQ     TX_CH4_FMT_ADDR, R10.b2, 4");
+	asm(" QBEQ     TX_CH6_FMT_ADDR, R10.b2, 6");
+	asm(" jmp      r30.w0");
 
-			"TX_CH0_FMT_ADDR:                                                    \n"
-			"    LDI      R13.w0, 0x090                                          \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("TX_CH0_FMT_ADDR:");
+	asm(" LDI      R13.w0, 0x090");
+	asm(" jmp      r30.w0");
 
-			"TX_CH2_FMT_ADDR:                                                    \n"
-			"    LDI      R13.w0, 0x0E0                                          \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("TX_CH2_FMT_ADDR:");
+	asm(" LDI      R13.w0, 0x0E0");
+	asm(" jmp      r30.w0");
 
-			"TX_CH4_FMT_ADDR:                                                    \n"
-			"    LDI      R13.w0, 0x130                                          \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("TX_CH4_FMT_ADDR:");
+	asm(" LDI      R13.w0, 0x130");
+	asm(" jmp      r30.w0");
 
-			"TX_CH6_FMT_ADDR:                                                    \n"
-			"    LDI      R13.w0, 0x180                                          \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("TX_CH6_FMT_ADDR:");
+	asm(" LDI      R13.w0, 0x180");
+	asm(" jmp      r30.w0");
 
 //******************************************** TX LOAD_TX_FORMAT_ADDRESS Routine: ENDS ***********************
 
@@ -955,35 +952,35 @@ int main(void) {
 // This routine Prescales data bit to be transmitted into the TX_DATA_reg.w0 register
 //======================================================================================================================================
 
-			"PRESACLE_TX_DATA:                                                   \n"
-			// to Left shift each copied data bit
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-			// Xbuf Size: Keep track of byte loop
-			"    LDI      r23, 16                                                \n"
-			// Clear TX_DATA_reg.w0
-			"    XOR      r28.w0, r28.w0, r28.w0                                 \n"
+	asm("PRESACLE_TX_DATA:");
+	// to Left shift each copied data bit
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+	// Xbuf Size: Keep track of byte loop
+	asm(" LDI      r23, 16");
+	// Clear TX_DATA_reg.w0
+	asm(" XOR      r28.w0, r28.w0, r28.w0");
 
-			"BYTE_LOOP:                                                          \n"
-			"    LDI      r25, 0x03FF                                            \n"
-			"    AND      r22, r25, R4.w2                                        \n"
+	asm("BYTE_LOOP:");
+	asm(" LDI      r25, 0x03FF");
+	asm(" AND      r22, r25, R4.w2");
 
-			"BITS_LOOP:                                                          \n"
-			// CLR scratch_reg4
-			"    XOR      r25, r25, r25                                          \n"
-			// COPY 1 bit to scratch_reg4 from scratch_reg3
-			"    AND      r25, r24, 0x1                                          \n"
-			"    LSL      r25, r25, r21.b1                                       \n"
-			"    OR       r28.w0, r28.w0, r25                                    \n"
-			"    ADD      r21.b1, r21.b1, 1                                      \n"
-			// INC Bytes loop counter
-			"    SUB      r23, r23, 1                                            \n"
-			// INC Bits loop counter
-			"    SUB      r22, r22, 1                                            \n"
-			"    QBLE     BITS_LOOP, r22, 1                                      \n"
-			"    LSR      r24, r24, 1                                            \n"
-			"    QBLE     BYTE_LOOP, r23, 1                                      \n"
-			// Return to PRESACLE_TX_DATA
-			"    jmp      r30.w0                                                 \n"
+	asm("BITS_LOOP:");
+	// CLR scratch_reg4
+	asm(" XOR      r25, r25, r25");
+	// COPY 1 bit to scratch_reg4 from scratch_reg3
+	asm(" AND      r25, r24, 0x1");
+	asm(" LSL      r25, r25, r21.b1");
+	asm(" OR       r28.w0, r28.w0, r25");
+	asm(" ADD      r21.b1, r21.b1, 1");
+	// INC Bytes loop counter
+	asm(" SUB      r23, r23, 1");
+	// INC Bits loop counter
+	asm(" SUB      r22, r22, 1");
+	asm(" QBLE     BITS_LOOP, r22, 1");
+	asm(" LSR      r24, r24, 1");
+	asm(" QBLE     BYTE_LOOP, r23, 1");
+	// Return to PRESACLE_TX_DATA
+	asm(" jmp      r30.w0");
 
 //********************************************  PRESACLE_TX_DATA : ENDs **************************************
 
@@ -995,19 +992,19 @@ int main(void) {
 // This routine Transmits the prescaled data by writing to mcasp x_buf register mapped to this serializer
 //======================================================================================================================================
 
-			"TRANSMIT_PRESCALED_DATA:                                            \n"
-			// Clear the under run error
-			"    LBCO     &r22, C25, 0xc0, 4                                     \n"
-			"    QBBC     WRITE_TO_XBUF, r22, 0x8                                \n"
+	asm("TRANSMIT_PRESCALED_DATA:");
+	// Clear the under run error
+	asm(" LBCO     &r22, C25, 0xc0, 4");
+	asm(" QBBC     WRITE_TO_XBUF, r22, 0x8");
 
-			"    LDI      r22, 0xFFFF                                            \n"
-			"    SBCO     &r22, C25, 0xc0, 4                                     \n"
+	asm(" LDI      r22, 0xFFFF");
+	asm(" SBCO     &r22, C25, 0xc0, 4");
 
-			"WRITE_TO_XBUF:                                                      \n"
-			// Write Byte to X_BUF
-			"    SBBO     &r28.w0, R12, 00, 4                                    \n"
-			// return from Transmit Prescaled Data
-			"    jmp      r30.w0                                                 \n"
+	asm("WRITE_TO_XBUF:");
+	// Write Byte to X_BUF
+	asm(" SBBO     &r28.w0, R12, 00, 4");
+	// return from Transmit Prescaled Data
+	asm(" jmp      r30.w0");
 
 //******************************************** TRANSMIT_PRESCALED_DATA : ENDs ********************************
 
@@ -1019,15 +1016,15 @@ int main(void) {
 // This routine the cleanup after one character has been transmitted successfully
 //======================================================================================================================================
 
-			"TX_DONE:                                                            \n"
-			"    XOR      R7.b1, R7.b1, R7.b1                                    \n"
-			// Write To RAM number of Bits Transmitted
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
+	asm("TX_DONE:");
+	asm(" XOR      R7.b1, R7.b1, R7.b1");
+	// Write To RAM number of Bits Transmitted
+	asm(" SBBO     &R7.b1, R8, 13,  1");
 
-			"    ADD      R7.b0, R7.b0, 1                                        \n"
-			"    SBBO     &R7.b0, R8, 12,  1                                     \n"
+	asm(" ADD      R7.b0, R7.b0, 1");
+	asm(" SBBO     &R7.b0, R8, 12,  1");
 
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
 //******************************************** TX_DONE : ENDs ************************************************
 
@@ -1044,80 +1041,80 @@ int main(void) {
 // It also, causes the dummy transfer when there is no character to send
 //=======================================================================================================================================
 
-			"TxInterruptServiceRequestHndlr:                                     \n"
-			// Retrieve the channel number and load the context base
-			"    LDI      R8, 0x0000                                             \n"
-			"    LDI      R10.w0, 0x0000                                         \n"
-			"    LDI      R10.b2, 0x00                                           \n"
-			"    LDI      R13.w0, 0x90                                           \n"
+	asm("TxInterruptServiceRequestHndlr:");
+	// Retrieve the channel number and load the context base
+	asm(" LDI      R8, 0x0000");
+	asm(" LDI      R10.w0, 0x0000");
+	asm(" LDI      R10.b2, 0x00");
+	asm(" LDI      R13.w0, 0x90");
 
-			"SERCH_MAPPED_TX_CHN:                                                \n"
-			"    ADD      r22, R10.w0, 7                                         \n"
-			// Load the Channel Cntrl info from Memory to Register
-			"    LBBO     &R5.b3, R8, r22,  1                                    \n"
-			"    QBBC     NEXT_TX_CHN, R5.b3, 7                                  \n"
+	asm("SERCH_MAPPED_TX_CHN:");
+	asm(" ADD      r22, R10.w0, 7");
+	// Load the Channel Cntrl info from Memory to Register
+	asm(" LBBO     &R5.b3, R8, r22,  1");
+	asm(" QBBC     NEXT_TX_CHN, R5.b3, 7");
 
-			"    ADD      r22, R13.w0, 0x20                                      \n"
-			"    LBBO     &r23, r22, 0, 4                                        \n"
-			"    LBBO     &r22, r23, 0, 4                                        \n"
-			"    QBBS     MAPPED_TX_CHN_FOUND, r22, 4                            \n"
+	asm(" ADD      r22, R13.w0, 0x20");
+	asm(" LBBO     &r23, r22, 0, 4");
+	asm(" LBBO     &r22, r23, 0, 4");
+	asm(" QBBS     MAPPED_TX_CHN_FOUND, r22, 4");
 
-			"NEXT_TX_CHN:                                                        \n"
-			"    QBEQ     PRU_TX_ONLY_MODE, R3.b1, 0x1                           \n"
+	asm("NEXT_TX_CHN:");
+	asm(" QBEQ     PRU_TX_ONLY_MODE, R3.b1, 0x1");
 
-			// TX & RX together. So channel nunbers are 0, 2, 4, 6
-			"    ADD      R10.w0, R10.w0, 0x20                                   \n"
-			"    ADD      R10.b2, R10.b2, 0x02                                   \n"
-			"    ADD      R13.w0, R13.w0, 0x50                                   \n"
-			"    QBGE     SERCH_MAPPED_TX_CHN, R10.b2, (8 - 1)                   \n"
-			"    JMP      CORE_LOOP                                              \n"
+	// TX & RX together. So channel nunbers are 0, 2, 4, 6
+	asm(" ADD      R10.w0, R10.w0, 0x20");
+	asm(" ADD      R10.b2, R10.b2, 0x02");
+	asm(" ADD      R13.w0, R13.w0, 0x50");
+	asm(" QBGE     SERCH_MAPPED_TX_CHN, R10.b2, (8 - 1)");
+	asm(" JMP      CORE_LOOP");
 
-			"PRU_TX_ONLY_MODE:                                                   \n"
-			// TX Only ...So channel numbers are contiguous
-			"    ADD      R10.w0, R10.w0, 0x10                                   \n"
-			"    ADD      R10.b2, R10.b2, 0x01                                   \n"
-			"    ADD      R13.w0, R13.w0, 0x2C                                   \n"
-			"    QBGE     SERCH_MAPPED_TX_CHN, R10.b2, (8 - 1)                   \n"
-			"    JMP      CORE_LOOP                                              \n"
+	asm("PRU_TX_ONLY_MODE:");
+	// TX Only ...So channel numbers are contiguous
+	asm(" ADD      R10.w0, R10.w0, 0x10");
+	asm(" ADD      R10.b2, R10.b2, 0x01");
+	asm(" ADD      R13.w0, R13.w0, 0x2C");
+	asm(" QBGE     SERCH_MAPPED_TX_CHN, R10.b2, (8 - 1)");
+	asm(" JMP      CORE_LOOP");
 
-			"MAPPED_TX_CHN_FOUND:                                                \n"
-			"    LBBO     &R4.w0, R8, R10.w0,  16                                \n"
-			"    ADD      R8, R8, R10.w0                                         \n"
+	asm("MAPPED_TX_CHN_FOUND:");
+	asm(" LBBO     &R4.w0, R8, R10.w0,  16");
+	asm(" ADD      R8, R8, R10.w0");
 
-			"    QBEQ     PRUx_MODE_TX_ONLY, R3.b1, 0x1                          \n"
+	asm(" QBEQ     PRUx_MODE_TX_ONLY, R3.b1, 0x1");
 
-			"    QBEQ     CORE_LOOP, R3.b1, 0x00                                 \n"
+	asm(" QBEQ     CORE_LOOP, R3.b1, 0x00");
 
-			"PRUx_MODE_TX_ONLY:                                                  \n"
-			"    ADD      r22, R13.w0, 0x20                                      \n"
-			"    LBBO     &R11, r22, 0, 12                                       \n"
+	asm("PRUx_MODE_TX_ONLY:");
+	asm(" ADD      r22, R13.w0, 0x20");
+	asm(" LBBO     &R11, r22, 0, 12");
 
-			// JMP TO TxServiceReqHndlLoop Chn_TxRxBytesDoneCtr is less than Data length
-			"    LSR      r22, R5.w0, 0x8                                        \n"
-			"    AND      r22, r22, 0x0F                                         \n"
-			"    ADD      r22, r22, 0x01                                         \n"
-			"    QBLT     TxServiceReqHndlLoop, r22, R7.b0                       \n"
+	// JMP TO TxServiceReqHndlLoop Chn_TxRxBytesDoneCtr is less than Data length
+	asm(" LSR      r22, R5.w0, 0x8");
+	asm(" AND      r22, r22, 0x0F");
+	asm(" ADD      r22, r22, 0x01");
+	asm(" QBLT     TxServiceReqHndlLoop, r22, R7.b0");
 
-			"    QBBS     DECLARE_COMPLETE, R5.b2, 0                             \n"
-			"    NOT      r22, r20                                               \n"
-			"    SBBO     &r22, R12, 00, 4                                       \n"
+	asm(" QBBS     DECLARE_COMPLETE, R5.b2, 0");
+	asm(" NOT      r22, r20");
+	asm(" SBBO     &r22, R12, 00, 4");
 
-			"    JMP      CORE_LOOP                                              \n"
+	asm(" JMP      CORE_LOOP");
 
-			"DECLARE_COMPLETE:                                                   \n"
-			// Set the status in the context area
-			"    SET      R5.b2, R5.b2, 1                                        \n"
-			"    CLR      R5.b2, R5.b2, 0                                        \n"
-			"    SBBO     &R5.b2, R8, 6,  1                                      \n"
+	asm("DECLARE_COMPLETE:");
+	// Set the status in the context area
+	asm(" SET      R5.b2, R5.b2, 1");
+	asm(" CLR      R5.b2, R5.b2, 0");
+	asm(" SBBO     &R5.b2, R8, 6,  1");
 
-			// Generate the interrupt to the ARM/DSP about the completion
-			"    LBBO     &R2.w0, r20, 0x080, 2                                  \n"
-			"    QBBC     CORE_LOOP, R2.w0, R10.b2                               \n"
+	// Generate the interrupt to the ARM/DSP about the completion
+	asm(" LBBO     &R2.w0, r20, 0x080, 2");
+	asm(" QBBC     CORE_LOOP, R2.w0, R10.b2");
 
-			"    LBBO     &R2.w2, r20, 0x082, 2                                  \n"
-			"    SET      R2.w2, R2.w2, R10.b2                                   \n"
-			"    SBBO     &R2.w2, r20, 0x082, 2                                  \n"
-			"    JMP      PRU_TO_HOST_INTERRUPT                                  \n"
+	asm(" LBBO     &R2.w2, r20, 0x082, 2");
+	asm(" SET      R2.w2, R2.w2, R10.b2");
+	asm(" SBBO     &R2.w2, r20, 0x082, 2");
+	asm(" JMP      PRU_TO_HOST_INTERRUPT");
 
 //******************************************** TxInterruptServiceRequestHndlr: ENDs **************************
 
@@ -1140,67 +1137,67 @@ int main(void) {
 // if there is no event, it loops in the core loop and waits for interrupt form ARM or DSP.
 //========================================================================================================================================
 
-			"CORE_LOOP:                                                          \n"
-			"    QBEQ     CORE_LOOP, R3.b1, 0x00                                 \n"
+	asm("CORE_LOOP:");
+	asm(" QBEQ     CORE_LOOP, R3.b1, 0x00");
 
-			"ARM_DSP_EVENT:                                                      \n"
-			"    QBEQ     CORE_LOOP_PRU1, R3.b0, 1                               \n"
+	asm("ARM_DSP_EVENT:");
+	asm(" QBEQ     CORE_LOOP_PRU1, R3.b0, 1");
 
-			"CORE_LOOP_PRU0:                                                     \n"
-			// wait for the hostEventStatus to get set. Loop till then
-			"    WBS      r31, 30                                                \n"
+	asm("CORE_LOOP_PRU0:");
+	// wait for the hostEventStatus to get set. Loop till then
+	asm(" WBS      r31, 30");
 
-			// Read the PRUINTC register to know if the event is from ARM/DSP. If yes, then branch
-			"    LDI      r23.w0, 0x204 & 0xFFFF                                 \n"
-			"    LDI      r23.w2, 0x204 >> 16                                    \n"
-			"    LBCO     &r22, C0, r23, 4                                       \n"
-			"    QBBS     CHN_SEARCH, r22, 0                                     \n"
+	// Read the PRUINTC register to know if the event is from ARM/DSP. If yes, then branch
+	asm(" LDI      r23.w0, 0x204 & 0xFFFF");
+	asm(" LDI      r23.w2, 0x204 >> 16");
+	asm(" LBCO     &r22, C0, r23, 4");
+	asm(" QBBS     CHN_SEARCH, r22, 0");
 
-			// Else it is McASP Event. So before proceeding, clear it
-			"    LDI      r22.w0, 31 & 0xFFFF                                    \n"
-			"    LDI      r22.w2, 31 >> 16                                       \n"
-			"    SBCO     &r22, C0, 0x24, 4                                      \n"
+	// Else it is McASP Event. So before proceeding, clear it
+	asm(" LDI      r22.w0, 31 & 0xFFFF");
+	asm(" LDI      r22.w2, 31 >> 16");
+	asm(" SBCO     &r22, C0, 0x24, 4");
 
-			"    JMP      MCASP_EVENT                                            \n"
+	asm(" JMP      MCASP_EVENT");
 
-			"CORE_LOOP_PRU1:                                                     \n"
-			// wait for the hostEventStatus to get set. Loop till then
-			"    WBS      r31, 31                                                \n"
+	asm("CORE_LOOP_PRU1:");
+	// wait for the hostEventStatus to get set. Loop till then
+	asm(" WBS      r31, 31");
 
-			"    LBCO     &r22, C25, 0xc0, 4                                     \n"
-			"    QBBC     CHN_SEARCH, r22, 5                                     \n"
+	asm(" LBCO     &r22, C25, 0xc0, 4");
+	asm(" QBBC     CHN_SEARCH, r22, 5");
 
-			// Clear the event here and go to Transmit processing
-			"    LDI      r22.w0, 50 & 0xFFFF                                    \n"
-			"    LDI      r22.w2, 50 >> 16                                       \n"
-			"    SBCO     &r22, C0, 0x24, 4                                      \n"
-			"    JMP      TxInterruptServiceRequestHndlr                         \n"
+	// Clear the event here and go to Transmit processing
+	asm(" LDI      r22.w0, 50 & 0xFFFF");
+	asm(" LDI      r22.w2, 50 >> 16");
+	asm(" SBCO     &r22, C0, 0x24, 4");
+	asm(" JMP      TxInterruptServiceRequestHndlr");
 
-			"MCASP_EVENT:                                                        \n"
-			// Check for RX interrrupt first
-			// If TX only PRU Skip RSTAT Check
-			"    QBEQ     MCASP_TX_EVNT, R3.b1, 0x1                              \n"
+	asm("MCASP_EVENT:");
+	// Check for RX interrrupt first
+	// If TX only PRU Skip RSTAT Check
+	asm(" QBEQ     MCASP_TX_EVNT, R3.b1, 0x1");
 
-			// if the PRU is RX only mode, then check if the XSTAT is set. If so, raise event to PRU1 and proceed
-			"    QBNE     RX_TX_PROCESS, R3.b1, 0x2                              \n"
-			"    LBCO     &r22, C25, 0xc0, 4                                     \n"
-			"    QBBC     RX_TX_PROCESS, r22, 5                                  \n"
-			"    LDI      r22.w0, 50 & 0xFFFF                                    \n"
-			"    LDI      r22.w2, 50 >> 16                                       \n"
-			"    SBCO     &r22, C0, 0x20, 4                                      \n"
+	// if the PRU is RX only mode, then check if the XSTAT is set. If so, raise event to PRU1 and proceed
+	asm(" QBNE     RX_TX_PROCESS, R3.b1, 0x2");
+	asm(" LBCO     &r22, C25, 0xc0, 4");
+	asm(" QBBC     RX_TX_PROCESS, r22, 5");
+	asm(" LDI      r22.w0, 50 & 0xFFFF");
+	asm(" LDI      r22.w2, 50 >> 16");
+	asm(" SBCO     &r22, C0, 0x20, 4");
 
-			"RX_TX_PROCESS:                                                      \n"
-			"    LBCO     &r22, C25, 0x80, 4                                     \n"
-			"    QBBS     RxInterruptServiceRequestHndlr, r22, 5                 \n"
-			// Skip the check for XSTAT if we are not Rx/Tx PRU.
-			// We don't want the PRU to spin in a tight loop around the McASP register to introduce a delay
-			"    QBNE     CORE_LOOP, R3.b1, 0x3                                  \n"
+	asm("RX_TX_PROCESS:");
+	asm(" LBCO     &r22, C25, 0x80, 4");
+	asm(" QBBS     RxInterruptServiceRequestHndlr, r22, 5");
+	// Skip the check for XSTAT if we are not Rx/Tx PRU.
+	// We don't want the PRU to spin in a tight loop around the McASP register to introduce a delay
+	asm(" QBNE     CORE_LOOP, R3.b1, 0x3");
 
-			"MCASP_TX_EVNT:                                                      \n"
-			"    LBCO     &r22, C25, 0xc0, 4                                     \n"
-			"    QBBS     TxInterruptServiceRequestHndlr, r22, 5                 \n"
-			// If PRU is both TX/RX, then go back to Core-loop. Else delay to avoid McASP Spins
-			"    QBEQ     CORE_LOOP, R3.b1, 0x3                                  \n"
+	asm("MCASP_TX_EVNT:");
+	asm(" LBCO     &r22, C25, 0xc0, 4");
+	asm(" QBBS     TxInterruptServiceRequestHndlr, r22, 5");
+	// If PRU is both TX/RX, then go back to Core-loop. Else delay to avoid McASP Spins
+	asm(" QBEQ     CORE_LOOP, R3.b1, 0x3");
 
 //******************************************** CORE LOOP: Ends ***********************************************
 
@@ -1213,48 +1210,48 @@ int main(void) {
 //	load the context base info for that channel
 //========================================================================================================================================
 
-			"CHN_SEARCH:                                                         \n"
-			"    LDI      r24.w0, 0x00000001 & 0xFFFF                            \n"
-			"    LDI      r24.w2, 0x00000001 >> 16                               \n"
-			"    LSL      r24, r24, R3.b0                                        \n"
-			"    LDI      r22.w0, 0x284 & 0xFFFF                                 \n"
-			"    LDI      r22.w2, 0x284 >> 16                                    \n"
-			"    SBCO     &r24, C0, r22, 4                                       \n"
+	asm("CHN_SEARCH:");
+	asm(" LDI      r24.w0, 0x00000001 & 0xFFFF");
+	asm(" LDI      r24.w2, 0x00000001 >> 16");
+	asm(" LSL      r24, r24, R3.b0");
+	asm(" LDI      r22.w0, 0x284 & 0xFFFF");
+	asm(" LDI      r22.w2, 0x284 >> 16");
+	asm(" SBCO     &r24, C0, r22, 4");
 
-			// Read Global control register
-			"    LBBO     &R2.w0, r20, 0x080,  8                                 \n"
+	// Read Global control register
+	asm(" LBBO     &R2.w0, r20, 0x080,  8");
 
-			// Retrieve the channel number and load the context base
-			"    LDI      R8, 0x0000                                             \n"
-			"    LDI      R10.w0, 0x0000                                         \n"
-			"    LDI      R10.b2, 0x00                                           \n"
-			"    XOR      R13.w0, R13.w0, R13.w0                                 \n"
-			"    XOR      R9, R9, R9                                             \n"
+	// Retrieve the channel number and load the context base
+	asm(" LDI      R8, 0x0000");
+	asm(" LDI      R10.w0, 0x0000");
+	asm(" LDI      R10.b2, 0x00");
+	asm(" XOR      R13.w0, R13.w0, R13.w0");
+	asm(" XOR      R9, R9, R9");
 
-			"    LDI      R13.w0, 0x90                                           \n"
-			"    LDI      R9, 0x90                                               \n"
+	asm(" LDI      R13.w0, 0x90");
+	asm(" LDI      R9, 0x90");
 
-			"CHN_ACTIVE:                                                         \n"
-			"    LBBO     &R4.w0, R8, R10.w0,  2                                 \n"
-			"    QBBS     CHN_SERACH_RTN, R4.w0, 0x2                             \n"
-			"    ADD      R10.w0, R10.w0, 0x10                                   \n"
-			"    ADD      R10.b2, R10.b2, 0x01                                   \n"
-			"    ADD      R13.w0, R13.w0, 0x2C                                   \n"
-			"    ADD      R9, R9, 0x20                                           \n"
+	asm("CHN_ACTIVE:");
+	asm(" LBBO     &R4.w0, R8, R10.w0,  2");
+	asm(" QBBS     CHN_SERACH_RTN, R4.w0, 0x2");
+	asm(" ADD      R10.w0, R10.w0, 0x10");
+	asm(" ADD      R10.b2, R10.b2, 0x01");
+	asm(" ADD      R13.w0, R13.w0, 0x2C");
+	asm(" ADD      R9, R9, 0x20");
 
-			// None of the channel has service request, go back to MainLoop
-			// check to be verified to boundary condition
-			"    QBLT     MCASP_EVENT, R10.b2, (8 - 1)                           \n"
-			"    JMP      CHN_ACTIVE                                             \n"
+	// None of the channel has service request, go back to MainLoop
+	// check to be verified to boundary condition
+	asm(" QBLT     MCASP_EVENT, R10.b2, (8 - 1)");
+	asm(" JMP      CHN_ACTIVE");
 
-			"CHN_SERACH_RTN:                                                     \n"
-			"    LBBO     &R4.w0, R8, R10.w0,  16                                \n"
-			"    ADD      R8, R8, R10.w0                                         \n"
+	asm("CHN_SERACH_RTN:");
+	asm(" LBBO     &R4.w0, R8, R10.w0,  16");
+	asm(" ADD      R8, R8, R10.w0");
 
-			"    AND      r22.w0, R4.w0, 0x3                                     \n"
-			"    QBEQ     TxServiceRequestHndlr, r22.w0, 0x1                     \n"
-			"    QBEQ     RxServiceRequestHndlr, r22.w0, 0x2                     \n"
-			"    JMP      CORE_LOOP                                              \n"
+	asm(" AND      r22.w0, R4.w0, 0x3");
+	asm(" QBEQ     TxServiceRequestHndlr, r22.w0, 0x1");
+	asm(" QBEQ     RxServiceRequestHndlr, r22.w0, 0x2");
+	asm(" JMP      CORE_LOOP");
 
 //******************************************** CHN_SEARCH: Ends **********************************************
 
@@ -1288,34 +1285,34 @@ int main(void) {
 //		 PRU1 - SYS_EVT49 (host9 - ch13) - SUART Channel 15	        (SUART7: RX)
 //======================================================================================================================================
 
-			"PRU_TO_HOST_INTERRUPT:                                              \n"
-			"    LDI      r22, 0                                                 \n"
+	asm("PRU_TO_HOST_INTERRUPT:");
+	asm(" LDI      r22, 0");
 
-			"    QBEQ     EVTOUT_PRU0_EVENTS, R3.b0, 0                           \n"
-			"    QBEQ     EVTOUT_PRU1_EVENTS, R3.b0, 1                           \n"
+	asm(" QBEQ     EVTOUT_PRU0_EVENTS, R3.b0, 0");
+	asm(" QBEQ     EVTOUT_PRU1_EVENTS, R3.b0, 1");
 
-			"EVTOUT_PRU0_EVENTS:                                                 \n"
-			//storing the counter value
-			"    ADD      r22, r22, 34                                           \n"
-			"    JMP      EVTOUT_SYSEVT_INIT                                     \n"
+	asm("EVTOUT_PRU0_EVENTS:");
+	//storing the counter value
+	asm(" ADD      r22, r22, 34");
+	asm(" JMP      EVTOUT_SYSEVT_INIT");
 
-			"EVTOUT_PRU1_EVENTS:                                                 \n"
-			"    ADD      r22, r22, 42                                           \n"
+	asm("EVTOUT_PRU1_EVENTS:");
+	asm(" ADD      r22, r22, 42");
 
-			"EVTOUT_SYSEVT_INIT:                                                 \n"
-			"    ADD      r22, r22, R10.b2                                       \n"
+	asm("EVTOUT_SYSEVT_INIT:");
+	asm(" ADD      r22, r22, R10.b2");
 
-			"EVTOUT_GEN:                                                         \n"
-			// Clear SYS_EVTn
-			"    SBCO     &r22, C0, 0x24, 4                                      \n"
+	asm("EVTOUT_GEN:");
+	// Clear SYS_EVTn
+	asm(" SBCO     &r22, C0, 0x24, 4");
 
-			// Enable SYS_EVTn system interrupt
-			"    SBCO     &r22, C0, 0x28, 4                                      \n"
+	// Enable SYS_EVTn system interrupt
+	asm(" SBCO     &r22, C0, 0x28, 4");
 
-			// Generate SYS_EVTn by event out mapping
-			"    MOV      r31.w0, r22.w0                                         \n"
+	// Generate SYS_EVTn by event out mapping
+	asm(" MOV      r31.w0, r22.w0");
 
-			"    JMP      MCASP_EVENT                                            \n"
+	asm(" JMP      MCASP_EVENT");
 
 //******************************************** PRU_TO_HOST_INTERRUPT : ENDS **********************************
 
@@ -1340,85 +1337,85 @@ int main(void) {
 //	and activates the RX serilizer if it is diabled.
 //========================================================================================================================================
 
-			"RxServiceRequestHndlr:                                              \n"
-			// load the max RX TRIES before time out
-			"    LBBO     &r1.w0, r20, 0x088, 2                                  \n"
+	asm("RxServiceRequestHndlr:");
+	// load the max RX TRIES before time out
+	asm(" LBBO     &r1.w0, r20, 0x088, 2");
 
-			// read interrupt status regsiter
-			"    LBBO     &R2.w2, r20, 0x082, 2                                  \n"
+	// read interrupt status regsiter
+	asm(" LBBO     &R2.w2, r20, 0x082, 2");
 
-			"    CLR      R2.w2, R2.w2, R10.b2                                   \n"
+	asm(" CLR      R2.w2, R2.w2, R10.b2");
 
-			// write interrupt status regsiter
-			"    SBBO     &R2.w2, r20, 0x082, 2                                  \n"
+	// write interrupt status regsiter
+	asm(" SBBO     &R2.w2, r20, 0x082, 2");
 
-			//Clear Service Request
-			"    CLR      R4.w0, R4.w0, 0x2                                      \n"
-			"    SBBO     &R4.w0, R8, 0,  2                                      \n"
+	//Clear Service Request
+	asm(" CLR      R4.w0, R4.w0, 0x2");
+	asm(" SBBO     &R4.w0, R8, 0,  2");
 
-			// clear timeout flag
-			"    CLR      R5.b2, R5.b2, 6                                        \n"
+	// clear timeout flag
+	asm(" CLR      R5.b2, R5.b2, 6");
 
-			// Set the TXRX_READY_BIT
-			"    SET      R5.b2, R5.b2, 0                                        \n"
+	// Set the TXRX_READY_BIT
+	asm(" SET      R5.b2, R5.b2, 0");
 
-			// update the RX Status Register
-			"    SBBO     &R5.b2, R8, 6,  1                                      \n"
+	// update the RX Status Register
+	asm(" SBBO     &R5.b2, R8, 6,  1");
 
-			// Set the SUART_CH_TXRXCHNSTATUS_BIT to indicate the channel being active
-			"    SET      R5.b3, R5.b3, 7                                        \n"
-			"    SBBO     &R5.b3, R8, 7,  1                                      \n"
+	// Set the SUART_CH_TXRXCHNSTATUS_BIT to indicate the channel being active
+	asm(" SET      R5.b3, R5.b3, 7");
+	asm(" SBBO     &R5.b3, R8, 7,  1");
 
-			"RX_CONTEXT_INIT:                                                    \n"
-			"    QBEQ     PRUxxx_MODE_RX_ONLY, R3.b1, 0x2                        \n"
+	asm("RX_CONTEXT_INIT:");
+	asm(" QBEQ     PRUxxx_MODE_RX_ONLY, R3.b1, 0x2");
 
-			// Load RX Context Base Address corresponding to Active RX Channel
-			"    JAL      r30.w0, LOAD_RX_CONTEXT_ADDRESS                        \n"
+	// Load RX Context Base Address corresponding to Active RX Channel
+	asm(" JAL      r30.w0, LOAD_RX_CONTEXT_ADDRESS");
 
-			"PRUxxx_MODE_RX_ONLY:                                                \n"
-			// Calculating the specific SRCTL and R_BUF register offset.
-			"    AND      r22, R4.b1, 0x0F                                       \n"
-			"    LSL      r22, r22, 2                                            \n"
-			// Storing SRCTL register address in RX Context Area Region
-			"    LDI      R12.w0, (0x01D00180) & 0xFFFF                          \n"
-			"    LDI      R12.w2, (0x01D00180) >> 16                             \n"
-			"    ADD      R12, R12, r22                                          \n"
+	asm("PRUxxx_MODE_RX_ONLY:");
+	// Calculating the specific SRCTL and R_BUF register offset.
+	asm(" AND      r22, R4.b1, 0x0F");
+	asm(" LSL      r22, r22, 2");
+	// Storing SRCTL register address in RX Context Area Region
+	asm(" LDI      R12.w0, (0x01D00180) & 0xFFFF");
+	asm(" LDI      R12.w2, (0x01D00180) >> 16");
+	asm(" ADD      R12, R12, r22");
 
-			//storing asp_rsrctl_reg in RX Context Address Region
-			"    SBBO     &R12, R9, 4,  4                                        \n"
+	//storing asp_rsrctl_reg in RX Context Address Region
+	asm(" SBBO     &R12, R9, 4,  4");
 
-			// Store RBuf Address in RX Context Region
-			"    LDI      R11.w0, (0x01D00280) & 0xFFFF                          \n"
-			"    LDI      R11.w2, (0x01D00280) >> 16                             \n"
-			"    ADD      R11, R11, r22                                          \n"
+	// Store RBuf Address in RX Context Region
+	asm(" LDI      R11.w0, (0x01D00280) & 0xFFFF");
+	asm(" LDI      R11.w2, (0x01D00280) >> 16");
+	asm(" ADD      R11, R11, r22");
 
-			// storing asp_rbuf_reg in RX context  adress region
-			"    SBBO     &R11, R9, 0,  4                                        \n"
+	// storing asp_rbuf_reg in RX context  adress region
+	asm(" SBBO     &R11, R9, 0,  4");
 
-			// Load the Context info specific to Current RX channel from memory to registers
-			//	LBBO   	rx_context,  suart_ch_info.rx_context_addr, #00, SIZE (rx_context)
+	// Load the Context info specific to Current RX channel from memory to registers
+	//	LBBO   	rx_context,  suart_ch_info.rx_context_addr, #00, SIZE (rx_context)
 
-			// Clear the RX timeout counter
-			"    XOR      R16.w0, R16.w0, R16.w0                                 \n"
-			"    SBBO     &R16.w0, R9, 20,  2                                    \n"
+	// Clear the RX timeout counter
+	asm(" XOR      R16.w0, R16.w0, R16.w0");
+	asm(" SBBO     &R16.w0, R9, 20,  2");
 
-			// Activate RX serializer
-			"    LBBO     &r23, R12, 0, 4                                        \n"
-			"    AND      r23, r23, 0x3                                          \n"
-			// Check if Serializer is Already Active as Rx if ,yes skip activation
-			"    QBEQ     CLR_RSTAT, r23, 0x2                                    \n"
-			//  Activate serializer as Receiver
-			"    LDI      r23.w0, 0x000E & 0xFFFF                                \n"
-			"    LDI      r23.w2, 0x000E >> 16                                   \n"
-			"    SBBO     &r23, R12, 0, 4                                        \n"
+	// Activate RX serializer
+	asm(" LBBO     &r23, R12, 0, 4");
+	asm(" AND      r23, r23, 0x3");
+	// Check if Serializer is Already Active as Rx if ,yes skip activation
+	asm(" QBEQ     CLR_RSTAT, r23, 0x2");
+	//  Activate serializer as Receiver
+	asm(" LDI      r23.w0, 0x000E & 0xFFFF");
+	asm(" LDI      r23.w2, 0x000E >> 16");
+	asm(" SBBO     &r23, R12, 0, 4");
 
-			"CLR_RSTAT:                                                          \n"
-			// Clear the RSTAT  (Overrun, etc)
-			"    LDI      r22.w0, 0xFFFF & 0xFFFF                                \n"
-			"    LDI      r22.w2, 0xFFFF >> 16                                   \n"
-			"    SBCO     &r22, C25, 0x80, 4                                     \n"
+	asm("CLR_RSTAT:");
+	// Clear the RSTAT  (Overrun, etc)
+	asm(" LDI      r22.w0, 0xFFFF & 0xFFFF");
+	asm(" LDI      r22.w2, 0xFFFF >> 16");
+	asm(" SBCO     &r22, C25, 0x80, 4");
 
-			"    JMP      MCASP_EVENT                                            \n"
+	asm(" JMP      MCASP_EVENT");
 
 //******************************************** RxServiceRequestHndlr: ENDS ***********************************
 
@@ -1432,634 +1429,634 @@ int main(void) {
 //	the context info for RX channel and proceeds for reading the frame tramsmitted by sender.
 //========================================================================================================================================
 
-			"RxInterruptServiceRequestHndlr:                                     \n"
-			// Retrieve the channel number and load the RX context base info corressponding to serializer address in scratch_reg1 and serializer number  in scratch_reg4
-			// Load the SUART CHANNEL BASE ADDRESS
-			"    LDI      R8, 0x0000                                             \n"
-
-			"    QBEQ     PRUx_MODE_RX_ONLY, R3.b1, 0x2                          \n"
-
-			// Since the Rx Channel are 1,3,5,7 Load the suart_ch_regs for Rx channel 1 as it is first channel
-			"    ADD      R10.w0, r20.w0, 0x10                                   \n"
-
-			"    LDI      R10.b2, 0x01                                           \n"
-
-			// Load the RX channel 1 context address to Ch_info register's rx_context_addr field
-			"    LDI      R9, 0x0C0                                              \n"
-			"    JMP      SERCH_ACTIVE_RX_CHN_RX                                 \n"
-
-			"PRUx_MODE_RX_ONLY:                                                  \n"
-			// Since the Rx Channel are 1,3,5,7 Load the suart_ch_regs for Rx channel 1 as it is first channel
-			"    LDI      R10.w0, 0x00                                           \n"
-
-			"    LDI      R10.b2, 0x00                                           \n"
-
-			// Load the RX channel 1 context address to Ch_info register's rx_context_addr field
-			"    LDI      R9, 0x90                                               \n"
-
-			"SERCH_ACTIVE_RX_CHN_RX:                                             \n"
-			"    ADD      r22, R10.w0, 7                                         \n"
-			// Load the Channel Cntrl info from Memory to Register
-			"    LBBO     &R5.b3, R8, r22,  1                                    \n"
-			"    QBBC     NEXT_RX_CHN, R5.b3, 7                                  \n"
-
-			"    LBBO     &r22, R9, 4, 4                                         \n"
-			"    LBBO     &r23, r22, 0, 4                                        \n"
-			"    QBBS     ACTIVE_RX_CHN_FOUND, r23, 5                            \n"
-
-			"NEXT_RX_CHN:                                                        \n"
-			"    QBEQ     PRUxx_MODE_RX_ONLY, R3.b1, 0x2                         \n"
-
-			// offset of RX suart_ch_regs
-			"    ADD      R10.w0, R10.w0, 0x20                                   \n"
-			// Increament to Next Rx Channel number
-			"    ADD      R10.b2, R10.b2, 0x2                                    \n"
-
-			// Increament rx_context_addr by RX_CONTEXT_OFFSET i.e. to next RX channel context address
-			"    ADD      R9, R9, 0x50                                           \n"
-			"    QBGE     SERCH_ACTIVE_RX_CHN_RX, R10.b2, (8 - 1)                \n"
-			"    JMP      CORE_LOOP                                              \n"
-
-			"PRUxx_MODE_RX_ONLY:                                                 \n"
-			// offset of RX suart_ch_regs
-			"    ADD      R10.w0, R10.w0, 0x10                                   \n"
-			// Increamnet to Next Rx ChanneL number
-			"    ADD      R10.b2, R10.b2, 0x1                                    \n"
-			// Increamnet rx_context_addr by RX_CONTEXT_OFFSET i.e. to next RX channel context address
-			"    ADD      R9, R9, 0x20                                           \n"
-			"    QBGE     SERCH_ACTIVE_RX_CHN_RX, R10.b2, (8 - 1)                \n"
-			"    JMP      CORE_LOOP                                              \n"
-
-			"ACTIVE_RX_CHN_FOUND:                                                \n"
-			// Load the suart_ch_regs from Memory to Register
-			"    LBBO     &R4.w0, R8, R10.w0,  16                                \n"
-
-			// Load the Context info specific to current RX Channel from memory to registers
-			"    LBBO     &R11, R9, 0, 24                                        \n"
-
-			"    ADD      R8, R8, R10.w0                                         \n"
-
-			// Clear the RSTAT  (Overrun, etc) for Errors
-			"    LBCO     &r22, C25, 0x80, 4                                     \n"
-			"    QBBC     RX_PROCESSING_INIT, r22, 8                             \n"
-
-			"    LDI      r22.w0, 0xFFFF & 0xFFFF                                \n"
-			"    LDI      r22.w2, 0xFFFF >> 16                                   \n"
-			"    SBCO     &r22, C25, 0x80, 4                                     \n"
-
-			//  Start receving DATA from MAC_ASP's R-Buf corresponding to channel
-			"RX_PROCESSING_INIT:                                                 \n"
-			"    XOR      r19, r19, r19                                          \n"
-			// Read the content of RBUF
-			"    LBBO     &r22, R11, 0, 4                                        \n"
-			"    OR       r19, r19, r22                                          \n"
-
-			// If start condition is already received then go to reading next bit  otherwise look for start condition
-			"    QBLT     READ_CURRENT, R7.b1, 0                                 \n"
-
-			// check Chn_TxRxRepeatDoneCtr, if it is not zero, jump to READ_CURRENT to prescale the start condition
-			"    QBLT     READ_CURRENT, R7.w2, 0                                 \n"
-
-			// If sampling point i.e. sampling_bit_pos is equal to greater than 16 (INVALID_SAMPLING_POINT),
-			// start bit transition edge is being detected, fall through to calculate sampling point,
-			// otherwise, sampling point is already calculated JUMP to READ_CURRENT
-			"    QBGE     READ_CURRENT, R16.b2, 16                               \n"
-
-			// Extract timing information by detecting start transition (first left most zero)
-			"    LMBD     r25, r22, 0                                            \n"
-			// branch if zero: start bit transition detected
-			"    QBGT     START_BIT_TRANSITION, r25, 32                          \n"
-			"    LDI      R16.b2, 0xff                                           \n"
-			"    SBBO     &R16.b2, R9, 22,  1                                    \n"
-
-			// RX time out logic
-			"    QBBC     RxInterruptServiceRequestHndlr, R4.w2, 14              \n"
-			"    QBBC     RxInterruptServiceRequestHndlr, R5.b2, 0               \n"
-			"    QBEQ     RxInterruptServiceRequestHndlr, R7.b0, 0               \n"
-
-			// Read the request count to be received
-			"    LSR      r22, R5.w0, 0x8                                        \n"
-			"    AND      r22, r22, 0x0F                                         \n"
-			// Since fifo size is 16
-			"    ADD      r22, r22, 0x01                                         \n"
-			"    QBEQ     RxInterruptServiceRequestHndlr, R7.b0, r22             \n"
-
-			// check if time-out is enabled, if yes increament the timeout counter and check if count is equal to MAX_RX_TIMEOUT_TRIES
-			// if yes raise the interrupt for time out.
-			"    ADD      R16.w0, R16.w0, 1                                      \n"
-			"    SBBO     &R16.w0, R9, 20,  2                                    \n"
-			"    QBGE     RxInterruptServiceRequestHndlr, R16.w0, r1.w0          \n"
-			"    SET      R5.b2, R5.b2, 6                                        \n"
-			"    CLR      R4.w2, R4.w2, 14                                       \n"
-			"    SBBO     &R4.w2, R8, 2,  2                                      \n"
-
-			// Clear the RX timeout counter
-			"    XOR      R16.w0, R16.w0, R16.w0                                 \n"
-			"    SBBO     &R16.w0, R9, 20,  2                                    \n"
-			"    JMP      RX_CHN_INTR                                            \n"
-
-			// Calculate the sampling bit position based on the start bit position
-			// center = oversampling / 2
-			// sampling bit position = start bit possition - center
-
-			"START_BIT_TRANSITION:                                               \n"
-    			// clear the rx time out counter
-			"    XOR      R16.w0, R16.w0, R16.w0                                 \n"
-			"    SBBO     &R16.w0, R9, 20,  2                                    \n"
-
-			// determine the over-sampling rate
-			"    LSR      r23, R4.w2, 10                                         \n"
-			"    AND      r23, r23, 0x3                                          \n"
-
-			// OVER_SAMPLE
-			"    QBEQ     OVER_SAMPLE_SIZE8BIT, r23, 0x0                         \n"
-			"    QBEQ     OVER_SAMPLE_SIZE8BIT, r23, 0x1                         \n"
-			"    QBEQ     OVER_SAMPLE_SIZE16BIT, r23, 0x2                        \n"
-
-			// Calaulate sampling bit position for 8 bit over sampling
-			"OVER_SAMPLE_SIZE8BIT:                                               \n"
-			// start bit possition - center
-			"    SUB      R16.b2, r25, 0x4                                       \n"
-			// sampling point
-			"    AND      R16.b2, R16.b2, 7                                      \n"
-			"    SBBO     &R16.b2, R9, 22,  1                                    \n"
-			// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
-			"    QBLE     READ_CURRENT, r25, 0x4                                 \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// Calaulate sampling bit position for 16 bit over sampling
-			"OVER_SAMPLE_SIZE16BIT:                                              \n"
-			// start bit possition - center
-			"    SUB      R16.b2, r25, 0x8                                       \n"
-			// samplimg point
-			"    AND      R16.b2, R16.b2, 15                                     \n"
-			"    SBBO     &R16.b2, R9, 22,  1                                    \n"
-			// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
-			"    QBLE     READ_CURRENT, r25, 0x8                                 \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			"READ_CURRENT:                                                       \n"
-			// scratch_8bit_reg2 holds the information if bit detected is zero if scratch_8bit_reg2= 0, or one if scratch_8bit_reg2 = 1
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-			// if bit at sampling point is zero jump to READ_ZERO
-			"    QBBC     READ_ZERO, r22, R16.b2                                 \n"
-			// otherwise increament scratch_8bit_reg2 by one as bit detected is one
-			"    ADD      r21.b1, r21.b1, 1                                      \n"
-
-			"READ_ZERO:                                                          \n"
-			// We have read the data bit here...
-			// If start bit is being received already, then skip the start condition processing.
-			"    QBLT     RX_BIT_RECVD, R7.b1, 0                                 \n"
-
-			//(Chn_TxRxBitsDoneCtr == 0)            //No bit is being Recieved, check if it is start bit
-			// if DataBit == 0, i.e. scratch_8bit_reg2 == 0, Jump to Start Condition, else error fall through
-			"    QBEQ     START_CONDITION, r21.b1, 0                             \n"
-
-			"    QBEQ     START_CONDITION, R7.w2, 0                              \n"
-
-			// Broken start condition or false alarm, Reset repeat counter		//if DataBit == 1, instead of zero
-			"    XOR      R7.w2, R7.w2, R7.w2                                    \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// else part for NO_REPEAT_DONE  DataBit == 0
-			"START_CONDITION:                                                    \n"
-			// Increament Repeat Done Counter by One, write back to memory
-			"    ADD      R7.w2, R7.w2, 1                                        \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-
-			// Read Pre Scaler
-			"    LDI      r23, 0x03FF                                            \n"
-			"    AND      r23, r23, R4.w2                                        \n"
-
-			// if Repeat Done count is greater than or equal to prescaler, start bit is received, jump to START_BIT_RECIVED,
-			"    QBGE     START_BIT_RECIVED, r23, R7.w2                          \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// Start bit is condition Detected properly
-			"START_BIT_RECIVED:                                                  \n"
-			// Increament Bit Count by One, and write it to memory
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
-
-			// Reset Repeat Counter, and write it to memory
-			"    XOR      R7.w2, R7.w2, R7.w2                                    \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// Start Bit has been detected Already, Now the data bit is being received
-			"RX_BIT_RECVD:                                                       \n"
-			// Now scratch_reg1 holds the info whether the data bit in scratch_8bit_reg2, is zero or one
-			"    XOR      r22, r22, r22                                          \n"
-			// if scratch_8bit_reg2 = 0, i.e data bit is Zero Jump to RX_DATA_BIT_ZERO
-			// else Data bit is one fall through, data bit is ONE
-			"    QBEQ     RX_DATA_BIT_ZERO, r21.b1, 0                            \n"
-			// bit received is one, scratch_reg1 = 1
-			"    OR       r22, r22, 0x1                                          \n"
-
-			"RX_DATA_BIT_ZERO:                                                   \n"
-			// if (Chn_TxRxRepeatDoneCntr < 32), check if reapeat done counter is less than 32, if yes Jump to RX_REPEAT_DONE_CNTR_LT_32
-			"    QBGE     RX_REPEAT_DONE_CNTR_LT_32, R7.w2, 0x20                 \n"
-
-			// repeat done counter is Greater than 32, Read Chn_RxDataBitsHoldRegHigh reg, Copy the Received bit to Chn_RxDataBitsHoldRegHigh register
-			// else part : (Chn_TxRxRepeatDoneCntr is Greater than or equal to 32 )
-			"RX_REPEAT_DONE_CNTR_GT_32:                                          \n"
-			// Calculate the offset for bit in Chn_RxDataBitsHoldRegHigh regsiter
-			"    RSB      r23, R7.w2, 0x20                                       \n"
-			// Shift Received bit by above calculated of set i.e Chn_TxRxRepeatDoneCntr - 20
-			"    LSL      r22, r22, r23                                          \n"
-			"    LBBO     &R15, R9, 16,  4                                       \n"
-			"    OR       R15, r22, R15                                          \n"
-			"    SBBO     &R15, R9, 16,  4                                       \n"
-			"    JMP      RX_REPEAT_COUNT_LESS_THAN_PRESCALR                     \n"
-
-			// repeat done counter is less than OR equal to 32, Read the Chn_RxDataBitsHoldRegLow, Copy the Received bit to Chn_RxDataBitsHoldRegLow register
-			// write it back to memory
-			// if for (Chn_TxRxRepeatDoneCntr < 32)
-			"RX_REPEAT_DONE_CNTR_LT_32:                                          \n"
-			// Shift Received bit by Repeat Done Counter
-			"    LSL      r22, r22, R7.w2                                        \n"
-			"    LBBO     &R14, R9, 12,  4                                       \n"
-			"    OR       R14, r22, R14                                          \n"
-			"    SBBO     &R14, R9, 12,  4                                       \n"
-
-			// Increament Chn_TxRxRepeatDoneCntr by one and Check if Repeat Done Counter is equal to Prescalar,
-			// if yes jump to PROCESS_RX_DATA_BIT, otherewise again sample RBuf for same bit
-			"RX_REPEAT_COUNT_LESS_THAN_PRESCALR:                                 \n"
-			"    ADD      R7.w2, R7.w2, 1                                        \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-
-			// Read Pre Scaler
-			"    LDI      r23, 0x03FF                                            \n"
-			"    AND      r23, r23, R4.w2                                        \n"
-
-			// check if number of bits sampled (Chn_TxRxRepeatDoneCtr) is equal to prescaler (scratch_reg2), if yes jump to PROCESS_RX_DATA_BIT
-			"    QBGE     PROCESS_RX_DATA_BIT, r23, R7.w2                        \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// Scan Chn_RxDataBitsHoldRegLow, Chn_RxDataBitsHoldRegHigh, to check if BIT received is one or zero and write to Chn_RxDataHoldReg
-			// (Chn_TxRxRepeatDoneCntr >= Chn_Config1.PreScaller) if part
-			"PROCESS_RX_DATA_BIT:                                                \n"
-			// Get the Presaclar
-			"    LDI      r24, 0x03FF                                            \n"
-			// scratch_reg3 hold prescalar
-			"    AND      r24, r24, R4.w2                                        \n"
-
-			// Initialize the register to zero required for copying data bit received in rxdata_buf
-			// keep count of number of ONE scanned
-			"    XOR      r21.b0, r21.b0, r21.b0                                 \n"
-			// keep count of number of ZERO scanned
-			"    XOR      r21.b1, r21.b1, r21.b1                                 \n"
-
-			// used to store count of number of bits scanned in Chn_RxDataBitsHoldRegLow, & Chn_RxDataBitsHoldRegHigh
-			"    XOR      r23, r23, r23                                          \n"
-
-			// points to location taken as start point in Chn_RxDataBitsHoldRegLow for scannig bit received
-			"    XOR      r22, r22, r22                                          \n"
-
-			// scratch_reg4 holds the data from Chn_RxDataBitsHoldRegLow
-			"    LBBO     &r25, R9, 12,  4                                       \n"
-			// if Pre Scalar is less than or equal to 32, JMP to BIT_CHK_LOOP
-			"    QBGE     BIT_CHK_LOOP, r24, 0x20                                \n"
-
-			// pre scalar is greater 32, check if it is greater that 48 then set scratch_reg3 = 48, scan bit upto this count only.
-			"PRE_SCALR_GT_32:                                                    \n"
-			// start checking bit from bit position 0x10
-			"    OR       r22, r22, 0x10                                         \n"
-			// if Pre Scalar is less than 48
-			"    QBGT     BIT_CHK_LOOP, r24, 0x30                                \n"
-
-			// pre scalar is greater 48,  set scratch_reg3 = 48, scan bit upto this count only.
-			"PRE_SCALR_GT_48:                                                    \n"
-			"    LDI      r24, 0x30                                              \n"
-
-			// Scan the Chn_RxDataBitsHoldRegLow, and Chn_RxDataBitsHoldRegHigh registers to know received bit is ZERO or ONE
-			"BIT_CHK_LOOP:                                                       \n"
-			// if bit is cleared, Jump to BIT_RECVD_ZERO
-			"    QBBC     BIT_RECVD_ZERO, r25, r22                               \n"
-			// else BIT prerscaled is one
-			"    ADD      r21.b0, r21.b0, 1                                      \n"
-			// Increament scratch_reg1 by one so that it points to next bit to scanned
-			"    ADD      r22, r22, 1                                            \n"
-			// Increament scratch_reg2 holding bits scanned count
-			"    ADD      r23, r23, 1                                            \n"
-			// if Prescaler is greater than 32, and scratch_reg2 is equal to 32, load Chn_RxDataBitsHoldRegHigh in scratch_reg4
-			"    QBLT     LOAD_RXDATABITS_HOLDREGHIGH, r23, 0x20                 \n"
-			// scan untill all the bits are scanned
-			"    QBGT     BIT_CHK_LOOP, r23, r24                                 \n"
-			"    JMP      COPY_BIT_RECVD                                         \n"
-
-			// Load the Chn_RxDataBitsHoldRegHigh to scratch_reg4
-			"LOAD_RXDATABITS_HOLDREGHIGH:                                        \n"
-			"    LBBO     &r25, R9, 16,  4                                       \n"
-			// Reset the scratch_reg1, so that starts from bit 0 for Chn_RxDataBitsHoldRegHigh
-			"    XOR      r22, r22, r22                                          \n"
-			// Reset the scratch_reg2, so that only jump to label LOAD_RXDATABITS_HOLDREGHIGH done one's only
-			"    XOR      r23, r23, r23                                          \n"
-			// Decreament Total loop count by 32, since it has been already checked in Chn_RxDataBitsHoldRegLow
-			"    SUB      r24, r24, 0x20                                         \n"
-			"    JMP      BIT_CHK_LOOP                                           \n"
-
-			// Current sacnned Bit in Chn_RxDataBitsHoldRegHigh or Chn_RxDataBitsHoldRegLow is zero
-			"BIT_RECVD_ZERO:                                                     \n"
-			// for Zero
-			"    ADD      r21.b1, r21.b1, 1                                      \n"
-			"    ADD      r22, r22, 1                                            \n"
-			"    ADD      r23, r23, 1                                            \n"
-			"    QBGT     BIT_CHK_LOOP, r23, r24                                 \n"
-
-			// Copy the Received bit to Chn_RxDataHoldReg, scratch_reg1, now store the info if bit received is zero or one
-			"COPY_BIT_RECVD:                                                     \n"
-
-			// scratch_8bit_reg1= Bit is ONE, scratch_8bit_reg2 = Bit is Zero, if scratch_8bit_reg2 > scratch_8bit_reg1,
-			// jump to WRITE_RCVD_BIT_TO_RX_DATAHOLDREG as data bit is ZERO
-			"    XOR      r22, r22, r22                                          \n"
-			"    QBGE     WRITE_RCVD_BIT_TO_RX_DATAHOLDREG, r21.b0, r21.b1       \n"
-			//Bit Received is One,  write to Chn_RxDataHoldReg
-			"    OR       r22, r22, 0x1                                          \n"
-
-			// Write the Received Data bit (in scratch_reg1) to Chn_RxDataHoldReg
-			"WRITE_RCVD_BIT_TO_RX_DATAHOLDREG:                                   \n"
-			// Shift the bit received by Chn_TxRxBitsDoneCtr
-			"    LSL      r22, r22, R7.b1                                        \n"
-
-			// Read the Chn_RxDataHoldReg from Memory
-			"    LBBO     &R13.w2, R9, 10,  2                                    \n"
-
-			// Write the bit received to Chn_RxDataHoldReg
-			"    OR       R13.w2, R13.w2, r22                                    \n"
-
-			// Write updated Chn_RxDataHoldReg to memory
-			"    SBBO     &R13.w2, R9, 10,  2                                    \n"
-
-			// Increment the Data bit Counter
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
-
-			// Reset the Repeat Done Counter
-			"    XOR      R7.w2, R7.w2, R7.w2                                    \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-
-			// initialize Chn_RxDataBitsHoldRegLow
-			"    XOR      R14, R14, R14                                          \n"
-			"    SBBO     &R14, R9, 12,  4                                       \n"
-
-			// initialize Chn_RxDataBitsHoldRegHigh
-			"    XOR      R15, R15, R15                                          \n"
-			"    SBBO     &R15, R9, 16,  4                                       \n"
-
-			// Read Bit Per Charater
-			"    AND      r23, R5.w0, 0xF                                        \n"
-
-			// check is (N-1) bit is being received for current data frame, if yes jump to CHK_RECVD_DATA_FRAME
-			// if all N bits has been Received Jump to RESET_BITS_CNTR, otherwise receive remaining bits.
-			// (Chn_TxRxBitsDoneCntr >= Chn_Config2.BitsPerChar)
-			"    QBGE     RESET_BITS_CNTR, r23, R7.b1                            \n"
-			"    SUB      r23, r23, 1                                            \n"
-			"    QBEQ     CHK_RECVD_DATA_FRAME, r23, R7.b1                       \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// if all bits received, verify the Received data frame
-			"CHK_RECVD_DATA_FRAME:                                               \n"
-			// Zero the (16 - Chn_TxRxBitsDoneCntr) Most significant bits in the Chn_RxDataHoldReg.
-			"    RSB      r23, r23, 16                                           \n"
-			// load the count to for number of zero to inserted
-			"    ADD      r23, r23, 0x10                                         \n"
-			// Used to Insert  Zero in MSB
-			"    NOT      r22, r20                                               \n"
-
-			"REGHOLD_MSB_ZERO:                                                   \n"
-			// Prepare the MASK with  ZERO's in bits that do not corresponds to data bits
-			"    LSR      r22, r22, r23                                          \n"
-
-			// Read the Data hold Reg
-			"    LBBO     &R13.w2, R9, 10,  2                                    \n"
-			// Insert the ZERO's in bits that do  not  corresponds to Data Bits
-			"    AND      R13.w2, R13.w2, r22                                    \n"
-			"    SBBO     &R13.w2, R9, 10,  2                                    \n"
-
-			// removing start bit
-			"    LSR      R13.w2, R13.w2, 1                                      \n"
-
-			// load the arm memory lacation address where data is to be written
-			"    LBBO     &R6, R8, 8,  4                                         \n"
-
-			// Read Bits Per Character
-			"    AND      r25, R5.w0, 0xF                                        \n"
-			"    SUB      r25, r25, 2                                            \n"
-
-			// Load the Bytes Done counter
-			"    MOV      r22, R7.b0                                             \n"
-
-			// check, if two byte offset is required (bits per character greater than 8)
-			"    QBGE     WRITE_RX_CHAR_TO_MEM, r25, 0x8                         \n"
-
-			// calculate the offset in memory where received character is to be written
-			"    LSL      r22, r22, 1                                            \n"
-
-			"WRITE_RX_CHAR_TO_MEM:                                               \n"
-			// Write the actual data to ARM Memory
-			"    SBBO     &R13.w2, R6, r22,  2                                   \n"
-
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			"RESET_BITS_CNTR:                                                    \n"
-			// Check for Framing Error Framing Error
-			"    SUB      r24, R7.b1, 1                                          \n"
-
-			// Reset bits done counter
-			"    XOR      R7.b1, R7.b1, R7.b1                                    \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
-
-			// Get the Prescalar
-			"    LDI      r23, 0x03FF                                            \n"
-			//scratch_reg2 hold prescalar
-			"    AND      r23, r23, R4.w2                                        \n"
-
-			// Extract timing information by detecting start transition (first left most zero)
-			"    LMBD     r25, r19, 0                                            \n"
-			// branch if zero start bit transition detected
-			"    QBEQ     INVALID_SAMPLING_PNT, r25, 32                          \n"
-
-			// determine the over-sampling rate
-			"    LSR      r22, R4.w2, 10                                         \n"
-			// OVER_SAMPLE
-			"    AND      r22, r22, 0x3                                          \n"
-			// 16 bit over sampling
-			"    QBEQ     NXT_FRAME_SAMPLING_16BIT_OVS, r22, 0x2                 \n"
-
-			// Calaulate sampling bit position for 8 bit over sampling
-			"NXT_FRAME_SAMPLING_8BIT_OVS:                                        \n"
-			// to correct  bit timing error used 4
-			"    QBLT     INVALID_SAMPLING_PNT, r25, 4                           \n"
-
-			"CAL_SAMPL_PNT8:                                                     \n"
-			// start bit position - center
-			"    SUB      R16.b2, r25, 0x4                                       \n"
-			// sampling point
-			"    AND      R16.b2, R16.b2, 7                                      \n"
-			"    QBGT     UPDATE_SAMPLING_PNT, r25, 4                            \n"
-			"    JMP      NXT_FRAME_SAMPLING_PNT                                 \n"
-
-			// Calaulate sampling bit position for 16 bit over sampling
-			"NXT_FRAME_SAMPLING_16BIT_OVS:                                       \n"
-			// to correct  bit timing error used 4
-			"    QBLT     INVALID_SAMPLING_PNT, r25, 8                           \n"
-
-			"CAL_SAMPL_PNT16:                                                    \n"
-			// start bit position - center
-			"    SUB      R16.b2, r25, 0x8                                       \n"
-			// sampling point
-			"    AND      R16.b2, R16.b2, 15                                     \n"
-			"    QBGT     UPDATE_SAMPLING_PNT, r25, 8                            \n"
-
-			"NXT_FRAME_SAMPLING_PNT:                                             \n"
-			// Increament Repeat Done Counter by One, write back to memory
-			"    ADD      R7.w2, R7.w2, 1                                        \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-
-			// Read Pre Scaler
-			"    LDI      r23, 0x03FF                                            \n"
-			"    AND      r23, r23, R4.w2                                        \n"
-
-			// if Repeat Done count is greater than or equal to prescaler, start bit is received, jump to START_BIT
-			"    QBLT     UPDATE_SAMPLING_PNT, r23, R7.w2                        \n"
-
-			// Start bit is condition Detected properly
-			"START_BIT:                                                          \n"
-			// Increament Bit Count by One, and write it to memory
-			"    ADD      R7.b1, R7.b1, 1                                        \n"
-			"    SBBO     &R7.b1, R8, 13,  1                                     \n"
-
-			"    XOR      R7.w2, R7.w2, R7.w2                                    \n"
-			"    SBBO     &R7.w2, R8, 14,  2                                     \n"
-			"    JMP      UPDATE_SAMPLING_PNT                                    \n"
-
-			"INVALID_SAMPLING_PNT:                                               \n"
-			// Reset the Sampling Point
-			"    LDI      R16.b2, 0xff                                           \n"
-
-			"UPDATE_SAMPLING_PNT:                                                \n"
-			"    SBBO     &R16.b2, R9, 22,  1                                    \n"
-
-			// read interrupt mask regsiter
-			"    LBBO     &R2.w0, r20, 0x080, 2                                  \n"
-
-			//read interrupt status regsiter
-			"    LBBO     &R2.w2, r20, 0x082, 2                                  \n"
-
-			// check for error in received data frame
-			// Check for Break Condiotion Error
-			"    QBGE     RX_DATA_ZERO, R13.w2, 0                                \n"
-
-			// Framing Error: Check if the Bit at Chn_TxRxBitsDoneCtr Bit Position in the Chn_RxDataHoldReg is set
-			"    QBBC     BIT_CLEARD, R13.w2, r24                                \n"
-
-			// increament Chn_TxRxBytesDoneCtr by one
-			"    ADD      R7.b0, R7.b0, 1                                        \n"
-			"    SBBO     &R7.b0, R8, 12,  1                                     \n"
-
-			// Reset the Data Hold Reg
-			"    XOR      R13.w2, R13.w2, R13.w2                                 \n"
-			"    SBBO     &R13.w2, R9, 10,  2                                    \n"
-
-			// Read the request count to be received
-			"    LSR      r22, R5.w0, 0x8                                        \n"
-			"    AND      r22, r22, 0x0F                                         \n"
-			"    ADD      r22, r22, 0x01                                         \n"
-
-			// Read the bytes done counter
-			"    MOV      r23, R7.b0                                             \n"
-
-			// check if bytes done counter is less than or equal to data len,
-			// if yes go to CHK_RX_CMPL_INT and check for raise RX complete intr
-			"    QBGE     CHK_RX_CMPL_INT, R7.b0, r22                            \n"
-
-			// if bytes done counter is greater than data len subtract data len from it and
-			// check if differnce is data len, if yes raise RX complete intr
-			"    SUB      r23, R7.b0, r22                                        \n"
-
-			"CHK_RX_CMPL_INT:                                                    \n"
-			// check if all data frame received or not, if RX request if complete, else receive next data frame
-			"    QBLT     RxInterruptServiceRequestHndlr, r22, r23               \n"
-
-			// All requested frame received raise interrupt to ARM/DSP, set SUART_RX_FIFO_INDX_BIT, clear SUART_TXRX_READY_BIT
-			"RX_COMPLETE:                                                        \n"
-			// RX Data is in lower half of Fifo, if bytes done counter is equal to data len
-			"    CLR      R5.b2, R5.b2, 1                                        \n"
-
-			// Raise the RX interrupt if Chn_TxRxBytesDoneCtr is equal to data len otherwise reset Chn_TxRxBytesDoneCtr and raise Rx interrupt
-			"    QBEQ     CHK_RX_OVERRUN, R7.b0, r22                             \n"
-
-			// reset Chn_TxRxBytesDoneCtr if Chn_TxRxBytesDoneCtr is equal to twice the data len
-			"    XOR      R7.b0, R7.b0, R7.b0                                    \n"
-			"    SBBO     &R7.b0, R8, 12,  1                                     \n"
-
-			// RX data is in upper half of Fifo,if bytes done counter is equal to twice the data len
-			"    SET      R5.b2, R5.b2, 1                                        \n"
-
-			"CHK_RX_OVERRUN:                                                     \n"
-			"    LDI      r23.w0, 0x284 & 0xFFFF                                 \n"
-			"    LDI      r23.w2, 0x284 >> 16                                    \n"
-			"    LBCO     &r22, C0, r23, 4                                       \n"
-			"    ADD      r23, R10.b2, 2                                         \n"
-			"    ADD      r23, R10.b2, 2                                         \n"
-
-			"OVER_RUN_ERR:                                                       \n"
-			"    QBBC     CHK_RX_READY_BIT, r22, r23                             \n"
-			"    QBBC     CHK_RX_READY_BIT, R4.w2, 15                            \n"
-			"    SET      R5.b2, R5.b2, 3                                        \n"
-			"    SET      R5.b2, R5.b2, 2                                        \n"
-
-			"CHK_RX_READY_BIT:                                                   \n"
-			// If the receive is not activated from the host, then don't dump the data
-			"    QBBC     RxInterruptServiceRequestHndlr, R5.b2, 0               \n"
-			"    JMP      RX_CHN_INTR                                            \n"
-
-			// Framing Error Detected, interrupt are masked go to DEACTIVATE_SERIALIZER, other wise update status reg
-			"BIT_CLEARD:                                                         \n"
-			"    SET      R5.b2, R5.b2, 4                                        \n"
-			"    JMP      SET_RX_ERR_STAT                                        \n"
-
-			// Break Condiotion Error detected, interrupt are masked go to DEACTIVATE_SERIALIZER, other wise update status reg
-			"RX_DATA_ZERO:                                                       \n"
-			"    SET      R5.b2, R5.b2, 5                                        \n"
-
-			// Update the Global and Channel Error Status Registers
-			"SET_RX_ERR_STAT:                                                    \n"
-			"    SET      R2.w2, R2.w2, 9                                        \n"
-			"    SET      R5.b2, R5.b2, 2                                        \n"
-
-			// if global Error interrupt is clear do not raise interrupt
-			"    QBBC     RxInterruptServiceRequestHndlr, R2.w0, 9               \n"
-
-			// if Framing error status bit for channel is clear look for Break Condiotion Error
-			"    QBBC     BREAK_COND_ERR, R5.b2, 4                               \n"
-
-			// Framming Error Occurred, if Framing Error mask is not set jum to RxInterruptServiceRequestHndlr
-			"FRAMING_ERR:                                                        \n"
-			"    QBBS     RX_CHN_INTR, R4.w2, 12                                 \n"
-			"    JMP      RxInterruptServiceRequestHndlr                         \n"
-
-			// if Break Error Mask not set jump to RxInterruptServiceRequestHndlr
-			"BREAK_COND_ERR:                                                     \n"
-			"    QBBC     RxInterruptServiceRequestHndlr, R4.w2, 13              \n"
-
-			// Set the Global interrupt status register
-			"RX_CHN_INTR:                                                        \n"
-			"    SET      R2.w2, R2.w2, R10.b2                                   \n"
-
-			// write interrupt status regsiter
-			"    SBBO     &R2.w2, r20, 0x082, 2                                  \n"
-
-			// Update tx rx status regsiter status
-			"    SBBO     &R5.b2, R8, 6,  1                                      \n"
-
-			// if interrupt are masked for channel then go to RxInterruptServiceRequestHndlr, otherwise raise the interrupt
-			"    QBBC     RxInterruptServiceRequestHndlr, R2.w0, R10.b2          \n"
-
-			// Raise the interrupt to ARM/DSP
-			"    JMP      PRU_TO_HOST_INTERRUPT                                  \n"
+	asm("RxInterruptServiceRequestHndlr:");
+	// Retrieve the channel number and load the RX context base info corressponding to serializer address in scratch_reg1 and serializer number  in scratch_reg4
+	// Load the SUART CHANNEL BASE ADDRESS
+	asm(" LDI      R8, 0x0000");
+
+	asm(" QBEQ     PRUx_MODE_RX_ONLY, R3.b1, 0x2");
+
+	// Since the Rx Channel are 1,3,5,7 Load the suart_ch_regs for Rx channel 1 as it is first channel
+	asm(" ADD      R10.w0, r20.w0, 0x10");
+
+	asm(" LDI      R10.b2, 0x01");
+
+	// Load the RX channel 1 context address to Ch_info register's rx_context_addr field
+	asm(" LDI      R9, 0x0C0");
+	asm(" JMP      SERCH_ACTIVE_RX_CHN_RX");
+
+	asm("PRUx_MODE_RX_ONLY:");
+	// Since the Rx Channel are 1,3,5,7 Load the suart_ch_regs for Rx channel 1 as it is first channel
+	asm(" LDI      R10.w0, 0x00");
+
+	asm(" LDI      R10.b2, 0x00");
+
+	// Load the RX channel 1 context address to Ch_info register's rx_context_addr field
+	asm(" LDI      R9, 0x90");
+
+	asm("SERCH_ACTIVE_RX_CHN_RX:");
+	asm(" ADD      r22, R10.w0, 7");
+	// Load the Channel Cntrl info from Memory to Register
+	asm(" LBBO     &R5.b3, R8, r22,  1");
+	asm(" QBBC     NEXT_RX_CHN, R5.b3, 7");
+
+	asm(" LBBO     &r22, R9, 4, 4");
+	asm(" LBBO     &r23, r22, 0, 4");
+	asm(" QBBS     ACTIVE_RX_CHN_FOUND, r23, 5");
+
+	asm("NEXT_RX_CHN:");
+	asm(" QBEQ     PRUxx_MODE_RX_ONLY, R3.b1, 0x2");
+
+	// offset of RX suart_ch_regs
+	asm(" ADD      R10.w0, R10.w0, 0x20");
+	// Increament to Next Rx Channel number
+	asm(" ADD      R10.b2, R10.b2, 0x2");
+
+	// Increament rx_context_addr by RX_CONTEXT_OFFSET i.e. to next RX channel context address
+	asm(" ADD      R9, R9, 0x50");
+	asm(" QBGE     SERCH_ACTIVE_RX_CHN_RX, R10.b2, (8 - 1)");
+	asm(" JMP      CORE_LOOP");
+
+	asm("PRUxx_MODE_RX_ONLY:");
+	// offset of RX suart_ch_regs
+	asm(" ADD      R10.w0, R10.w0, 0x10");
+	// Increamnet to Next Rx ChanneL number
+	asm(" ADD      R10.b2, R10.b2, 0x1");
+	// Increamnet rx_context_addr by RX_CONTEXT_OFFSET i.e. to next RX channel context address
+	asm(" ADD      R9, R9, 0x20");
+	asm(" QBGE     SERCH_ACTIVE_RX_CHN_RX, R10.b2, (8 - 1)");
+	asm(" JMP      CORE_LOOP");
+
+	asm("ACTIVE_RX_CHN_FOUND:");
+	// Load the suart_ch_regs from Memory to Register
+	asm(" LBBO     &R4.w0, R8, R10.w0,  16");
+
+	// Load the Context info specific to current RX Channel from memory to registers
+	asm(" LBBO     &R11, R9, 0, 24");
+
+	asm(" ADD      R8, R8, R10.w0");
+
+	// Clear the RSTAT  (Overrun, etc) for Errors
+	asm(" LBCO     &r22, C25, 0x80, 4");
+	asm(" QBBC     RX_PROCESSING_INIT, r22, 8");
+
+	asm(" LDI      r22.w0, 0xFFFF & 0xFFFF");
+	asm(" LDI      r22.w2, 0xFFFF >> 16");
+	asm(" SBCO     &r22, C25, 0x80, 4");
+
+	//  Start receving DATA from MAC_ASP's R-Buf corresponding to channel
+	asm("RX_PROCESSING_INIT:");
+	asm(" XOR      r19, r19, r19");
+	// Read the content of RBUF
+	asm(" LBBO     &r22, R11, 0, 4");
+	asm(" OR       r19, r19, r22");
+
+	// If start condition is already received then go to reading next bit  otherwise look for start condition
+	asm(" QBLT     READ_CURRENT, R7.b1, 0");
+
+	// check Chn_TxRxRepeatDoneCtr, if it is not zero, jump to READ_CURRENT to prescale the start condition
+	asm(" QBLT     READ_CURRENT, R7.w2, 0");
+
+	// If sampling point i.e. sampling_bit_pos is equal to greater than 16 (INVALID_SAMPLING_POINT),
+	// start bit transition edge is being detected, fall through to calculate sampling point,
+	// otherwise, sampling point is already calculated JUMP to READ_CURRENT
+	asm(" QBGE     READ_CURRENT, R16.b2, 16");
+
+	// Extract timing information by detecting start transition (first left most zero)
+	asm(" LMBD     r25, r22, 0");
+	// branch if zero: start bit transition detected
+	asm(" QBGT     START_BIT_TRANSITION, r25, 32");
+	asm(" LDI      R16.b2, 0xff");
+	asm(" SBBO     &R16.b2, R9, 22,  1");
+
+	// RX time out logic
+	asm(" QBBC     RxInterruptServiceRequestHndlr, R4.w2, 14");
+	asm(" QBBC     RxInterruptServiceRequestHndlr, R5.b2, 0");
+	asm(" QBEQ     RxInterruptServiceRequestHndlr, R7.b0, 0");
+
+	// Read the request count to be received
+	asm(" LSR      r22, R5.w0, 0x8");
+	asm(" AND      r22, r22, 0x0F");
+	// Since fifo size is 16
+	asm(" ADD      r22, r22, 0x01");
+	asm(" QBEQ     RxInterruptServiceRequestHndlr, R7.b0, r22");
+
+	// check if time-out is enabled, if yes increament the timeout counter and check if count is equal to MAX_RX_TIMEOUT_TRIES
+	// if yes raise the interrupt for time out.
+	asm(" ADD      R16.w0, R16.w0, 1");
+	asm(" SBBO     &R16.w0, R9, 20,  2");
+	asm(" QBGE     RxInterruptServiceRequestHndlr, R16.w0, r1.w0");
+	asm(" SET      R5.b2, R5.b2, 6");
+	asm(" CLR      R4.w2, R4.w2, 14");
+	asm(" SBBO     &R4.w2, R8, 2,  2");
+
+	// Clear the RX timeout counter
+	asm(" XOR      R16.w0, R16.w0, R16.w0");
+	asm(" SBBO     &R16.w0, R9, 20,  2");
+	asm(" JMP      RX_CHN_INTR");
+
+	// Calculate the sampling bit position based on the start bit position
+	// center = oversampling / 2
+	// sampling bit position = start bit possition - center
+
+	asm("START_BIT_TRANSITION:");
+	// clear the rx time out counter
+	asm(" XOR      R16.w0, R16.w0, R16.w0");
+	asm(" SBBO     &R16.w0, R9, 20,  2");
+
+	// determine the over-sampling rate
+	asm(" LSR      r23, R4.w2, 10");
+	asm(" AND      r23, r23, 0x3");
+
+	// OVER_SAMPLE
+	asm(" QBEQ     OVER_SAMPLE_SIZE8BIT, r23, 0x0");
+	asm(" QBEQ     OVER_SAMPLE_SIZE8BIT, r23, 0x1");
+	asm(" QBEQ     OVER_SAMPLE_SIZE16BIT, r23, 0x2");
+
+	// Calaulate sampling bit position for 8 bit over sampling
+	asm("OVER_SAMPLE_SIZE8BIT:");
+	// start bit possition - center
+	asm(" SUB      R16.b2, r25, 0x4");
+	// sampling point
+	asm(" AND      R16.b2, R16.b2, 7");
+	asm(" SBBO     &R16.b2, R9, 22,  1");
+	// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
+	asm(" QBLE     READ_CURRENT, r25, 0x4");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// Calaulate sampling bit position for 16 bit over sampling
+	asm("OVER_SAMPLE_SIZE16BIT:");
+	// start bit possition - center
+	asm(" SUB      R16.b2, r25, 0x8");
+	// samplimg point
+	asm(" AND      R16.b2, R16.b2, 15");
+	asm(" SBBO     &R16.b2, R9, 22,  1");
+	// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
+	asm(" QBLE     READ_CURRENT, r25, 0x8");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	asm("READ_CURRENT:");
+	// scratch_8bit_reg2 holds the information if bit detected is zero if scratch_8bit_reg2= 0, or one if scratch_8bit_reg2 = 1
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+	// if bit at sampling point is zero jump to READ_ZERO
+	asm(" QBBC     READ_ZERO, r22, R16.b2");
+	// otherwise increament scratch_8bit_reg2 by one as bit detected is one
+	asm(" ADD      r21.b1, r21.b1, 1");
+
+	asm("READ_ZERO:");
+	// We have read the data bit here...
+	// If start bit is being received already, then skip the start condition processing.
+	asm(" QBLT     RX_BIT_RECVD, R7.b1, 0");
+
+	//(Chn_TxRxBitsDoneCtr == 0)            //No bit is being Recieved, check if it is start bit
+	// if DataBit == 0, i.e. scratch_8bit_reg2 == 0, Jump to Start Condition, else error fall through
+	asm(" QBEQ     START_CONDITION, r21.b1, 0");
+
+	asm(" QBEQ     START_CONDITION, R7.w2, 0");
+
+	// Broken start condition or false alarm, Reset repeat counter		//if DataBit == 1, instead of zero
+	asm(" XOR      R7.w2, R7.w2, R7.w2");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// else part for NO_REPEAT_DONE  DataBit == 0
+	asm("START_CONDITION:");
+	// Increament Repeat Done Counter by One, write back to memory
+	asm(" ADD      R7.w2, R7.w2, 1");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+
+	// Read Pre Scaler
+	asm(" LDI      r23, 0x03FF");
+	asm(" AND      r23, r23, R4.w2");
+
+	// if Repeat Done count is greater than or equal to prescaler, start bit is received, jump to START_BIT_RECIVED,
+	asm(" QBGE     START_BIT_RECIVED, r23, R7.w2");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// Start bit is condition Detected properly
+	asm("START_BIT_RECIVED:");
+	// Increament Bit Count by One, and write it to memory
+	asm(" ADD      R7.b1, R7.b1, 1");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
+
+	// Reset Repeat Counter, and write it to memory
+	asm(" XOR      R7.w2, R7.w2, R7.w2");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// Start Bit has been detected Already, Now the data bit is being received
+	asm("RX_BIT_RECVD:");
+	// Now scratch_reg1 holds the info whether the data bit in scratch_8bit_reg2, is zero or one
+	asm(" XOR      r22, r22, r22");
+	// if scratch_8bit_reg2 = 0, i.e data bit is Zero Jump to RX_DATA_BIT_ZERO
+	// else Data bit is one fall through, data bit is ONE
+	asm(" QBEQ     RX_DATA_BIT_ZERO, r21.b1, 0");
+	// bit received is one, scratch_reg1 = 1
+	asm(" OR       r22, r22, 0x1");
+
+	asm("RX_DATA_BIT_ZERO:");
+	// if (Chn_TxRxRepeatDoneCntr < 32), check if reapeat done counter is less than 32, if yes Jump to RX_REPEAT_DONE_CNTR_LT_32
+	asm(" QBGE     RX_REPEAT_DONE_CNTR_LT_32, R7.w2, 0x20");
+
+	// repeat done counter is Greater than 32, Read Chn_RxDataBitsHoldRegHigh reg, Copy the Received bit to Chn_RxDataBitsHoldRegHigh register
+	// else part : (Chn_TxRxRepeatDoneCntr is Greater than or equal to 32 )
+	asm("RX_REPEAT_DONE_CNTR_GT_32:");
+	// Calculate the offset for bit in Chn_RxDataBitsHoldRegHigh regsiter
+	asm(" RSB      r23, R7.w2, 0x20");
+	// Shift Received bit by above calculated of set i.e Chn_TxRxRepeatDoneCntr - 20
+	asm(" LSL      r22, r22, r23");
+	asm(" LBBO     &R15, R9, 16,  4");
+	asm(" OR       R15, r22, R15");
+	asm(" SBBO     &R15, R9, 16,  4");
+	asm(" JMP      RX_REPEAT_COUNT_LESS_THAN_PRESCALR");
+
+	// repeat done counter is less than OR equal to 32, Read the Chn_RxDataBitsHoldRegLow, Copy the Received bit to Chn_RxDataBitsHoldRegLow register
+	// write it back to memory
+	// if for (Chn_TxRxRepeatDoneCntr < 32)
+	asm("RX_REPEAT_DONE_CNTR_LT_32:");
+	// Shift Received bit by Repeat Done Counter
+	asm(" LSL      r22, r22, R7.w2");
+	asm(" LBBO     &R14, R9, 12,  4");
+	asm(" OR       R14, r22, R14");
+	asm(" SBBO     &R14, R9, 12,  4");
+
+	// Increament Chn_TxRxRepeatDoneCntr by one and Check if Repeat Done Counter is equal to Prescalar,
+	// if yes jump to PROCESS_RX_DATA_BIT, otherewise again sample RBuf for same bit
+	asm("RX_REPEAT_COUNT_LESS_THAN_PRESCALR:");
+	asm(" ADD      R7.w2, R7.w2, 1");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+
+	// Read Pre Scaler
+	asm(" LDI      r23, 0x03FF");
+	asm(" AND      r23, r23, R4.w2");
+
+	// check if number of bits sampled (Chn_TxRxRepeatDoneCtr) is equal to prescaler (scratch_reg2), if yes jump to PROCESS_RX_DATA_BIT
+	asm(" QBGE     PROCESS_RX_DATA_BIT, r23, R7.w2");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// Scan Chn_RxDataBitsHoldRegLow, Chn_RxDataBitsHoldRegHigh, to check if BIT received is one or zero and write to Chn_RxDataHoldReg
+	// (Chn_TxRxRepeatDoneCntr >= Chn_Config1.PreScaller) if part
+	asm("PROCESS_RX_DATA_BIT:");
+	// Get the Presaclar
+	asm(" LDI      r24, 0x03FF");
+	// scratch_reg3 hold prescalar
+	asm(" AND      r24, r24, R4.w2");
+
+	// Initialize the register to zero required for copying data bit received in rxdata_buf
+	// keep count of number of ONE scanned
+	asm(" XOR      r21.b0, r21.b0, r21.b0");
+	// keep count of number of ZERO scanned
+	asm(" XOR      r21.b1, r21.b1, r21.b1");
+
+	// used to store count of number of bits scanned in Chn_RxDataBitsHoldRegLow, & Chn_RxDataBitsHoldRegHigh
+	asm(" XOR      r23, r23, r23");
+
+	// points to location taken as start point in Chn_RxDataBitsHoldRegLow for scannig bit received
+	asm(" XOR      r22, r22, r22");
+
+	// scratch_reg4 holds the data from Chn_RxDataBitsHoldRegLow
+	asm(" LBBO     &r25, R9, 12,  4");
+	// if Pre Scalar is less than or equal to 32, JMP to BIT_CHK_LOOP
+	asm(" QBGE     BIT_CHK_LOOP, r24, 0x20");
+
+	// pre scalar is greater 32, check if it is greater that 48 then set scratch_reg3 = 48, scan bit upto this count only.
+	asm("PRE_SCALR_GT_32:");
+	// start checking bit from bit position 0x10
+	asm(" OR       r22, r22, 0x10");
+	// if Pre Scalar is less than 48
+	asm(" QBGT     BIT_CHK_LOOP, r24, 0x30");
+
+	// pre scalar is greater 48,  set scratch_reg3 = 48, scan bit upto this count only.
+	asm("PRE_SCALR_GT_48:");
+	asm(" LDI      r24, 0x30");
+
+	// Scan the Chn_RxDataBitsHoldRegLow, and Chn_RxDataBitsHoldRegHigh registers to know received bit is ZERO or ONE
+	asm("BIT_CHK_LOOP:");
+	// if bit is cleared, Jump to BIT_RECVD_ZERO
+	asm(" QBBC     BIT_RECVD_ZERO, r25, r22");
+	// else BIT prerscaled is one
+	asm(" ADD      r21.b0, r21.b0, 1");
+	// Increament scratch_reg1 by one so that it points to next bit to scanned
+	asm(" ADD      r22, r22, 1");
+	// Increament scratch_reg2 holding bits scanned count
+	asm(" ADD      r23, r23, 1");
+	// if Prescaler is greater than 32, and scratch_reg2 is equal to 32, load Chn_RxDataBitsHoldRegHigh in scratch_reg4
+	asm(" QBLT     LOAD_RXDATABITS_HOLDREGHIGH, r23, 0x20");
+	// scan untill all the bits are scanned
+	asm(" QBGT     BIT_CHK_LOOP, r23, r24");
+	asm(" JMP      COPY_BIT_RECVD");
+
+	// Load the Chn_RxDataBitsHoldRegHigh to scratch_reg4
+	asm("LOAD_RXDATABITS_HOLDREGHIGH:");
+	asm(" LBBO     &r25, R9, 16,  4");
+	// Reset the scratch_reg1, so that starts from bit 0 for Chn_RxDataBitsHoldRegHigh
+	asm(" XOR      r22, r22, r22");
+	// Reset the scratch_reg2, so that only jump to label LOAD_RXDATABITS_HOLDREGHIGH done one's only
+	asm(" XOR      r23, r23, r23");
+	// Decreament Total loop count by 32, since it has been already checked in Chn_RxDataBitsHoldRegLow
+	asm(" SUB      r24, r24, 0x20");
+	asm(" JMP      BIT_CHK_LOOP");
+
+	// Current sacnned Bit in Chn_RxDataBitsHoldRegHigh or Chn_RxDataBitsHoldRegLow is zero
+	asm("BIT_RECVD_ZERO:");
+	// for Zero
+	asm(" ADD      r21.b1, r21.b1, 1");
+	asm(" ADD      r22, r22, 1");
+	asm(" ADD      r23, r23, 1");
+	asm(" QBGT     BIT_CHK_LOOP, r23, r24");
+
+	// Copy the Received bit to Chn_RxDataHoldReg, scratch_reg1, now store the info if bit received is zero or one
+	asm("COPY_BIT_RECVD:");
+
+	// scratch_8bit_reg1= Bit is ONE, scratch_8bit_reg2 = Bit is Zero, if scratch_8bit_reg2 > scratch_8bit_reg1,
+	// jump to WRITE_RCVD_BIT_TO_RX_DATAHOLDREG as data bit is ZERO
+	asm(" XOR      r22, r22, r22");
+	asm(" QBGE     WRITE_RCVD_BIT_TO_RX_DATAHOLDREG, r21.b0, r21.b1");
+	//Bit Received is One,  write to Chn_RxDataHoldReg
+	asm(" OR       r22, r22, 0x1");
+
+	// Write the Received Data bit (in scratch_reg1) to Chn_RxDataHoldReg
+	asm("WRITE_RCVD_BIT_TO_RX_DATAHOLDREG:");
+	// Shift the bit received by Chn_TxRxBitsDoneCtr
+	asm(" LSL      r22, r22, R7.b1");
+
+	// Read the Chn_RxDataHoldReg from Memory
+	asm(" LBBO     &R13.w2, R9, 10,  2");
+
+	// Write the bit received to Chn_RxDataHoldReg
+	asm(" OR       R13.w2, R13.w2, r22");
+
+	// Write updated Chn_RxDataHoldReg to memory
+	asm(" SBBO     &R13.w2, R9, 10,  2");
+
+	// Increment the Data bit Counter
+	asm(" ADD      R7.b1, R7.b1, 1");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
+
+	// Reset the Repeat Done Counter
+	asm(" XOR      R7.w2, R7.w2, R7.w2");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+
+	// initialize Chn_RxDataBitsHoldRegLow
+	asm(" XOR      R14, R14, R14");
+	asm(" SBBO     &R14, R9, 12,  4");
+
+	// initialize Chn_RxDataBitsHoldRegHigh
+	asm(" XOR      R15, R15, R15");
+	asm(" SBBO     &R15, R9, 16,  4");
+
+	// Read Bit Per Charater
+	asm(" AND      r23, R5.w0, 0xF");
+
+	// check is (N-1) bit is being received for current data frame, if yes jump to CHK_RECVD_DATA_FRAME
+	// if all N bits has been Received Jump to RESET_BITS_CNTR, otherwise receive remaining bits.
+	// (Chn_TxRxBitsDoneCntr >= Chn_Config2.BitsPerChar)
+	asm(" QBGE     RESET_BITS_CNTR, r23, R7.b1");
+	asm(" SUB      r23, r23, 1");
+	asm(" QBEQ     CHK_RECVD_DATA_FRAME, r23, R7.b1");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// if all bits received, verify the Received data frame
+	asm("CHK_RECVD_DATA_FRAME:");
+	// Zero the (16 - Chn_TxRxBitsDoneCntr) Most significant bits in the Chn_RxDataHoldReg.
+	asm(" RSB      r23, r23, 16");
+	// load the count to for number of zero to inserted
+	asm(" ADD      r23, r23, 0x10");
+	// Used to Insert  Zero in MSB
+	asm(" NOT      r22, r20");
+
+	asm("REGHOLD_MSB_ZERO:");
+	// Prepare the MASK with  ZERO's in bits that do not corresponds to data bits
+	asm(" LSR      r22, r22, r23");
+
+	// Read the Data hold Reg
+	asm(" LBBO     &R13.w2, R9, 10,  2");
+	// Insert the ZERO's in bits that do  not  corresponds to Data Bits
+	asm(" AND      R13.w2, R13.w2, r22");
+	asm(" SBBO     &R13.w2, R9, 10,  2");
+
+	// removing start bit
+	asm(" LSR      R13.w2, R13.w2, 1");
+
+	// load the arm memory lacation address where data is to be written
+	asm(" LBBO     &R6, R8, 8,  4");
+
+	// Read Bits Per Character
+	asm(" AND      r25, R5.w0, 0xF");
+	asm(" SUB      r25, r25, 2");
+
+	// Load the Bytes Done counter
+	asm(" MOV      r22, R7.b0");
+
+	// check, if two byte offset is required (bits per character greater than 8)
+	asm(" QBGE     WRITE_RX_CHAR_TO_MEM, r25, 0x8");
+
+	// calculate the offset in memory where received character is to be written
+	asm(" LSL      r22, r22, 1");
+
+	asm("WRITE_RX_CHAR_TO_MEM:");
+	// Write the actual data to ARM Memory
+	asm(" SBBO     &R13.w2, R6, r22,  2");
+
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	asm("RESET_BITS_CNTR:");
+	// Check for Framing Error Framing Error
+	asm(" SUB      r24, R7.b1, 1");
+
+	// Reset bits done counter
+	asm(" XOR      R7.b1, R7.b1, R7.b1");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
+
+	// Get the Prescalar
+	asm(" LDI      r23, 0x03FF");
+	//scratch_reg2 hold prescalar
+	asm(" AND      r23, r23, R4.w2");
+
+	// Extract timing information by detecting start transition (first left most zero)
+	asm(" LMBD     r25, r19, 0");
+	// branch if zero start bit transition detected
+	asm(" QBEQ     INVALID_SAMPLING_PNT, r25, 32");
+
+	// determine the over-sampling rate
+	asm(" LSR      r22, R4.w2, 10");
+	// OVER_SAMPLE
+	asm(" AND      r22, r22, 0x3");
+	// 16 bit over sampling
+	asm(" QBEQ     NXT_FRAME_SAMPLING_16BIT_OVS, r22, 0x2");
+
+	// Calaulate sampling bit position for 8 bit over sampling
+	asm("NXT_FRAME_SAMPLING_8BIT_OVS:");
+	// to correct  bit timing error used 4
+	asm(" QBLT     INVALID_SAMPLING_PNT, r25, 4");
+
+	asm("CAL_SAMPL_PNT8:");
+	// start bit position - center
+	asm(" SUB      R16.b2, r25, 0x4");
+	// sampling point
+	asm(" AND      R16.b2, R16.b2, 7");
+	asm(" QBGT     UPDATE_SAMPLING_PNT, r25, 4");
+	asm(" JMP      NXT_FRAME_SAMPLING_PNT");
+
+	// Calaulate sampling bit position for 16 bit over sampling
+	asm("NXT_FRAME_SAMPLING_16BIT_OVS:");
+	// to correct  bit timing error used 4
+	asm(" QBLT     INVALID_SAMPLING_PNT, r25, 8");
+
+	asm("CAL_SAMPL_PNT16:");
+	// start bit position - center
+	asm(" SUB      R16.b2, r25, 0x8");
+	// sampling point
+	asm(" AND      R16.b2, R16.b2, 15");
+	asm(" QBGT     UPDATE_SAMPLING_PNT, r25, 8");
+
+	asm("NXT_FRAME_SAMPLING_PNT:");
+	// Increament Repeat Done Counter by One, write back to memory
+	asm(" ADD      R7.w2, R7.w2, 1");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+
+	// Read Pre Scaler
+	asm(" LDI      r23, 0x03FF");
+	asm(" AND      r23, r23, R4.w2");
+
+	// if Repeat Done count is greater than or equal to prescaler, start bit is received, jump to START_BIT
+	asm(" QBLT     UPDATE_SAMPLING_PNT, r23, R7.w2");
+
+	// Start bit is condition Detected properly
+	asm("START_BIT:");
+	// Increament Bit Count by One, and write it to memory
+	asm(" ADD      R7.b1, R7.b1, 1");
+	asm(" SBBO     &R7.b1, R8, 13,  1");
+
+	asm(" XOR      R7.w2, R7.w2, R7.w2");
+	asm(" SBBO     &R7.w2, R8, 14,  2");
+	asm(" JMP      UPDATE_SAMPLING_PNT");
+
+	asm("INVALID_SAMPLING_PNT:");
+	// Reset the Sampling Point
+	asm(" LDI      R16.b2, 0xff");
+
+	asm("UPDATE_SAMPLING_PNT:");
+	asm(" SBBO     &R16.b2, R9, 22,  1");
+
+	// read interrupt mask regsiter
+	asm(" LBBO     &R2.w0, r20, 0x080, 2");
+
+	//read interrupt status regsiter
+	asm(" LBBO     &R2.w2, r20, 0x082, 2");
+
+	// check for error in received data frame
+	// Check for Break Condiotion Error
+	asm(" QBGE     RX_DATA_ZERO, R13.w2, 0");
+
+	// Framing Error: Check if the Bit at Chn_TxRxBitsDoneCtr Bit Position in the Chn_RxDataHoldReg is set
+	asm(" QBBC     BIT_CLEARD, R13.w2, r24");
+
+	// increament Chn_TxRxBytesDoneCtr by one
+	asm(" ADD      R7.b0, R7.b0, 1");
+	asm(" SBBO     &R7.b0, R8, 12,  1");
+
+	// Reset the Data Hold Reg
+	asm(" XOR      R13.w2, R13.w2, R13.w2");
+	asm(" SBBO     &R13.w2, R9, 10,  2");
+
+	// Read the request count to be received
+	asm(" LSR      r22, R5.w0, 0x8");
+	asm(" AND      r22, r22, 0x0F");
+	asm(" ADD      r22, r22, 0x01");
+
+	// Read the bytes done counter
+	asm(" MOV      r23, R7.b0");
+
+	// check if bytes done counter is less than or equal to data len,
+	// if yes go to CHK_RX_CMPL_INT and check for raise RX complete intr
+	asm(" QBGE     CHK_RX_CMPL_INT, R7.b0, r22");
+
+	// if bytes done counter is greater than data len subtract data len from it and
+	// check if differnce is data len, if yes raise RX complete intr
+	asm(" SUB      r23, R7.b0, r22");
+
+	asm("CHK_RX_CMPL_INT:");
+	// check if all data frame received or not, if RX request if complete, else receive next data frame
+	asm(" QBLT     RxInterruptServiceRequestHndlr, r22, r23");
+
+	// All requested frame received raise interrupt to ARM/DSP, set SUART_RX_FIFO_INDX_BIT, clear SUART_TXRX_READY_BIT
+	asm("RX_COMPLETE:");
+	// RX Data is in lower half of Fifo, if bytes done counter is equal to data len
+	asm(" CLR      R5.b2, R5.b2, 1");
+
+	// Raise the RX interrupt if Chn_TxRxBytesDoneCtr is equal to data len otherwise reset Chn_TxRxBytesDoneCtr and raise Rx interrupt
+	asm(" QBEQ     CHK_RX_OVERRUN, R7.b0, r22");
+
+	// reset Chn_TxRxBytesDoneCtr if Chn_TxRxBytesDoneCtr is equal to twice the data len
+	asm(" XOR      R7.b0, R7.b0, R7.b0");
+	asm(" SBBO     &R7.b0, R8, 12,  1");
+
+	// RX data is in upper half of Fifo,if bytes done counter is equal to twice the data len
+	asm(" SET      R5.b2, R5.b2, 1");
+
+	asm("CHK_RX_OVERRUN:");
+	asm(" LDI      r23.w0, 0x284 & 0xFFFF");
+	asm(" LDI      r23.w2, 0x284 >> 16");
+	asm(" LBCO     &r22, C0, r23, 4");
+	asm(" ADD      r23, R10.b2, 2");
+	asm(" ADD      r23, R10.b2, 2");
+
+	asm("OVER_RUN_ERR:");
+	asm(" QBBC     CHK_RX_READY_BIT, r22, r23");
+	asm(" QBBC     CHK_RX_READY_BIT, R4.w2, 15");
+	asm(" SET      R5.b2, R5.b2, 3");
+	asm(" SET      R5.b2, R5.b2, 2");
+
+	asm("CHK_RX_READY_BIT:");
+	// If the receive is not activated from the host, then don't dump the data
+	asm(" QBBC     RxInterruptServiceRequestHndlr, R5.b2, 0");
+	asm(" JMP      RX_CHN_INTR");
+
+	// Framing Error Detected, interrupt are masked go to DEACTIVATE_SERIALIZER, other wise update status reg
+	asm("BIT_CLEARD:");
+	asm(" SET      R5.b2, R5.b2, 4");
+	asm(" JMP      SET_RX_ERR_STAT");
+
+	// Break Condiotion Error detected, interrupt are masked go to DEACTIVATE_SERIALIZER, other wise update status reg
+	asm("RX_DATA_ZERO:");
+	asm(" SET      R5.b2, R5.b2, 5");
+
+	// Update the Global and Channel Error Status Registers
+	asm("SET_RX_ERR_STAT:");
+	asm(" SET      R2.w2, R2.w2, 9");
+	asm(" SET      R5.b2, R5.b2, 2");
+
+	// if global Error interrupt is clear do not raise interrupt
+	asm(" QBBC     RxInterruptServiceRequestHndlr, R2.w0, 9");
+
+	// if Framing error status bit for channel is clear look for Break Condiotion Error
+	asm(" QBBC     BREAK_COND_ERR, R5.b2, 4");
+
+	// Framming Error Occurred, if Framing Error mask is not set jum to RxInterruptServiceRequestHndlr
+	asm("FRAMING_ERR:");
+	asm(" QBBS     RX_CHN_INTR, R4.w2, 12");
+	asm(" JMP      RxInterruptServiceRequestHndlr");
+
+	// if Break Error Mask not set jump to RxInterruptServiceRequestHndlr
+	asm("BREAK_COND_ERR:");
+	asm(" QBBC     RxInterruptServiceRequestHndlr, R4.w2, 13");
+
+	// Set the Global interrupt status register
+	asm("RX_CHN_INTR:");
+	asm(" SET      R2.w2, R2.w2, R10.b2");
+
+	// write interrupt status regsiter
+	asm(" SBBO     &R2.w2, r20, 0x082, 2");
+
+	// Update tx rx status regsiter status
+	asm(" SBBO     &R5.b2, R8, 6,  1");
+
+	// if interrupt are masked for channel then go to RxInterruptServiceRequestHndlr, otherwise raise the interrupt
+	asm(" QBBC     RxInterruptServiceRequestHndlr, R2.w0, R10.b2");
+
+	// Raise the interrupt to ARM/DSP
+	asm(" JMP      PRU_TO_HOST_INTERRUPT");
 
 //******************************************** RxInterruptServiceRequestHndlr: ENDs **************************
 
@@ -2067,28 +2064,28 @@ int main(void) {
 
 //******************************************** LOAD_RX_CONTEXT_ADDRESS: Start*********************************
 
-			"LOAD_RX_CONTEXT_ADDRESS:                                            \n"
-			"    QBEQ     RX_CONTEXT_CH1_ADDR, R10.b2, 1                         \n"
-			"    QBEQ     RX_CONTEXT_CH3_ADDR, R10.b2, 3                         \n"
-			"    QBEQ     RX_CONTEXT_CH5_ADDR, R10.b2, 5                         \n"
-			"    QBEQ     RX_CONTEXT_CH7_ADDR, R10.b2, 7                         \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("LOAD_RX_CONTEXT_ADDRESS:");
+	asm(" QBEQ     RX_CONTEXT_CH1_ADDR, R10.b2, 1");
+	asm(" QBEQ     RX_CONTEXT_CH3_ADDR, R10.b2, 3");
+	asm(" QBEQ     RX_CONTEXT_CH5_ADDR, R10.b2, 5");
+	asm(" QBEQ     RX_CONTEXT_CH7_ADDR, R10.b2, 7");
+	asm(" jmp      r30.w0");
 
-			"RX_CONTEXT_CH1_ADDR:                                                \n"
-			"    LDI      R9, 0x0C0                                              \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("RX_CONTEXT_CH1_ADDR:");
+	asm(" LDI      R9, 0x0C0");
+	asm(" jmp      r30.w0");
 
-			"RX_CONTEXT_CH3_ADDR:                                                \n"
-			"    LDI      R9, 0x110                                              \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("RX_CONTEXT_CH3_ADDR:");
+	asm(" LDI      R9, 0x110");
+	asm(" jmp      r30.w0");
 
-			"RX_CONTEXT_CH5_ADDR:                                                \n"
-			"    LDI      R9, 0x160                                              \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("RX_CONTEXT_CH5_ADDR:");
+	asm(" LDI      R9, 0x160");
+	asm(" jmp      r30.w0");
 
-			"RX_CONTEXT_CH7_ADDR:                                                \n"
-			"    LDI      R9, 0x1B0                                              \n"
-			"    jmp      r30.w0                                                 \n"
+	asm("RX_CONTEXT_CH7_ADDR:");
+	asm(" LDI      R9, 0x1B0");
+	asm(" jmp      r30.w0");
 
 //******************************************** LOAD_RX_CONTEXT_ADDRESS Ends ***********************************
 
@@ -2100,5 +2097,4 @@ int main(void) {
 
 //=====================================================================================================================================
 
-	);
 }
