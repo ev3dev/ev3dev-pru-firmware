@@ -47,7 +47,6 @@
 
 
 int main(void) {
-	asm("SUART_EMULATION:");
 	// Clear the ZERO Register r20
 	asm(" XOR      r20, r20, r20");
 
