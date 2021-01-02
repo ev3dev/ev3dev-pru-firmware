@@ -133,10 +133,10 @@
 
 #define MOV(REG1, REG2) asm(" MOV " STR(REG1) ", " STR(REG2))
 #define LDI(REG1, IM) asm(" LDI " STR(REG1) ", " STR(IM))
-#define LBBO(REG1, Rn2, OP, IM) asm(" LBBO &" STR(REG1) ", " STR(Rn2) ", " STR(OP) ", " STR(IM))
-#define SBBO(REG1, Rn2, OP, IM) asm(" SBBO &" STR(REG1) ", " STR(Rn2) ", " STR(OP) ", " STR(IM))
-#define LBCO(REG1, Cn2, OP, IM) asm(" LBCO &" STR(REG1) ", " STR(Cn2) ", " STR(OP) ", " STR(IM))
-#define SBCO(REG1, Cn2, OP, IM) asm(" SBCO &" STR(REG1) ", " STR(Cn2) ", " STR(OP) ", " STR(IM))
+#define LBBO(REG1, Rn2, OP, IM) asm(" LBBO " STR(REG1) ", " STR(Rn2) ", " STR(OP) ", " STR(IM))
+#define SBBO(REG1, Rn2, OP, IM) asm(" SBBO " STR(REG1) ", " STR(Rn2) ", " STR(OP) ", " STR(IM))
+#define LBCO(REG1, Cn2, OP, IM) asm(" LBCO " STR(REG1) ", " STR(Cn2) ", " STR(OP) ", " STR(IM))
+#define SBCO(REG1, Cn2, OP, IM) asm(" SBCO " STR(REG1) ", " STR(Cn2) ", " STR(OP) ", " STR(IM))
 
 #define JMP(OP) asm(" JMP " STR(OP))
 #define JAL(REG1, OP) asm(" JAL " STR(REG1) ", " STR(OP))
@@ -639,32 +639,32 @@ int main(void) {
 	// activate clocks, serializers, state machine and frame sync
 	LABEL(tx_asp_init1);
 	// Activate the high-transmit clock XHCLKRST
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 	SET(scratch_reg1, scratch_reg1, 9);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 
 	LABEL(tx_asp_init2);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 	QBBC(tx_asp_init2, scratch_reg1, 9);
 
 	//Activate the transmit frequency clock XCLKRST
 	SET(scratch_reg1, scratch_reg1, 8);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 
 	LABEL(tx_asp_init3);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 	QBBC(tx_asp_init3, scratch_reg1, 8);
 
 	// Before starting, clear the respective transmitter and receiver status registers by writing 0xffff
 	MOV32(scratch_reg2, 0xffff);
-	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_XSTAT, 2);
+	SBCO(&scratch_reg2, MCASP_CONTROL, MCASP_XSTAT, 2);
 
 	// Activate serializer, XSRCLR
 	SET(scratch_reg1, scratch_reg1, 10);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 
 	LABEL(tx_asp_init4);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 	QBBC(tx_asp_init4, scratch_reg1, 10);
 
 	// Till now no serializer is activated for TX, so no need to service all active XBUF
@@ -672,18 +672,18 @@ int main(void) {
 
 	// Actiavte the McASP state machine
 	SET(scratch_reg1, scratch_reg1, 11);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 
 	LABEL(tx_asp_init5);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 	QBBC(tx_asp_init5, scratch_reg1, 11);
 
 	// Activate the MCASP Frame sync
 	SET(scratch_reg1, scratch_reg1, 12);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 
 	LABEL(tx_asp_init6);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XGBLCTL, 4);
 	QBBC(tx_asp_init6, scratch_reg1, 12);
 
 	//----------------------- McASP TX Initialization - Ends ------------------
@@ -693,55 +693,55 @@ int main(void) {
 	// activate Clocks,Serializers,state machine and frame sync
 	LABEL(rx_asp_init1);
 	// Activate the high-transmit clock RHCLKRST
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 	SET(scratch_reg1, scratch_reg1, 1);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 
 	LABEL(rx_asp_init2);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 	QBBC(rx_asp_init2, scratch_reg1, 1);
 
 	//Activate the transmit frequency clock RCLKRST
 	SET(scratch_reg1, scratch_reg1, 0);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 
 	LABEL(rx_asp_init3);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 	QBBC(rx_asp_init3, scratch_reg1, 0);
 
 	// Clear RSTAT
 	LDI(scratch_reg2, 0xffff);
-	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_RSTAT, 2);
+	SBCO(&scratch_reg2, MCASP_CONTROL, MCASP_RSTAT, 2);
 
 	// Activate serializer, RSRCLR
 	SET(scratch_reg1, scratch_reg1, 2);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 
 	LABEL(rx_asp_init4);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 	QBBC(rx_asp_init4, scratch_reg1, 2);
 
 	// Activate the McASP state machine
 	SET(scratch_reg1, scratch_reg1, 3);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 
 	LABEL(rx_asp_init5);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 	QBBC(rx_asp_init5, scratch_reg1, 3);
 
 	// Activate the MCASP Frame sync
 	SET(scratch_reg1, scratch_reg1, 4);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 
 	LABEL(rx_asp_init6);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RGBLCTL, 4);
 	QBBC(rx_asp_init6, scratch_reg1, 4);
 
 	//----------------------- McASP RX Initialization - Ends ------------------
 
 	LABEL(LOCAL_INIT);
 	//Read the PRU ID
-	LBBO(scratch_reg2, pZERO, SUART_GBL_PRU_STATUS_ADDR, 4);
+	LBBO(&scratch_reg2, pZERO, SUART_GBL_PRU_STATUS_ADDR, 4);
 	MOV(suart_global.pru_id, scratch_reg2.b0);
 
 	// Read the PRU mode
@@ -752,11 +752,11 @@ int main(void) {
 
 	//Clear RSTAT
 	LDI(scratch_reg2, 0xffff);
-	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_RSTAT, 4);
+	SBCO(&scratch_reg2, MCASP_CONTROL, MCASP_RSTAT, 4);
 
 	//Clear XSTAT
 	LDI(scratch_reg2, 0xffff);
-	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_XSTAT, 4);
+	SBCO(&scratch_reg2, MCASP_CONTROL, MCASP_XSTAT, 4);
 
 	QBEQ(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
 
@@ -777,8 +777,8 @@ int main(void) {
 	LDI(scratch_reg3, 0x170);
 
 	LABEL(INIT_SAMPLE_PNT);
-	SBBO(scratch_reg2, scratch_reg1, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
-	SBBO(pZERO.b0, scratch_reg1, SUART_CH_FALSE_START_FLAG_OFFSET, 1);
+	SBBO(&scratch_reg2, scratch_reg1, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
+	SBBO(&pZERO.b0, scratch_reg1, SUART_CH_FALSE_START_FLAG_OFFSET, 1);
 
 	ADD(scratch_reg1, scratch_reg1, scratch_reg4);
 	QBGE(INIT_SAMPLE_PNT, scratch_reg1, scratch_reg3);
@@ -804,43 +804,43 @@ int main(void) {
 
 	LABEL(TxServiceRequestHndlr);
 	//read interrupt status regsiter
-	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	LBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 
 	// clear the channel interrupt status bit
 	CLR(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
 
 	//update interrupt status regsiter
-	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	SBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 
 	//Clear Service Request
 	CLR(suart_ch_regs.Chn_Cntrl.u16, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_SR_BIT);
-	SBBO(suart_ch_regs.Chn_Cntrl, suart_ch_info.curr_ch_base_addr, SUART_CH_CTRL_OFFSET, $sizeof(suart_ch_regs.Chn_Cntrl));
+	SBBO(&suart_ch_regs.Chn_Cntrl, suart_ch_info.curr_ch_base_addr, SUART_CH_CTRL_OFFSET, $sizeof(suart_ch_regs.Chn_Cntrl));
 
 	// Set the TXRX_READY_BIT
 	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
-	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
+	SBBO(&suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
 
 	// Set SUART_CH_TXRXCHNSTATUS_BIT bit in channel status to indicate the channel active
 	SET(suart_ch_regs.Chn_Status, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
-	SBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXCHNSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_Status));
+	SBBO(&suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXCHNSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_Status));
 
 	// New Tx Request received initialize the Channel specific data and save it in memory
 	XOR(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
 
 	// Load channel specific serializer, xbuf, srctl register mapped active channel
 	JMP(LOAD_TX_COMMON_INFO);
 
 	LABEL(ENABLE_TX_SERIALIZER);
 	//Change the MCASP AXR[n] pin from GPIO mode to MCASP mode of operation
-	LBCO(scratch_reg2, MCASP_CONTROL, MCASP_PFUNC, 4);
+	LBCO(&scratch_reg2, MCASP_CONTROL, MCASP_PFUNC, 4);
 	AND(scratch_reg1, suart_ch_regs.Chn_Cntrl.u8.b1, SUART_CTRL_SERIALIZER_MASK);
 	CLR(scratch_reg2, scratch_reg2, scratch_reg1);
-	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_PFUNC, 4);
+	SBCO(&scratch_reg2, MCASP_CONTROL, MCASP_PFUNC, 4);
 
 	LABEL(CLEAR_XSTAT);
 	LDI(scratch_reg1, 0xFFFF);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	JMP(MCASP_EVENT);
 
 //******************************************** TxServiceRequestHndlr Ends ************************************
@@ -887,7 +887,7 @@ int main(void) {
 
 	// Increament the Chn_TxRxBytesDoneCtr bye one
 	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -920,7 +920,7 @@ int main(void) {
 	// Write To RAM number of Bits Transmitted
 	// 8 bits transmitted
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 8);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// If bit per character less than 8  // added with start and stop bit in bits per channel
 	MOV(scratch_reg1, suart_ch_regs.Chn_Config2.u16);
@@ -971,7 +971,7 @@ int main(void) {
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 4);
 
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	AND(scratch_reg2, suart_ch_regs.Chn_Config2.u16, 0xF);
 
@@ -989,7 +989,7 @@ int main(void) {
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 4);
 
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1018,13 +1018,13 @@ int main(void) {
 	LABEL(XMIT_MORE_BITS);
 	// update the bytes done counter and reset the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
 	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
 
 	XOR(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	// set the remaining bits to one, if there are no more bits in formated data to send
 	// and still there is space in TX_DATA_reg.
@@ -1092,7 +1092,7 @@ int main(void) {
 	ADD(tx_context.bitsLoaded, tx_context.bitsLoaded, scratch_reg4);
 
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, scratch_reg4);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	// get the prescalar value
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
@@ -1105,11 +1105,11 @@ int main(void) {
 	LABEL(TX_DONE_CNTR6);
 	// Write Chn_TxRxBitsDoneCtr
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Write Chn_TxRxRepeatDoneCtr
 	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	//rename this label to CHK_TX_DATA_REG_FULL
 	LABEL(CHK_MORE_PRESCALAR);
@@ -1153,12 +1153,12 @@ int main(void) {
 	// Updating number of bits written
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 2);
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Updating number of bits written
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 4);
 	// Write To RAM Write Repeat done counter to RAM
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1202,12 +1202,12 @@ int main(void) {
 	// Updating number of bits written
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Updating number of bits written
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 4);
 	// Write To RAM number of Bits Repeated
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1238,12 +1238,12 @@ int main(void) {
 	// Updating number of bits written
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Updating number of bits written
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0);
 	// Write To RAM number of Bits Repeated
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1291,10 +1291,10 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Write To RAM Chn_TxRxRepeatDoneCtr
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 	JMP(TxInterruptServiceRequestHndlr);
 
 	LABEL(PRESCALE_START_BIT);
@@ -1308,7 +1308,7 @@ int main(void) {
 	// Update number of bits written
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 16);
 	// Write To RAM number of Bits Repeated
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 	JMP(TxInterruptServiceRequestHndlr);
 
 //************************************************ PRE_SCALAR24 ENDs *****************************************
@@ -1372,28 +1372,28 @@ int main(void) {
 	ADD(tx_context.asp_xsrctl_reg.u32, tx_context.asp_xsrctl_reg.u32, scratch_reg1);
 
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_ASP_XSRCTL_REG_OFFSET);
-	SBBO(tx_context.asp_xsrctl_reg, scratch_reg3, scratch_reg2, $sizeof(tx_context.asp_xsrctl_reg));
+	SBBO(&tx_context.asp_xsrctl_reg, scratch_reg3, scratch_reg2, $sizeof(tx_context.asp_xsrctl_reg));
 
 	// Calculating the specific xbuf register offset
 	MOV32(tx_context.asp_xbuf_reg.u16, MCASP_XBUF_BASE);
 	ADD(tx_context.asp_xbuf_reg.u32, tx_context.asp_xbuf_reg.u32, scratch_reg1);
 
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_ASP_XBUF_REG_OFFSET);
-	SBBO(tx_context.asp_xbuf_reg, scratch_reg3, scratch_reg2, $sizeof(tx_context.asp_xbuf_reg));
+	SBBO(&tx_context.asp_xbuf_reg, scratch_reg3, scratch_reg2, $sizeof(tx_context.asp_xbuf_reg));
 
 	// Store the data length
 	MOV(tx_context.buff_size, suart_tx_ch.Chn_Config2.u8.b1);
 
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_BUFF_SIZE_OFFSET);
-	SBBO(tx_context.buff_size, scratch_reg3, scratch_reg2, $sizeof(tx_context.buff_size));
+	SBBO(&tx_context.buff_size, scratch_reg3, scratch_reg2, $sizeof(tx_context.buff_size));
 
 	//Store the data Tx FMT Context address
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_BUFF_ADDR_OFFSET);
-	SBBO(tx_context.buff_addr, scratch_reg3, scratch_reg2, $sizeof(tx_context.buff_addr));
+	SBBO(&tx_context.buff_addr, scratch_reg3, scratch_reg2, $sizeof(tx_context.buff_addr));
 
 	LDI(tx_context.bitsLoaded, 0x00);
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_BITSLOADED_OFFSET);
-	SBBO(tx_context.bitsLoaded, scratch_reg3, scratch_reg2, $sizeof(tx_context.bitsLoaded));
+	SBBO(&tx_context.bitsLoaded, scratch_reg3, scratch_reg2, $sizeof(tx_context.bitsLoaded));
 
 	JMP(LOCATE_SR_XBUF_SRCTL_DONE);
 
@@ -1442,12 +1442,12 @@ int main(void) {
 
 	LABEL(TX_DATA_FORMAT_LOOP);
 	// Load the data from the data pointer
-	LBBO(TX_DATA_reg, suart_ch_regs.ch_TxRxData, 0, 2);
+	LBBO(&TX_DATA_reg, suart_ch_regs.ch_TxRxData, 0, 2);
 	LSL(TX_DATA_reg, TX_DATA_reg, 1);
 	OR(TX_DATA_reg, TX_DATA_reg, scratch_reg1);
 
 	// store formated data into DATA RAM
-	SBBO(TX_DATA_reg.w0, scratch_reg3, scratch_reg2, 2);
+	SBBO(&TX_DATA_reg.w0, scratch_reg3, scratch_reg2, 2);
 
 	// Increment the formatted buffer address offset
 	ADD(scratch_reg2, scratch_reg2, 2);
@@ -1486,7 +1486,7 @@ int main(void) {
 	LSL(scratch_reg4, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
 
 	// LOAD formated data from DATA RAM
-	LBBO(scratch_reg3, scratch_reg3, scratch_reg4, 2);
+	LBBO(&scratch_reg3, scratch_reg3, scratch_reg4, 2);
 
 	JMP(JMP_CALL_reg);
 
@@ -1575,15 +1575,15 @@ int main(void) {
 
 	LABEL(TRANSMIT_PRESCALED_DATA);
 	// Clear the under run error
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	QBBC(WRITE_TO_XBUF, scratch_reg1, 0x8);
 
 	LDI(scratch_reg1, 0xFFFF);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 
 	LABEL(WRITE_TO_XBUF);
 	// Write Byte to X_BUF
-	SBBO(TX_DATA_reg.w0, tx_context.asp_xbuf_reg.u32, 0, 4);
+	SBBO(&TX_DATA_reg.w0, tx_context.asp_xbuf_reg.u32, 0, 4);
 	// return from Transmit Prescaled Data
 	JMP(JMP_CALL_reg);
 
@@ -1600,10 +1600,10 @@ int main(void) {
 	LABEL(TX_DONE);
 	XOR(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	// Write To RAM number of Bits Transmitted
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1632,12 +1632,12 @@ int main(void) {
 	LABEL(SERCH_MAPPED_TX_CHN);
 	ADD(scratch_reg1, suart_ch_info.curr_ch_offset, SUART_CH_TXRXCHNSTATUS_OFFSET);
 	// Load the Channel Cntrl info from Memory to Register
-	LBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, scratch_reg1, $sizeof(suart_ch_regs.Chn_Status));
+	LBBO(&suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, scratch_reg1, $sizeof(suart_ch_regs.Chn_Status));
 	QBBC(NEXT_TX_CHN, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
 
 	ADD(scratch_reg1, tx_context.buff_addr, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
-	LBBO(scratch_reg2, scratch_reg1, SUART_CH_ASP_XSRCTL_REG_OFFSET, 4);
-	LBBO(scratch_reg1, scratch_reg2, 0, 4);
+	LBBO(&scratch_reg2, scratch_reg1, SUART_CH_ASP_XSRCTL_REG_OFFSET, 4);
+	LBBO(&scratch_reg1, scratch_reg2, 0, 4);
 	QBBS(MAPPED_TX_CHN_FOUND, scratch_reg1, ASP_SRCTL_XRDY_BIT);
 
 	LABEL(NEXT_TX_CHN);
@@ -1659,7 +1659,7 @@ int main(void) {
 	JMP(CORE_LOOP);
 
 	LABEL(MAPPED_TX_CHN_FOUND);
-	LBBO(suart_ch_regs, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs));
+	LBBO(&suart_ch_regs, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs));
 	ADD(suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset);
 
 	QBEQ(PRUx_MODE_TX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
@@ -1668,7 +1668,7 @@ int main(void) {
 
 	LABEL(PRUx_MODE_TX_ONLY);
 	ADD(scratch_reg1, tx_context.buff_addr, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
-	LBBO(tx_context, scratch_reg1, 0, $sizeof(tx_context));
+	LBBO(&tx_context, scratch_reg1, 0, $sizeof(tx_context));
 
 	// JMP TO TxServiceReqHndlLoop Chn_TxRxBytesDoneCtr is less than Data length
 	LSR(scratch_reg1, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_DATALEN_SHIFT);
@@ -1678,7 +1678,7 @@ int main(void) {
 
 	QBBS(DECLARE_COMPLETE, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
 	NOT(scratch_reg1, pZERO);
-	SBBO(scratch_reg1, tx_context.asp_xbuf_reg.u32, 0, 4);
+	SBBO(&scratch_reg1, tx_context.asp_xbuf_reg.u32, 0, 4);
 
 	JMP(CORE_LOOP);
 
@@ -1686,15 +1686,15 @@ int main(void) {
 	// Set the status in the context area
 	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_COMPLETE_BIT);
 	CLR(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
-	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
+	SBBO(&suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
 
 	// Generate the interrupt to the ARM/DSP about the completion
-	LBBO(suart_global.intrMask, pZERO, SUART_GBL_INT_MASK_ADDR, $sizeof(suart_global.intrMask));
+	LBBO(&suart_global.intrMask, pZERO, SUART_GBL_INT_MASK_ADDR, $sizeof(suart_global.intrMask));
 	QBBC(CORE_LOOP, suart_global.intrMask, suart_ch_info.ch_num);
 
-	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	LBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 	SET(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
-	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	SBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 	JMP(PRU_TO_HOST_INTERRUPT);
 
 //******************************************** TxInterruptServiceRequestHndlr: ENDs **************************
@@ -1730,12 +1730,12 @@ int main(void) {
 
 	// Read the PRUINTC register to know if the event is from ARM/DSP. If yes, then branch
 	MOV32(scratch_reg2, SRSR2_OFFSET);
-	LBCO(scratch_reg1, CONST_PRUSSINTC, scratch_reg2, 4);
+	LBCO(&scratch_reg1, CONST_PRUSSINTC, scratch_reg2, 4);
 	QBBS(CHN_SEARCH, scratch_reg1, 0);
 
 	// Else it is McASP Event. So before proceeding, clear it
 	MOV32(scratch_reg1, MCASP_TXRX_EVENT);
-	SBCO(scratch_reg1, CONST_PRUSSINTC, SICR_OFFSET, 4);
+	SBCO(&scratch_reg1, CONST_PRUSSINTC, SICR_OFFSET, 4);
 
 	JMP(MCASP_EVENT);
 
@@ -1743,12 +1743,12 @@ int main(void) {
 	// wait for the hostEventStatus to get set. Loop till then
 	WBS(hostEventStatus, ARM_TO_PRU1_INT);
 
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	QBBC(CHN_SEARCH, scratch_reg1, 5);
 
 	// Clear the event here and go to Transmit processing
 	MOV32(scratch_reg1, PRU0_TO_PRU1_EVENT);
-	SBCO(scratch_reg1, CONST_PRUSSINTC, SICR_OFFSET, 4);
+	SBCO(&scratch_reg1, CONST_PRUSSINTC, SICR_OFFSET, 4);
 	JMP(TxInterruptServiceRequestHndlr);
 
 	LABEL(MCASP_EVENT);
@@ -1758,20 +1758,20 @@ int main(void) {
 
 	// if the PRU is RX only mode, then check if the XSTAT is set. If so, raise event to PRU1 and proceed
 	QBNE(RX_TX_PROCESS, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	QBBC(RX_TX_PROCESS, scratch_reg1, 5);
 	MOV32(scratch_reg1, PRU0_TO_PRU1_EVENT);
-	SBCO(scratch_reg1, CONST_PRUSSINTC, SISR_OFFSET, 4);
+	SBCO(&scratch_reg1, CONST_PRUSSINTC, SISR_OFFSET, 4);
 
 	LABEL(RX_TX_PROCESS);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
 	QBBS(RxInterruptServiceRequestHndlr, scratch_reg1, 5);
 	// Skip the check for XSTAT if we are not Rx/Tx PRU.
 	// We don't want the PRU to spin in a tight loop around the McASP register to introduce a delay
 	QBNE(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_RX_TX_BOTH);
 
 	LABEL(MCASP_TX_EVNT);
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	QBBS(TxInterruptServiceRequestHndlr, scratch_reg1, 5);
 	// If PRU is both TX/RX, then go back to Core-loop. Else delay to avoid McASP Spins
 	QBEQ(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_RX_TX_BOTH);
@@ -1791,10 +1791,10 @@ int main(void) {
 	MOV32(scratch_reg3, 0x1);
 	LSL(scratch_reg3, scratch_reg3, suart_global.pru_id);
 	MOV32(scratch_reg1, SECR2_OFFSET);
-	SBCO(scratch_reg3, CONST_PRUSSINTC, scratch_reg1, 4);
+	SBCO(&scratch_reg3, CONST_PRUSSINTC, scratch_reg1, 4);
 
 	// Read Global control register
-	LBBO(suart_global, pZERO, SUART_GBL_CTRL_ADDR, $sizeof(suart_global));
+	LBBO(&suart_global, pZERO, SUART_GBL_CTRL_ADDR, $sizeof(suart_global));
 
 	// Retrieve the channel number and load the context base
 	LDI(suart_ch_info.curr_ch_base_addr, SUART_CH_BASE_ADDRESS);
@@ -1807,7 +1807,7 @@ int main(void) {
 	LDI(suart_ch_info.rx_context_addr, 0x90);
 
 	LABEL(CHN_ACTIVE);
-	LBBO(suart_ch_regs.Chn_Cntrl, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs.Chn_Cntrl));
+	LBBO(&suart_ch_regs.Chn_Cntrl, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs.Chn_Cntrl));
 	QBBS(CHN_SERACH_RTN, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_SR_BIT);
 	ADD(suart_ch_info.curr_ch_offset, suart_ch_info.curr_ch_offset, SUART_CH_REGS_SIZE);
 	ADD(suart_ch_info.ch_num, suart_ch_info.ch_num, 0x01);
@@ -1820,7 +1820,7 @@ int main(void) {
 	JMP(CHN_ACTIVE);
 
 	LABEL(CHN_SERACH_RTN);
-	LBBO(suart_ch_regs, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs));
+	LBBO(&suart_ch_regs, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs));
 	ADD(suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset);
 
 	AND(scratch_reg1.w0, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_MODE_MASK);
@@ -1879,10 +1879,10 @@ int main(void) {
 
 	LABEL(EVTOUT_GEN);
 	// Clear SYS_EVTn
-	SBCO(scratch_reg1, CONST_PRUSSINTC, SICR_OFFSET, 4);
+	SBCO(&scratch_reg1, CONST_PRUSSINTC, SICR_OFFSET, 4);
 
 	// Enable SYS_EVTn system interrupt
-	SBCO(scratch_reg1, CONST_PRUSSINTC, EISR_OFFSET, 4);
+	SBCO(&scratch_reg1, CONST_PRUSSINTC, EISR_OFFSET, 4);
 
 	// Generate SYS_EVTn by event out mapping
 	MOV(hostEventStatus.w0, scratch_reg1.w0);
@@ -1914,19 +1914,19 @@ int main(void) {
 
 	LABEL(RxServiceRequestHndlr);
 	// load the max RX TRIES before time out
-	LBBO(MAX_RX_TIMEOUT_TRIES, pZERO, MAX_RX_TIMEOUT_TRIES_OFFSET, 2);
+	LBBO(&MAX_RX_TIMEOUT_TRIES, pZERO, MAX_RX_TIMEOUT_TRIES_OFFSET, 2);
 
 	// read interrupt status regsiter
-	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	LBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 
 	CLR(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
 
 	// write interrupt status regsiter
-	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	SBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 
 	//Clear Service Request
 	CLR(suart_ch_regs.Chn_Cntrl.u16, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_SR_BIT);
-	SBBO(suart_ch_regs.Chn_Cntrl, suart_ch_info.curr_ch_base_addr, SUART_CH_CTRL_OFFSET, $sizeof(suart_ch_regs.Chn_Cntrl));
+	SBBO(&suart_ch_regs.Chn_Cntrl, suart_ch_info.curr_ch_base_addr, SUART_CH_CTRL_OFFSET, $sizeof(suart_ch_regs.Chn_Cntrl));
 
 	// clear timeout flag
 	CLR(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_TIMEOUT_BIT);
@@ -1935,11 +1935,11 @@ int main(void) {
 	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
 
 	// update the RX Status Register
-	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
+	SBBO(&suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
 
 	// Set the SUART_CH_TXRXCHNSTATUS_BIT to indicate the channel being active
 	SET(suart_ch_regs.Chn_Status, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
-	SBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXCHNSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_Status));
+	SBBO(&suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXCHNSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_Status));
 
 	LABEL(RX_CONTEXT_INIT);
 	QBEQ(PRUxxx_MODE_RX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
@@ -1957,35 +1957,35 @@ int main(void) {
 	ADD(rx_context.asp_rsrctl_reg.u32, rx_context.asp_rsrctl_reg.u32, scratch_reg1);
 
 	//storing asp_rsrctl_reg in RX Context Address Region
-	SBBO(rx_context.asp_rsrctl_reg, suart_ch_info.rx_context_addr, SUART_CH_ASP_RSRCTL_REG, $sizeof(rx_context.asp_rsrctl_reg));
+	SBBO(&rx_context.asp_rsrctl_reg, suart_ch_info.rx_context_addr, SUART_CH_ASP_RSRCTL_REG, $sizeof(rx_context.asp_rsrctl_reg));
 
 	// Store RBuf Address in RX Context Region
 	MOV32(rx_context.asp_rbuf_reg.u16, MCASP_RBUF_BASE);
 	ADD(rx_context.asp_rbuf_reg.u32, rx_context.asp_rbuf_reg.u32, scratch_reg1);
 
 	// storing asp_rbuf_reg in RX context  adress region
-	SBBO(rx_context.asp_rbuf_reg, suart_ch_info.rx_context_addr, SUART_CH_ASP_RBUF_REG, $sizeof(rx_context.asp_rbuf_reg));
+	SBBO(&rx_context.asp_rbuf_reg, suart_ch_info.rx_context_addr, SUART_CH_ASP_RBUF_REG, $sizeof(rx_context.asp_rbuf_reg));
 
 	// Load the Context info specific to Current RX channel from memory to registers
 	//	LBBO   	rx_context, suart_ch_info.rx_context_addr, 0, SIZE (rx_context)
 
 	// Clear the RX timeout counter
 	XOR(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr);
-	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
+	SBBO(&rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
 
 	// Activate RX serializer
-	LBBO(scratch_reg2, rx_context.asp_rsrctl_reg.u32, 0, 4);
+	LBBO(&scratch_reg2, rx_context.asp_rsrctl_reg.u32, 0, 4);
 	AND(scratch_reg2, scratch_reg2, 0x3);
 	// Check if Serializer is Already Active as Rx if ,yes skip activation
 	QBEQ(CLR_RSTAT, scratch_reg2, 0x2);
 	//  Activate serializer as Receiver
 	MOV32(scratch_reg2, 0x000E);
-	SBBO(scratch_reg2, rx_context.asp_rsrctl_reg.u32, 0, 4);
+	SBBO(&scratch_reg2, rx_context.asp_rsrctl_reg.u32, 0, 4);
 
 	LABEL(CLR_RSTAT);
 	// Clear the RSTAT  (Overrun, etc)
 	MOV32(scratch_reg1, 0xFFFF);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
 
 	JMP(MCASP_EVENT);
 
@@ -2029,11 +2029,11 @@ int main(void) {
 	LABEL(SERCH_ACTIVE_RX_CHN_RX);
 	ADD(scratch_reg1, suart_ch_info.curr_ch_offset, SUART_CH_TXRXCHNSTATUS_OFFSET);
 	// Load the Channel Cntrl info from Memory to Register
-	LBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, scratch_reg1, $sizeof(suart_ch_regs.Chn_Status));
+	LBBO(&suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, scratch_reg1, $sizeof(suart_ch_regs.Chn_Status));
 	QBBC(NEXT_RX_CHN, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
 
-	LBBO(scratch_reg1, suart_ch_info.rx_context_addr, SUART_CH_ASP_RSRCTL_REG, 4);
-	LBBO(scratch_reg2, scratch_reg1, 0, 4);
+	LBBO(&scratch_reg1, suart_ch_info.rx_context_addr, SUART_CH_ASP_RSRCTL_REG, 4);
+	LBBO(&scratch_reg2, scratch_reg1, 0, 4);
 	QBBS(ACTIVE_RX_CHN_FOUND, scratch_reg2, ASP_SRCTL_RRDY_BIT);
 
 	LABEL(NEXT_RX_CHN);
@@ -2061,25 +2061,25 @@ int main(void) {
 
 	LABEL(ACTIVE_RX_CHN_FOUND);
 	// Load the suart_ch_regs from Memory to Register
-	LBBO(suart_ch_regs, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs));
+	LBBO(&suart_ch_regs, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, $sizeof(suart_ch_regs));
 
 	// Load the Context info specific to current RX Channel from memory to registers
-	LBBO(rx_context, suart_ch_info.rx_context_addr, 0, $sizeof(rx_context));
+	LBBO(&rx_context, suart_ch_info.rx_context_addr, 0, $sizeof(rx_context));
 
 	ADD(suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset);
 
 	// Clear the RSTAT  (Overrun, etc) for Errors
-	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
+	LBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
 	QBBC(RX_PROCESSING_INIT, scratch_reg1, ASP_RSTAT_RERR_BIT);
 
 	MOV32(scratch_reg1, 0xFFFF);
-	SBCO(scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
+	SBCO(&scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
 
 	//  Start receving DATA from MAC_ASP's R-Buf corresponding to channel
 	LABEL(RX_PROCESSING_INIT);
 	XOR(mcasp_rbuf_val, mcasp_rbuf_val, mcasp_rbuf_val);
 	// Read the content of RBUF
-	LBBO(scratch_reg1, rx_context.asp_rbuf_reg.u32, 0, 4);
+	LBBO(&scratch_reg1, rx_context.asp_rbuf_reg.u32, 0, 4);
 	OR(mcasp_rbuf_val, mcasp_rbuf_val, scratch_reg1);
 
 	// If start condition is already received then go to reading next bit  otherwise look for start condition
@@ -2098,7 +2098,7 @@ int main(void) {
 	// branch if zero: start bit transition detected
 	QBGT(START_BIT_TRANSITION, scratch_reg4, ZERO_BIT_NOT_DETECTED);
 	LDI(rx_context.sampling_bit_pos, 0xff);
-	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
+	SBBO(&rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
 
 	// RX time out logic
 	QBBC(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_Config1, RX_TIMEOUT_INTR_MASK);
@@ -2115,15 +2115,15 @@ int main(void) {
 	// check if time-out is enabled, if yes increament the timeout counter and check if count is equal to MAX_RX_TIMEOUT_TRIES
 	// if yes raise the interrupt for time out.
 	ADD(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, 1);
-	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
+	SBBO(&rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
 	QBGE(RxInterruptServiceRequestHndlr, rx_context.rx_timeout_cntr, MAX_RX_TIMEOUT_TRIES);
 	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_TIMEOUT_BIT);
 	CLR(suart_ch_regs.Chn_Config1, suart_ch_regs.Chn_Config1, RX_TIMEOUT_INTR_MASK);
-	SBBO(suart_ch_regs.Chn_Config1, suart_ch_info.curr_ch_base_addr, SUART_CH_CONFIG1_OFFSET, $sizeof(suart_ch_regs.Chn_Config1));
+	SBBO(&suart_ch_regs.Chn_Config1, suart_ch_info.curr_ch_base_addr, SUART_CH_CONFIG1_OFFSET, $sizeof(suart_ch_regs.Chn_Config1));
 
 	// Clear the RX timeout counter
 	XOR(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr);
-	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
+	SBBO(&rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
 	JMP(RX_CHN_INTR);
 
 	// Calculate the sampling bit position based on the start bit position
@@ -2133,7 +2133,7 @@ int main(void) {
 	LABEL(START_BIT_TRANSITION);
 	// clear the rx time out counter
 	XOR(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr);
-	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
+	SBBO(&rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, $sizeof(rx_context.rx_timeout_cntr));
 
 	// determine the over-sampling rate
 	LSR(scratch_reg2, suart_ch_regs.Chn_Config1, SUART_CH_CONFIG1_OVS_BIT_SHIFT);
@@ -2150,7 +2150,7 @@ int main(void) {
 	SUB(rx_context.sampling_bit_pos, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
 	// sampling point
 	AND(rx_context.sampling_bit_pos, rx_context.sampling_bit_pos, SAMPING_MASK_8_BIT_OVRSAMPLNG);
-	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
+	SBBO(&rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
 	// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
 	QBLE(READ_CURRENT, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
 	JMP(RxInterruptServiceRequestHndlr);
@@ -2161,7 +2161,7 @@ int main(void) {
 	SUB(rx_context.sampling_bit_pos, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
 	// samplimg point
 	AND(rx_context.sampling_bit_pos, rx_context.sampling_bit_pos, SAMPING_MASK_16_BIT_OVRSAMPLNG);
-	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
+	SBBO(&rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
 	// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
 	QBLE(READ_CURRENT, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
 	JMP(RxInterruptServiceRequestHndlr);
@@ -2187,14 +2187,14 @@ int main(void) {
 
 	// Broken start condition or false alarm, Reset repeat counter		//if DataBit == 1, instead of zero
 	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// else part for NO_REPEAT_DONE  DataBit == 0
 	LABEL(START_CONDITION);
 	// Increament Repeat Done Counter by One, write back to memory
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	// Read Pre Scaler
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
@@ -2208,11 +2208,11 @@ int main(void) {
 	LABEL(START_BIT_RECIVED);
 	// Increament Bit Count by One, and write it to memory
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Reset Repeat Counter, and write it to memory
 	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// Start Bit has been detected Already, Now the data bit is being received
@@ -2236,9 +2236,9 @@ int main(void) {
 	RSB(scratch_reg2, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0x20);
 	// Shift Received bit by above calculated of set i.e Chn_TxRxRepeatDoneCntr - 20
 	LSL(scratch_reg1, scratch_reg1, scratch_reg2);
-	LBBO(rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegHigh));
+	LBBO(&rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegHigh));
 	OR(rx_context.Chn_RxDataBitsHoldRegHigh, scratch_reg1, rx_context.Chn_RxDataBitsHoldRegHigh);
-	SBBO(rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegHigh));
+	SBBO(&rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegHigh));
 	JMP(RX_REPEAT_COUNT_LESS_THAN_PRESCALR);
 
 	// repeat done counter is less than OR equal to 32, Read the Chn_RxDataBitsHoldRegLow, Copy the Received bit to Chn_RxDataBitsHoldRegLow register
@@ -2247,15 +2247,15 @@ int main(void) {
 	LABEL(RX_REPEAT_DONE_CNTR_LT_32);
 	// Shift Received bit by Repeat Done Counter
 	LSL(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	LBBO(rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegLow));
+	LBBO(&rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegLow));
 	OR(rx_context.Chn_RxDataBitsHoldRegLow, scratch_reg1, rx_context.Chn_RxDataBitsHoldRegLow);
-	SBBO(rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegLow));
+	SBBO(&rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegLow));
 
 	// Increament Chn_TxRxRepeatDoneCntr by one and Check if Repeat Done Counter is equal to Prescalar,
 	// if yes jump to PROCESS_RX_DATA_BIT, otherewise again sample RBuf for same bit
 	LABEL(RX_REPEAT_COUNT_LESS_THAN_PRESCALR);
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	// Read Pre Scaler
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
@@ -2286,7 +2286,7 @@ int main(void) {
 	XOR(scratch_reg1, scratch_reg1, scratch_reg1);
 
 	// scratch_reg4 holds the data from Chn_RxDataBitsHoldRegLow
-	LBBO(scratch_reg4, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
+	LBBO(&scratch_reg4, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
 	// if Pre Scalar is less than or equal to 32, JMP to BIT_CHK_LOOP
 	QBGE(BIT_CHK_LOOP, scratch_reg3, 0x20);
 
@@ -2319,7 +2319,7 @@ int main(void) {
 
 	// Load the Chn_RxDataBitsHoldRegHigh to scratch_reg4
 	LABEL(LOAD_RXDATABITS_HOLDREGHIGH);
-	LBBO(scratch_reg4, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
+	LBBO(&scratch_reg4, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
 	// Reset the scratch_reg1, so that starts from bit 0 for Chn_RxDataBitsHoldRegHigh
 	XOR(scratch_reg1, scratch_reg1, scratch_reg1);
 	// Reset the scratch_reg2, so that only jump to label LOAD_RXDATABITS_HOLDREGHIGH done one's only
@@ -2352,29 +2352,29 @@ int main(void) {
 	LSL(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 
 	// Read the Chn_RxDataHoldReg from Memory
-	LBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
+	LBBO(&rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
 
 	// Write the bit received to Chn_RxDataHoldReg
 	OR(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, scratch_reg1);
 
 	// Write updated Chn_RxDataHoldReg to memory
-	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
+	SBBO(&rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
 
 	// Increment the Data bit Counter
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Reset the Repeat Done Counter
 	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	// initialize Chn_RxDataBitsHoldRegLow
 	XOR(rx_context.Chn_RxDataBitsHoldRegLow, rx_context.Chn_RxDataBitsHoldRegLow, rx_context.Chn_RxDataBitsHoldRegLow);
-	SBBO(rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegLow));
+	SBBO(&rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegLow));
 
 	// initialize Chn_RxDataBitsHoldRegHigh
 	XOR(rx_context.Chn_RxDataBitsHoldRegHigh, rx_context.Chn_RxDataBitsHoldRegHigh, rx_context.Chn_RxDataBitsHoldRegHigh);
-	SBBO(rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegHigh));
+	SBBO(&rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, $sizeof(rx_context.Chn_RxDataBitsHoldRegHigh));
 
 	// Read Bit Per Charater
 	AND(scratch_reg2, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK);
@@ -2401,16 +2401,16 @@ int main(void) {
 	LSR(scratch_reg1, scratch_reg1, scratch_reg2);
 
 	// Read the Data hold Reg
-	LBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
+	LBBO(&rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
 	// Insert the ZERO's in bits that do  not  corresponds to Data Bits
 	AND(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, scratch_reg1);
-	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
+	SBBO(&rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
 
 	// removing start bit
 	LSR(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, 1);
 
 	// load the arm memory lacation address where data is to be written
-	LBBO(suart_ch_regs.ch_TxRxData, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXDATA_OFFSET, $sizeof(suart_ch_regs.ch_TxRxData));
+	LBBO(&suart_ch_regs.ch_TxRxData, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXDATA_OFFSET, $sizeof(suart_ch_regs.ch_TxRxData));
 
 	// Read Bits Per Character
 	AND(scratch_reg4, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK);
@@ -2427,7 +2427,7 @@ int main(void) {
 
 	LABEL(WRITE_RX_CHAR_TO_MEM);
 	// Write the actual data to ARM Memory
-	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_regs.ch_TxRxData, scratch_reg1, $sizeof(rx_context.Chn_RxDataHoldReg));
+	SBBO(&rx_context.Chn_RxDataHoldReg, suart_ch_regs.ch_TxRxData, scratch_reg1, $sizeof(rx_context.Chn_RxDataHoldReg));
 
 	JMP(RxInterruptServiceRequestHndlr);
 
@@ -2437,7 +2437,7 @@ int main(void) {
 
 	// Reset bits done counter
 	XOR(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	// Get the Prescalar
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
@@ -2484,7 +2484,7 @@ int main(void) {
 	LABEL(NXT_FRAME_SAMPLING_PNT);
 	// Increament Repeat Done Counter by One, write back to memory
 	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 
 	// Read Pre Scaler
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
@@ -2497,10 +2497,10 @@ int main(void) {
 	LABEL(START_BIT);
 	// Increament Bit Count by One, and write it to memory
 	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBitsDoneCtr));
 
 	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxRepeatDoneCtr));
 	JMP(UPDATE_SAMPLING_PNT);
 
 	LABEL(INVALID_SAMPLING_PNT);
@@ -2508,13 +2508,13 @@ int main(void) {
 	LDI(rx_context.sampling_bit_pos, 0xff);
 
 	LABEL(UPDATE_SAMPLING_PNT);
-	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
+	SBBO(&rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, $sizeof(rx_context.sampling_bit_pos));
 
 	// read interrupt mask regsiter
-	LBBO(suart_global.intrMask, pZERO, SUART_GBL_INT_MASK_ADDR, $sizeof(suart_global.intrMask));
+	LBBO(&suart_global.intrMask, pZERO, SUART_GBL_INT_MASK_ADDR, $sizeof(suart_global.intrMask));
 
 	//read interrupt status regsiter
-	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	LBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 
 	// check for error in received data frame
 	// Check for Break Condiotion Error
@@ -2525,11 +2525,11 @@ int main(void) {
 
 	// increament Chn_TxRxBytesDoneCtr by one
 	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
-	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
 
 	// Reset the Data Hold Reg
 	XOR(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg);
-	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
+	SBBO(&rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, $sizeof(rx_context.Chn_RxDataHoldReg));
 
 	// Read the request count to be received
 	LSR(scratch_reg1, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_DATALEN_SHIFT);
@@ -2561,14 +2561,14 @@ int main(void) {
 
 	// reset Chn_TxRxBytesDoneCtr if Chn_TxRxBytesDoneCtr is equal to twice the data len
 	XOR(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr);
-	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
+	SBBO(&suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxBytesDoneCtr));
 
 	// RX data is in upper half of Fifo,if bytes done counter is equal to twice the data len
 	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_FIFO_INDX_BIT);
 
 	LABEL(CHK_RX_OVERRUN);
 	MOV32(scratch_reg2, SECR2_OFFSET);
-	LBCO(scratch_reg1, CONST_PRUSSINTC, scratch_reg2, 4);
+	LBCO(&scratch_reg1, CONST_PRUSSINTC, scratch_reg2, 4);
 	ADD(scratch_reg2, suart_ch_info.ch_num, 2);
 	ADD(scratch_reg2, suart_ch_info.ch_num, 2);
 
@@ -2617,10 +2617,10 @@ int main(void) {
 	SET(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
 
 	// write interrupt status regsiter
-	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
+	SBBO(&suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, $sizeof(suart_global.intrStatus));
 
 	// Update tx rx status regsiter status
-	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
+	SBBO(&suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, $sizeof(suart_ch_regs.Chn_TxRxStatus));
 
 	// if interrupt are masked for channel then go to RxInterruptServiceRequestHndlr, otherwise raise the interrupt
 	QBBC(RxInterruptServiceRequestHndlr, suart_global.intrMask, suart_ch_info.ch_num);
