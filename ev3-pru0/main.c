@@ -504,80 +504,103 @@
 // *     Structures                      *
 // ***************************************
 
+// provide byte/word access similar to registers
+
+asm("u16_t:	.struct");
+asm("b0:	.ubyte");
+asm("b1:	.ubyte");
+asm("		.endstruct");
+
+asm("u16_union:	.union");
+asm("u8:	.tag u16_t");
+asm("u16:	.ushort");
+asm("		.endunion");
+
+asm("u32_t:	.struct");
+asm("w0:	.ushort");
+asm("w2:	.ushort");
+asm("		.endstruct");
+
+asm("u32_union:	.union");
+asm("u16:	.tag u32_t");
+asm("u32:	.uint");
+asm("		.endunion");
+
+
 //===========================================================================
 //				SUART GLOBAL CHANNEL STRUCTURE
 //===========================================================================
-// .struct Suart_Global
-//     .u16 intrMask
-//     .u16 intrStatus
-//     .u8  pru_id
-//     .u8  pru_rx_tx_mode
-//     .u8  pru_delay_cnt
-//     .u8  reserved
-// .ends
+asm("Suart_Global:	.struct");
+asm("intrMask:		.ushort");
+asm("intrStatus:	.ushort");
+asm("pru_id:		.ubyte");
+asm("pru_rx_tx_mode:	.ubyte");
+asm("pru_delay_cnt:	.ubyte");
+asm("reserved:		.ubyte");
+asm("			.endstruct");
 
 //===========================================================================
 //				STRUCTURE TO SUART CHANNEL SPECIFIC REGISTER
 //===========================================================================
-// .struct Suart_Ch_Struct
-//     .u16 Chn_Cntrl
-//     .u16 Chn_Config1
-//     .u16 Chn_Config2
-//     .u8  Chn_TxRxStatus
-//     .u8  Chn_Status
-//     .u32 ch_TxRxData
-//     .u8  Chn_TxRxBytesDoneCtr
-//     .u8  Chn_TxRxBitsDoneCtr
-//     .u16  Chn_TxRxRepeatDoneCtr
-// .ends
+asm("Suart_Ch_Struct:		.struct");
+asm("Chn_Cntrl:			.tag u16_union");
+asm("Chn_Config1:		.ushort");
+asm("Chn_Config2:		.tag u16_union");
+asm("Chn_TxRxStatus:		.ubyte");
+asm("Chn_Status:		.ubyte");
+asm("ch_TxRxData:		.uint");
+asm("Chn_TxRxBytesDoneCtr:	.ubyte");
+asm("Chn_TxRxBitsDoneCtr:	.ubyte");
+asm("Chn_TxRxRepeatDoneCtr:	.ushort");
+asm("				.endstruct");
 
 //===========================================================================
 //				CHANNEL INFORMATION STRUCTURE
 //===========================================================================
-// .struct Suart_Ch_Info
-//     .u32 curr_ch_base_addr	//Making galata with 16bit, need to do something @NG use scratch register
-//     .u32 rx_context_addr
-//     .u16 curr_ch_offset
-//     .u8  ch_num
-// .ends
+asm("Suart_Ch_Info:	.struct");
+asm("curr_ch_base_addr:	.uint");	// Making galata with 16bit, need to do something @NG use scratch register
+asm("rx_context_addr:	.uint");
+asm("curr_ch_offset:	.ushort");
+asm("ch_num:		.ubyte");
+asm("			.endstruct");
 
 //===========================================================================
 //				TX CONTEXT STRUCTURE
 //===========================================================================
-// .struct Suart_Tx_Context
-//     .u32 asp_xsrctl_reg		//NG: avoid recalculation, save cycles ;-)
-//     .u32 asp_xbuf_reg		//NG: avoid recalculation, save cycles ;-)
-//     .u16 buff_addr		 //Formatted data base address: data RAM address
-//     .u8  buff_size		//Number of data format in the data RAM
-//     .u8  bitsLoaded
-// .ends
+asm("Suart_Tx_Context:	.struct");
+asm("asp_xsrctl_reg:	.tag u32_union");	// NG: avoid recalculation, save cycles ;-)
+asm("asp_xbuf_reg:	.tag u32_union");	// NG: avoid recalculation, save cycles ;-)
+asm("buff_addr:		.ushort");		// Formatted data base address: data RAM address
+asm("buff_size:		.ubyte");		// Number of data format in the data RAM
+asm("bitsLoaded:	.ubyte");
+asm("			.endstruct");
 
 //===========================================================================
 //				RX CONTEXT STRUCTURE
 //===========================================================================
-// .struct Suart_Rx_Context
-//     .u32 asp_rbuf_reg
-//     .u32 asp_rsrctl_reg
-//     .u8  mcasp_shitf_correction
-//     .u8  reserved     //rxdata_buf		//to store the extracted data
-//     .u16 Chn_RxDataHoldReg;
-//     .u32 Chn_RxDataBitsHoldRegLow;
-//     .u32 Chn_RxDataBitsHoldRegHigh;
-//     .u16 rx_timeout_cntr
-//     .u8  sampling_bit_pos;
-//     .u8  false_start_flag
-// .ends
+asm("Suart_Rx_Context:		.struct");
+asm("asp_rbuf_reg:		.tag u32_union");
+asm("asp_rsrctl_reg:		.tag u32_union");
+asm("mcasp_shitf_correction:	.ubyte");
+asm("reserved:			.ubyte");	//rxdata_buf		//to store the extracted data
+asm("Chn_RxDataHoldReg:		.ushort");
+asm("Chn_RxDataBitsHoldRegLow:	.uint");
+asm("Chn_RxDataBitsHoldRegHigh:	.uint");
+asm("rx_timeout_cntr:		.ushort");
+asm("sampling_bit_pos:		.ubyte");
+asm("false_start_flag:		.ubyte");
+asm("				.endstruct");
 
 //===========================================================================
 //				PRU Registers allocation
 //===========================================================================
 
-// .assign Suart_Global,	 	r2, r3, suart_global
-// .assign Suart_Ch_Struct, 	r4, *, suart_ch_regs
-// .assign Suart_Ch_Struct, 	r4, *, suart_tx_ch
-// .assign Suart_Ch_Info, 		r8, *, suart_ch_info
-// .assign Suart_Tx_Context, 	r11, *, tx_context
-// .assign Suart_Rx_Context, 	r11, *, rx_context
+asm("suart_global: .sassign r2, Suart_Global");
+asm("suart_ch_regs: .sassign r4, Suart_Ch_Struct");
+asm("suart_tx_ch: .sassign r4, Suart_Ch_Struct");
+asm("suart_ch_info: .sassign r8, Suart_Ch_Info");
+asm("tx_context: .sassign r11, Suart_Tx_Context");
+asm("rx_context: .sassign r11, Suart_Rx_Context");
 
 #define mcasp_rbuf_val		r19
 #define	pZERO   		r20
@@ -719,13 +742,13 @@ int main(void) {
 	LABEL(LOCAL_INIT);
 	//Read the PRU ID
 	LBBO(scratch_reg2, pZERO, SUART_GBL_PRU_STATUS_ADDR, 4);
-	MOV(R3.b0, scratch_reg2.b0);
+	MOV(suart_global.pru_id, scratch_reg2.b0);
 
 	// Read the PRU mode
-	MOV(R3.b1, scratch_reg2.b1);
+	MOV(suart_global.pru_rx_tx_mode, scratch_reg2.b1);
 
 	//PRU Delay Count in CORE_LOOP
-	MOV(R3.b2, scratch_reg2.b2);
+	MOV(suart_global.pru_delay_cnt, scratch_reg2.b2);
 
 	//Clear RSTAT
 	LDI(scratch_reg2, 0xffff);
@@ -735,13 +758,13 @@ int main(void) {
 	LDI(scratch_reg2, 0xffff);
 	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_XSTAT, 4);
 
-	QBEQ(CORE_LOOP, R3.b1, PRU_MODE_TX_ONLY);
+	QBEQ(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
 
 	// This Block the Sampling Point with invalid value in RX Context Area
 	LDI(scratch_reg2, 0xFF);
 	XOR(scratch_reg3, scratch_reg3, scratch_reg3);
 
-	QBEQ(PRUxxxx_MODE_RX_ONLY, R3.b1, PRU_MODE_RX_ONLY);
+	QBEQ(PRUxxxx_MODE_RX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
 
 	LDI(scratch_reg1, SUART_CH1_RX_CONTEXT_ADDR);
 	LDI(scratch_reg4, RX_CONTEXT_OFFSET);
@@ -781,29 +804,29 @@ int main(void) {
 
 	LABEL(TxServiceRequestHndlr);
 	//read interrupt status regsiter
-	LBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 
 	// clear the channel interrupt status bit
-	CLR(R2.w2, R2.w2, R10.b2);
+	CLR(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
 
 	//update interrupt status regsiter
-	SBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 
 	//Clear Service Request
-	CLR(R4.w0, R4.w0, SUART_CTRL_SR_BIT);
-	SBBO(R4.w0, R8, SUART_CH_CTRL_OFFSET, 2);
+	CLR(suart_ch_regs.Chn_Cntrl.u16, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_SR_BIT);
+	SBBO(suart_ch_regs.Chn_Cntrl.u16, suart_ch_info.curr_ch_base_addr, SUART_CH_CTRL_OFFSET, 2);
 
 	// Set the TXRX_READY_BIT
-	SET(R5.b2, R5.b2, SUART_TXRX_READY_BIT);
-	SBBO(R5.b2, R8, SUART_CH_TXRXSTATUS_OFFSET, 1);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
+	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, 1);
 
 	// Set SUART_CH_TXRXCHNSTATUS_BIT bit in channel status to indicate the channel active
-	SET(R5.b3, R5.b3, SUART_CH_TXRXCHNSTATUS_BIT);
-	SBBO(R5.b3, R8, SUART_CH_TXRXCHNSTATUS_OFFSET, 1);
+	SET(suart_ch_regs.Chn_Status, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
+	SBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXCHNSTATUS_OFFSET, 1);
 
 	// New Tx Request received initialize the Channel specific data and save it in memory
-	XOR(R7.b0, R7.b0, R7.b0);
-	SBBO(R7.b0, R8, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
+	XOR(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
 
 	// Load channel specific serializer, xbuf, srctl register mapped active channel
 	JMP(LOAD_TX_COMMON_INFO);
@@ -811,7 +834,7 @@ int main(void) {
 	LABEL(ENABLE_TX_SERIALIZER);
 	//Change the MCASP AXR[n] pin from GPIO mode to MCASP mode of operation
 	LBCO(scratch_reg2, MCASP_CONTROL, MCASP_PFUNC, 4);
-	AND(scratch_reg1, R4.b1, SUART_CTRL_SERIALIZER_MASK);
+	AND(scratch_reg1, suart_ch_regs.Chn_Cntrl.u8.b1, SUART_CTRL_SERIALIZER_MASK);
 	CLR(scratch_reg2, scratch_reg2, scratch_reg1);
 	SBCO(scratch_reg2, MCASP_CONTROL, MCASP_PFUNC, 4);
 
@@ -840,7 +863,7 @@ int main(void) {
 
 	// Branch According to Pre-Scalar Value
 	LDI(scratch_reg1, SUART_CTRL_PRE_SCALAR_MASK);
-	AND(scratch_reg1, scratch_reg1, R4.w2);
+	AND(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_Config1);
 
 	QBEQ(PRE_SCALAR1, scratch_reg1, PRE_SCALAR_1);
 	QBEQ(PRE_SCALAR2, scratch_reg1, PRE_SCALAR_2);
@@ -863,8 +886,8 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Increament the Chn_TxRxBytesDoneCtr bye one
-	ADD(R7.b0, R7.b0, 1);
-	SBBO(R7.b0, R8, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -875,8 +898,8 @@ int main(void) {
 //******************************************** PRE_SCALAR2 Starts ********************************************
 
 	LABEL(PRE_SCALAR2);
-	MOV(scratch_reg1, R7.b1);
-	QBGT(XMIT_FISRT_8BIT, R7.b1, 1);
+	MOV(scratch_reg1, suart_ch_regs.Chn_TxRxBitsDoneCtr);
+	QBGT(XMIT_FISRT_8BIT, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 
 	LABEL(XMIT_LAST_8BIT);
 	//Last 8 bits to transmitted
@@ -896,11 +919,11 @@ int main(void) {
 
 	// Write To RAM number of Bits Transmitted
 	// 8 bits transmitted
-	ADD(R7.b1, R7.b1, 8);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 8);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// If bit per character less than 8  // added with start and stop bit in bits per channel
-	MOV(scratch_reg1, R5.w0);
+	MOV(scratch_reg1, suart_ch_regs.Chn_Config2.u16);
 	AND(scratch_reg1, scratch_reg1, 0xF);
 	//check  (Chn_Config2.BitsPerChar <= 8)
 	QBGE(TX_DONE, scratch_reg1, 0x8);
@@ -913,13 +936,13 @@ int main(void) {
 //******************************************** PRE_SCALAR4 Starts ********************************************
 
 	LABEL(PRE_SCALAR4);
-	MOV(scratch_reg1, R7.b1);
+	MOV(scratch_reg1, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	QBGT(XMIT_FIRST_4BIT, scratch_reg1, 1);
 
 	LABEL(XMIT_NXT_4BIT);
 	//Chn_Config2.BitsPerChar - Chn_TxRxBitsDoneCntr
-	AND(scratch_reg2, R5.w0, 0xF);
-	SUB(scratch_reg2, scratch_reg2, R7.b1);
+	AND(scratch_reg2, suart_ch_regs.Chn_Config2.u16, 0xF);
+	SUB(scratch_reg2, scratch_reg2, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 
 	// (Chn_Config2.BitsPerChar - Chn_TxRxBitsDoneCntr) > 4, more bits to be transmitted
 	QBLT(MORE_DATA4, scratch_reg2, 4);
@@ -945,15 +968,15 @@ int main(void) {
 	// Check all bits have been transmitted
 	LABEL(CHK_TX_DONE);
 	// Updating number of bits written
-	ADD(R7.b1, R7.b1, 4);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 4);
 
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
-	AND(scratch_reg2, R5.w0, 0xF);
+	AND(scratch_reg2, suart_ch_regs.Chn_Config2.u16, 0xF);
 
 	// check if all bits have been transmitted
-	QBGE(TX_DONE, scratch_reg2, R7.b1);
+	QBGE(TX_DONE, scratch_reg2, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	JMP(TxInterruptServiceRequestHndlr);
 
 	// transmit first 4 bit of formated data
@@ -963,10 +986,10 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	//Updating number of bits written
-	ADD(R7.b1, R7.b1, 4);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 4);
 
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -978,35 +1001,35 @@ int main(void) {
 
 	LABEL(PRE_SCALAR6);
 	// transmit first 3 bit of formated data
-	QBGT(XMIT_FIRST_3BIT, R7.b1, 1);
+	QBGT(XMIT_FIRST_3BIT, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 
 	LABEL(GENERIC_TRANSMIT_BLOCK);
 	// initialize the register
-	LDI(R13.b3, 0x0);
+	LDI(tx_context.bitsLoaded, 0x0);
 	XOR(scratch_8bit_reg2, scratch_8bit_reg2, scratch_8bit_reg2);
 
 	LABEL(LOAD_BITS_LOOP_FOR6);
-	AND(scratch_reg2, R5.w0, 0xF);
+	AND(scratch_reg2, suart_ch_regs.Chn_Config2.u16, 0xF);
 
 	// transmit the next bits if (ChnTxRxBitsDoneCntr < Chn_Config2.BitsPerChar)
-	QBLT(XMIT_NXT_3BIT, scratch_reg2, R7.b1);
+	QBLT(XMIT_NXT_3BIT, scratch_reg2, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 
 	// transmit the last remaining bits of the present byte if any and updated counters as below
 	LABEL(XMIT_MORE_BITS);
 	// update the bytes done counter and reset the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
-	ADD(R7.b0, R7.b0, 1);
-	SBBO(R7.b0, R8, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
 
-	XOR(R7.b1, R7.b1, R7.b1);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	XOR(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
-	XOR(R7.w2, R7.w2, R7.w2);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	// set the remaining bits to one, if there are no more bits in formated data to send
 	// and still there is space in TX_DATA_reg.
 	// 16 - bitsLoaded
-	RSB(scratch_reg1, R13.b3, 16);
+	RSB(scratch_reg1, tx_context.bitsLoaded, 16);
 	// Load the remaining (16 - bitsLoaded) bits with logic High
 	XOR(scratch_reg3, scratch_reg3, scratch_reg3);
 	NOT(scratch_reg3, scratch_reg3);
@@ -1026,36 +1049,37 @@ int main(void) {
 	SUB(scratch_reg1, scratch_reg1, 1);
 	QBLE(SET_BIT_BIT, scratch_reg1, 1);
 
-	LDI(R13.b3, 16);
+	LDI(tx_context.bitsLoaded, 16);
 	JMP(CHK_MORE_PRESCALAR);
 	JMP(TxInterruptServiceRequestHndlr);
 
 	LABEL(XMIT_NXT_3BIT);
 	// if the bitsLoaded in TX_DATA_reg is less than 16 load the next bits
 	// (bitsLoaded < 16)
-	QBLT(CHK_MORE_PRESCALAR, R13.b3, 16);
+	QBLT(CHK_MORE_PRESCALAR, tx_context.bitsLoaded, 16);
 
 	LABEL(BIT_LOAD16);
 	// Read Prescalar value
-	LDI(scratch_reg2, 0x03FF);
-	AND(scratch_reg1, scratch_reg2, R4.w2);
+	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
+	AND(scratch_reg1, scratch_reg2, suart_ch_regs.Chn_Config1);
 
 	// (16 - bitsLoaded)
-	RSB(scratch_reg2, R13.b3, 16);
+	RSB(scratch_reg2, tx_context.bitsLoaded, 16);
 	// (Chn_Config1.PreScaller - ChnTxRxRepeatDoneCntr)
-	SUB(scratch_reg1, scratch_reg1, R7.w2);
+	SUB(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+
 	MIN(scratch_reg1, scratch_reg1, scratch_reg2);
 
 	// Read Next Bit
 	JAL(JMP_CALL_reg, READ_TX_DATA);
-	LSR(scratch_reg3, scratch_reg3, R7.b1);
+	LSR(scratch_reg3, scratch_reg3, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 
 	// copy bit to transmitted to scratch_reg2
 	AND(scratch_reg2, scratch_reg3, 0x1);
 	// move repeat count to scratch_reg4
 	MOV(scratch_reg4, scratch_reg1);
 	// shift the bit to be transmitted to expected position
-	LSL(scratch_reg2, scratch_reg2, R13.b3);
+	LSL(scratch_reg2, scratch_reg2, tx_context.bitsLoaded);
 
 	// prescale the bit to transmitted
 	LABEL(PRESCALE_NXT_BIT);
@@ -1065,32 +1089,32 @@ int main(void) {
 	QBLE(PRESCALE_NXT_BIT, scratch_reg1, 1);
 
 	// write back to memory
-	ADD(R13.b3, R13.b3, scratch_reg4);
+	ADD(tx_context.bitsLoaded, tx_context.bitsLoaded, scratch_reg4);
 
-	ADD(R7.w2, R7.w2, scratch_reg4);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, scratch_reg4);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	// get the prescalar value
-	LDI(scratch_reg2, 0x03FF);
-	AND(scratch_reg1, scratch_reg2, R4.w2);
+	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
+	AND(scratch_reg1, scratch_reg2, suart_ch_regs.Chn_Config1);
 
 	//if bit has been transmitted prescaler times, fall through and updated the Chn_TxRxBitsDoneCtr and Chn_TxRxRepeatDoneCtr
-	QBGT(CHK_MORE_PRESCALAR, R7.w2, scratch_reg1);
+	QBGT(CHK_MORE_PRESCALAR, suart_ch_regs.Chn_TxRxRepeatDoneCtr, scratch_reg1);
 
 	// rename to TX_BIT_DONE_CNTR
 	LABEL(TX_DONE_CNTR6);
 	// Write Chn_TxRxBitsDoneCtr
-	ADD(R7.b1, R7.b1, 1);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Write Chn_TxRxRepeatDoneCtr
-	XOR(R7.w2, R7.w2, R7.w2);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	//rename this label to CHK_TX_DATA_REG_FULL
 	LABEL(CHK_MORE_PRESCALAR);
 	// if (bitsLoaded < 16), next bit can be loaded in TX_DATA_reg
-	QBGT(LOAD_BITS_LOOP_FOR6, R13.b3, 0x10);
+	QBGT(LOAD_BITS_LOOP_FOR6, tx_context.bitsLoaded, 0x10);
 	// TX_DATA_reg is full, transmit the data
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 	JMP(TxInterruptServiceRequestHndlr);
@@ -1127,14 +1151,14 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Updating number of bits written
-	ADD(R7.b1, R7.b1, 2);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 2);
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Updating number of bits written
-	ADD(R7.w2, R7.w2, 4);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 4);
 	// Write To RAM Write Repeat done counter to RAM
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1145,7 +1169,7 @@ int main(void) {
 //******************************************** PRE_SCALAR12 Starts *******************************************
 
 	LABEL(PRE_SCALAR12);
-	QBGT(XMIT_FIRST_2BIT, R7.b1, 1);
+	QBGT(XMIT_FIRST_2BIT, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	JMP(GENERIC_TRANSMIT_BLOCK);
 
 	LABEL(XMIT_FIRST_2BIT);
@@ -1176,14 +1200,14 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Updating number of bits written
-	ADD(R7.b1, R7.b1, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Updating number of bits written
-	ADD(R7.w2, R7.w2, 4);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 4);
 	// Write To RAM number of Bits Repeated
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1194,7 +1218,7 @@ int main(void) {
 //******************************************** PRE_SCALAR16 Starts *******************************************
 
 	LABEL(PRE_SCALAR16);
-	QBGT(XMIT_FIRST_16, R7.b1, 1);
+	QBGT(XMIT_FIRST_16, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	JMP(GENERIC_TRANSMIT_BLOCK);
 
 	LABEL(XMIT_FIRST_16);
@@ -1212,14 +1236,14 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Updating number of bits written
-	ADD(R7.b1, R7.b1, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Updating number of bits written
-	ADD(R7.w2, R7.w2, 0);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0);
 	// Write To RAM number of Bits Repeated
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1230,14 +1254,14 @@ int main(void) {
 //********************************************* PRE_SCALAR24 Starts ******************************************
 
 	LABEL(PRE_SCALAR24);
-	QBGT(XMIT_FIRST_24, R7.b1, 1);
+	QBGT(XMIT_FIRST_24, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 	JMP(GENERIC_TRANSMIT_BLOCK);
 
 	LABEL(XMIT_FIRST_24);
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
-	AND(scratch_reg1, scratch_reg2, R4.w2);
+	AND(scratch_reg1, scratch_reg2, suart_ch_regs.Chn_Config1);
 	// Chn_TxRxConfig1.PreScaler - ChnTxRxRepeadDoneCnt
-	SUB(scratch_reg1, scratch_reg1, R7.w2);
+	SUB(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
 	//(Chn_TxRxConfig1.PreScaler - ChnTxRxRepeadDoneCntr >= 16 )
 	QBLE(PRESCALE_START_BIT, scratch_reg1, 16);
 
@@ -1245,18 +1269,18 @@ int main(void) {
 	// Clear Scratch reg
 	XOR(scratch_reg3, scratch_reg3, scratch_reg3);
 	// Updating number of bits written
-	ADD(R7.b1, R7.b1, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 
 	JAL(JMP_CALL_reg, READ_TX_DATA);
 
 	// get the bits to be transmitted
-	LSR(scratch_reg3, scratch_reg3, R7.b1);
+	LSR(scratch_reg3, scratch_reg3, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	AND(scratch_reg2, scratch_reg3, 0x1);
 
 	// shift the bit to desired bit position
 	LSL(scratch_reg2, scratch_reg2, scratch_reg1);
 	RSB(scratch_reg1, scratch_reg1, 16);
-	MOV(R7.w2, scratch_reg1);
+	MOV(suart_ch_regs.Chn_TxRxRepeatDoneCtr, scratch_reg1);
 
 	LABEL(PRESCALE_FIRST_DAT_BIT);
 	OR(TX_DATA_reg.w0, TX_DATA_reg.w0, scratch_reg2);
@@ -1267,10 +1291,10 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Write To RAM Chn_TxRxRepeatDoneCtr
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 	JMP(TxInterruptServiceRequestHndlr);
 
 	LABEL(PRESCALE_START_BIT);
@@ -1282,9 +1306,9 @@ int main(void) {
 	JAL(JMP_CALL_reg, TRANSMIT_PRESCALED_DATA);
 
 	// Update number of bits written
-	ADD(R7.w2, R7.w2, 16);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 16);
 	// Write To RAM number of Bits Repeated
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 	JMP(TxInterruptServiceRequestHndlr);
 
 //************************************************ PRE_SCALAR24 ENDs *****************************************
@@ -1310,7 +1334,7 @@ int main(void) {
 
 	LABEL(LOAD_TX_COMMON_INFO);
 	// Load the TX Format Address for the specific channel
-	QBEQ(LOAD_TX_FORMAT_ADDRESS_DONE, R3.b1, PRU_MODE_TX_ONLY);
+	QBEQ(LOAD_TX_FORMAT_ADDRESS_DONE, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
 	JAL(JMP_CALL_reg, LOAD_TX_FORMAT_ADDRESS);
 
 	LABEL(LOAD_TX_FORMAT_ADDRESS_DONE);
@@ -1336,40 +1360,40 @@ int main(void) {
 
 	LABEL(LOCATE_SR_XBUF_SRCTL);
 	// Calculating Serializer Mapped to Channel
-	AND(scratch_reg1, R4.b1, SUART_CTRL_SERIALIZER_MASK);
+	AND(scratch_reg1, suart_ch_regs.Chn_Cntrl.u8.b1, SUART_CTRL_SERIALIZER_MASK);
 	LSL(scratch_reg1, scratch_reg1, SUART_CTRL_SRCTL_BIT_SHIFT);
 
 	// copy the tx format address to temp regsiter
-	MOV(scratch_reg3, R13.w0);
+	MOV(scratch_reg3, tx_context.buff_addr);
 	LDI(scratch_reg4, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
 
 	// Calculating the specific SRCTL register offset
-	MOV32(R11, MCASP_SRCTL_BASE);
-	ADD(R11, R11, scratch_reg1);
+	MOV32(tx_context.asp_xsrctl_reg.u16, MCASP_SRCTL_BASE);
+	ADD(tx_context.asp_xsrctl_reg.u32, tx_context.asp_xsrctl_reg.u32, scratch_reg1);
 
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_ASP_XSRCTL_REG_OFFSET);
-	SBBO(R11, scratch_reg3, scratch_reg2, 4);
+	SBBO(tx_context.asp_xsrctl_reg.u32, scratch_reg3, scratch_reg2, 4);
 
 	// Calculating the specific xbuf register offset
-	MOV32(R12, MCASP_XBUF_BASE);
-	ADD(R12, R12, scratch_reg1);
+	MOV32(tx_context.asp_xbuf_reg.u16, MCASP_XBUF_BASE);
+	ADD(tx_context.asp_xbuf_reg.u32, tx_context.asp_xbuf_reg.u32, scratch_reg1);
 
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_ASP_XBUF_REG_OFFSET);
-	SBBO(R12, scratch_reg3, scratch_reg2, 4);
+	SBBO(tx_context.asp_xbuf_reg.u32, scratch_reg3, scratch_reg2, 4);
 
 	// Store the data length
-	MOV(R13.b2, R5.b1);
+	MOV(tx_context.buff_size, suart_tx_ch.Chn_Config2.u8.b1);
 
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_BUFF_SIZE_OFFSET);
-	SBBO(R13.b2, scratch_reg3, scratch_reg2, 1);
+	SBBO(tx_context.buff_size, scratch_reg3, scratch_reg2, 1);
 
 	//Store the data Tx FMT Context address
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_BUFF_ADDR_OFFSET);
-	SBBO(R13.w0, scratch_reg3, scratch_reg2, 2);
+	SBBO(tx_context.buff_addr, scratch_reg3, scratch_reg2, 2);
 
-	LDI(R13.b3, 0x00);
+	LDI(tx_context.bitsLoaded, 0x00);
 	ADD(scratch_reg2, scratch_reg4, SUART_CH_BITSLOADED_OFFSET);
-	SBBO(R13.b3, scratch_reg3, scratch_reg2, 1);
+	SBBO(tx_context.bitsLoaded, scratch_reg3, scratch_reg2, 1);
 
 	JMP(LOCATE_SR_XBUF_SRCTL_DONE);
 
@@ -1387,15 +1411,15 @@ int main(void) {
 //======================================================================================================================================
 
 	LABEL(CHK_TX_DATA_FORMAT);
-	QBEQ(CHK_TX_DATA_FORMAT_BITS, R7.w2, 0);
+	QBEQ(CHK_TX_DATA_FORMAT_BITS, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0);
 	JMP(CHK_TX_DATA_FORMAT_DONE);
 
 	LABEL(CHK_TX_DATA_FORMAT_BITS);
-	QBEQ(CHK_TX_DATA_FORMAT_BYTE, R7.b1, 0);
+	QBEQ(CHK_TX_DATA_FORMAT_BYTE, suart_ch_regs.Chn_TxRxBitsDoneCtr, 0);
 	JMP(CHK_TX_DATA_FORMAT_DONE);
 
 	LABEL(CHK_TX_DATA_FORMAT_BYTE);
-	QBEQ(TX_DATA_FORMAT, R7.b0, 0);
+	QBEQ(TX_DATA_FORMAT, suart_ch_regs.Chn_TxRxBytesDoneCtr, 0);
 	JMP(CHK_TX_DATA_FORMAT_DONE);
 
 	LABEL(TX_DATA_FORMAT);
@@ -1403,22 +1427,22 @@ int main(void) {
 	XOR(scratch_reg1, scratch_reg1, scratch_reg1);
 	NOT(scratch_reg1, scratch_reg1);
 
-	SUB(scratch_reg2, R5.b0, 1);
+	SUB(scratch_reg2, suart_tx_ch.Chn_Config2.u8.b0, 1);
 
 	LSL(scratch_reg1, scratch_reg1, scratch_reg2);
 	// offset from base addr
 	XOR(scratch_reg2, scratch_reg2, scratch_reg2);
 
 	// to store formated data into DATA RAM
-	MOV(scratch_reg3, R13.w0);
+	MOV(scratch_reg3, tx_context.buff_addr);
 
 	// Number of Bits Per Character
-	AND(scratch_8bit_reg1, R5.b0, 0xF);
+	AND(scratch_8bit_reg1, suart_tx_ch.Chn_Config2.u8.b0, 0xF);
 	SUB(scratch_8bit_reg1, scratch_8bit_reg1, 2);
 
 	LABEL(TX_DATA_FORMAT_LOOP);
 	// Load the data from the data pointer
-	LBBO(TX_DATA_reg, R6, 0x00, 2);
+	LBBO(TX_DATA_reg, suart_ch_regs.ch_TxRxData, 0, 2);
 	LSL(TX_DATA_reg, TX_DATA_reg, 1);
 	OR(TX_DATA_reg, TX_DATA_reg, scratch_reg1);
 
@@ -1430,17 +1454,17 @@ int main(void) {
 
 	QBGE(INC_ADDR_BY_ONE, scratch_8bit_reg1, SUART_CH_CONFIG2_8BITS_PER_CHAR);
 	// Next data buffer pointer
-	ADD(R6, R6, 1);
+	ADD(suart_ch_regs.ch_TxRxData, suart_ch_regs.ch_TxRxData, 1);
 
 	// Increamnet the tx buffer data pointer by ONE, if bit per character is less or equal to 8 including start and stop bit
 	LABEL(INC_ADDR_BY_ONE);
 	// Next data buffer pointer
-	ADD(R6, R6, 1);
+	ADD(suart_ch_regs.ch_TxRxData, suart_ch_regs.ch_TxRxData, 1);
 
-	QBEQ(CHK_TX_DATA_FORMAT_DONE, R13.b2, 0);
+	QBEQ(CHK_TX_DATA_FORMAT_DONE, tx_context.buff_size, 0);
 
 	//Decrement the data length .i.e no of bytes to send
-	SUB(R13.b2, R13.b2, 1);
+	SUB(tx_context.buff_size, tx_context.buff_size, 1);
 
 	JMP(TX_DATA_FORMAT_LOOP);
 
@@ -1456,10 +1480,10 @@ int main(void) {
 
 	LABEL(READ_TX_DATA);
 	// Copy the base address of formated data
-	MOV(scratch_reg3, R13.w0);
+	MOV(scratch_reg3, tx_context.buff_addr);
 
 	// Calculate the offset of formated data
-	LSL(scratch_reg4, R7.b0, 1);
+	LSL(scratch_reg4, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
 
 	// LOAD formated data from DATA RAM
 	LBBO(scratch_reg3, scratch_reg3, scratch_reg4, 2);
@@ -1477,26 +1501,26 @@ int main(void) {
 //======================================================================================================================================
 
 	LABEL(LOAD_TX_FORMAT_ADDRESS);
-	QBEQ(TX_CH0_FMT_ADDR, R10.b2, SUART_CHANNEL_0);
-	QBEQ(TX_CH2_FMT_ADDR, R10.b2, SUART_CHANNEL_2);
-	QBEQ(TX_CH4_FMT_ADDR, R10.b2, SUART_CHANNEL_4);
-	QBEQ(TX_CH6_FMT_ADDR, R10.b2, SUART_CHANNEL_6);
+	QBEQ(TX_CH0_FMT_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_0);
+	QBEQ(TX_CH2_FMT_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_2);
+	QBEQ(TX_CH4_FMT_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_4);
+	QBEQ(TX_CH6_FMT_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_6);
 	JMP(JMP_CALL_reg);
 
 	LABEL(TX_CH0_FMT_ADDR);
-	LDI(R13.w0, SUART_CH0_TX_FMT_ADDR);
+	LDI(tx_context.buff_addr, SUART_CH0_TX_FMT_ADDR);
 	JMP(JMP_CALL_reg);
 
 	LABEL(TX_CH2_FMT_ADDR);
-	LDI(R13.w0, SUART_CH2_TX_FMT_ADDR);
+	LDI(tx_context.buff_addr, SUART_CH2_TX_FMT_ADDR);
 	JMP(JMP_CALL_reg);
 
 	LABEL(TX_CH4_FMT_ADDR);
-	LDI(R13.w0, SUART_CH4_TX_FMT_ADDR);
+	LDI(tx_context.buff_addr, SUART_CH4_TX_FMT_ADDR);
 	JMP(JMP_CALL_reg);
 
 	LABEL(TX_CH6_FMT_ADDR);
-	LDI(R13.w0, SUART_CH6_TX_FMT_ADDR);
+	LDI(tx_context.buff_addr, SUART_CH6_TX_FMT_ADDR);
 	JMP(JMP_CALL_reg);
 
 //******************************************** TX LOAD_TX_FORMAT_ADDRESS Routine: ENDS ***********************
@@ -1519,7 +1543,7 @@ int main(void) {
 
 	LABEL(BYTE_LOOP);
 	LDI(scratch_reg4, SUART_CTRL_PRE_SCALAR_MASK);
-	AND(scratch_reg1, scratch_reg4, R4.w2);
+	AND(scratch_reg1, scratch_reg4, suart_ch_regs.Chn_Config1);
 
 	LABEL(BITS_LOOP);
 	// CLR scratch_reg4
@@ -1559,7 +1583,7 @@ int main(void) {
 
 	LABEL(WRITE_TO_XBUF);
 	// Write Byte to X_BUF
-	SBBO(TX_DATA_reg.w0, R12, 0, 4);
+	SBBO(TX_DATA_reg.w0, tx_context.asp_xbuf_reg.u32, 0, 4);
 	// return from Transmit Prescaled Data
 	JMP(JMP_CALL_reg);
 
@@ -1574,12 +1598,12 @@ int main(void) {
 //======================================================================================================================================
 
 	LABEL(TX_DONE);
-	XOR(R7.b1, R7.b1, R7.b1);
+	XOR(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	// Write To RAM number of Bits Transmitted
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
-	ADD(R7.b0, R7.b0, 1);
-	SBBO(R7.b0, R8, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
 
 	JMP(TxInterruptServiceRequestHndlr);
 
@@ -1600,77 +1624,77 @@ int main(void) {
 
 	LABEL(TxInterruptServiceRequestHndlr);
 	// Retrieve the channel number and load the context base
-	LDI(R8, SUART_CH_BASE_ADDRESS);
-	LDI(R10.w0, SUART_CH_BASE_ADDRESS);
-	LDI(R10.b2, 0x00);
-	LDI(R13.w0, 0x90);
+	LDI(suart_ch_info.curr_ch_base_addr, SUART_CH_BASE_ADDRESS);
+	LDI(suart_ch_info.curr_ch_offset, SUART_CH_BASE_ADDRESS);
+	LDI(suart_ch_info.ch_num, 0x00);
+	LDI(tx_context.buff_addr, 0x90);
 
 	LABEL(SERCH_MAPPED_TX_CHN);
-	ADD(scratch_reg1, R10.w0, SUART_CH_TXRXCHNSTATUS_OFFSET);
+	ADD(scratch_reg1, suart_ch_info.curr_ch_offset, SUART_CH_TXRXCHNSTATUS_OFFSET);
 	// Load the Channel Cntrl info from Memory to Register
-	LBBO(R5.b3, R8, scratch_reg1, 1);
-	QBBC(NEXT_TX_CHN, R5.b3, SUART_CH_TXRXCHNSTATUS_BIT);
+	LBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, scratch_reg1, 1);
+	QBBC(NEXT_TX_CHN, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
 
-	ADD(scratch_reg1, R13.w0, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
+	ADD(scratch_reg1, tx_context.buff_addr, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
 	LBBO(scratch_reg2, scratch_reg1, SUART_CH_ASP_XSRCTL_REG_OFFSET, 4);
 	LBBO(scratch_reg1, scratch_reg2, 0, 4);
 	QBBS(MAPPED_TX_CHN_FOUND, scratch_reg1, ASP_SRCTL_XRDY_BIT);
 
 	LABEL(NEXT_TX_CHN);
-	QBEQ(PRU_TX_ONLY_MODE, R3.b1, PRU_MODE_TX_ONLY);
+	QBEQ(PRU_TX_ONLY_MODE, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
 
 	// TX & RX together. So channel nunbers are 0, 2, 4, 6
-	ADD(R10.w0, R10.w0, SUART_CH_REGS_SIZE2);
-	ADD(R10.b2, R10.b2, 0x02);
-	ADD(R13.w0, R13.w0, SUART_TX_FMT_OFFSET);
-	QBGE(SERCH_MAPPED_TX_CHN, R10.b2, NUM_OF_CHANNELS);
+	ADD(suart_ch_info.curr_ch_offset, suart_ch_info.curr_ch_offset, SUART_CH_REGS_SIZE2);
+	ADD(suart_ch_info.ch_num, suart_ch_info.ch_num, 0x02);
+	ADD(tx_context.buff_addr, tx_context.buff_addr, SUART_TX_FMT_OFFSET);
+	QBGE(SERCH_MAPPED_TX_CHN, suart_ch_info.ch_num, NUM_OF_CHANNELS);
 	JMP(CORE_LOOP);
 
 	LABEL(PRU_TX_ONLY_MODE);
 	// TX Only ...So channel numbers are contiguous
-	ADD(R10.w0, R10.w0, SUART_CH_REGS_SIZE);
-	ADD(R10.b2, R10.b2, 0x01);
-	ADD(R13.w0, R13.w0, 0x2C);
-	QBGE(SERCH_MAPPED_TX_CHN, R10.b2, NUM_OF_CHANNELS);
+	ADD(suart_ch_info.curr_ch_offset, suart_ch_info.curr_ch_offset, SUART_CH_REGS_SIZE);
+	ADD(suart_ch_info.ch_num, suart_ch_info.ch_num, 0x01);
+	ADD(tx_context.buff_addr, tx_context.buff_addr, 0x2C);
+	QBGE(SERCH_MAPPED_TX_CHN, suart_ch_info.ch_num, NUM_OF_CHANNELS);
 	JMP(CORE_LOOP);
 
 	LABEL(MAPPED_TX_CHN_FOUND);
-	LBBO(R4.w0, R8, R10.w0, 16);
-	ADD(R8, R8, R10.w0);
+	LBBO(suart_ch_regs.Chn_Cntrl.u16, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, 16);
+	ADD(suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset);
 
-	QBEQ(PRUx_MODE_TX_ONLY, R3.b1, PRU_MODE_TX_ONLY);
+	QBEQ(PRUx_MODE_TX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
 
-	QBEQ(CORE_LOOP, R3.b1, PRU_MODE_INVALID);
+	QBEQ(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_INVALID);
 
 	LABEL(PRUx_MODE_TX_ONLY);
-	ADD(scratch_reg1, R13.w0, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
-	LBBO(R11, scratch_reg1, 0, 12);
+	ADD(scratch_reg1, tx_context.buff_addr, TX_FMT_DATA_TO_TX_CONTEXT_OFFSET);
+	LBBO(tx_context, scratch_reg1, 0, 12);
 
 	// JMP TO TxServiceReqHndlLoop Chn_TxRxBytesDoneCtr is less than Data length
-	LSR(scratch_reg1, R5.w0, SUART_CH_CONFIG2_DATALEN_SHIFT);
+	LSR(scratch_reg1, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_DATALEN_SHIFT);
 	AND(scratch_reg1, scratch_reg1, SUART_CH_CONFIG2_DATALEN_MASK);
 	ADD(scratch_reg1, scratch_reg1, 0x01);
-	QBLT(TxServiceReqHndlLoop, scratch_reg1, R7.b0);
+	QBLT(TxServiceReqHndlLoop, scratch_reg1, suart_ch_regs.Chn_TxRxBytesDoneCtr);
 
-	QBBS(DECLARE_COMPLETE, R5.b2, SUART_TXRX_READY_BIT);
+	QBBS(DECLARE_COMPLETE, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
 	NOT(scratch_reg1, pZERO);
-	SBBO(scratch_reg1, R12, 0, 4);
+	SBBO(scratch_reg1, tx_context.asp_xbuf_reg.u32, 0, 4);
 
 	JMP(CORE_LOOP);
 
 	LABEL(DECLARE_COMPLETE);
 	// Set the status in the context area
-	SET(R5.b2, R5.b2, SUART_TXRX_COMPLETE_BIT);
-	CLR(R5.b2, R5.b2, SUART_TXRX_READY_BIT);
-	SBBO(R5.b2, R8, SUART_CH_TXRXSTATUS_OFFSET, 1);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_COMPLETE_BIT);
+	CLR(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
+	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, 1);
 
 	// Generate the interrupt to the ARM/DSP about the completion
-	LBBO(R2.w0, pZERO, SUART_GBL_INT_MASK_ADDR, 2);
-	QBBC(CORE_LOOP, R2.w0, R10.b2);
+	LBBO(suart_global.intrMask, pZERO, SUART_GBL_INT_MASK_ADDR, 2);
+	QBBC(CORE_LOOP, suart_global.intrMask, suart_ch_info.ch_num);
 
-	LBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
-	SET(R2.w2, R2.w2, R10.b2);
-	SBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	SET(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
+	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 	JMP(PRU_TO_HOST_INTERRUPT);
 
 //******************************************** TxInterruptServiceRequestHndlr: ENDs **************************
@@ -1695,10 +1719,10 @@ int main(void) {
 //========================================================================================================================================
 
 	LABEL(CORE_LOOP);
-	QBEQ(CORE_LOOP, R3.b1, PRU_MODE_INVALID);
+	QBEQ(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_INVALID);
 
 	LABEL(ARM_DSP_EVENT);
-	QBEQ(CORE_LOOP_PRU1, R3.b0, 1);
+	QBEQ(CORE_LOOP_PRU1, suart_global.pru_id, 1);
 
 	LABEL(CORE_LOOP_PRU0);
 	// wait for the hostEventStatus to get set. Loop till then
@@ -1730,10 +1754,10 @@ int main(void) {
 	LABEL(MCASP_EVENT);
 	// Check for RX interrrupt first
 	// If TX only PRU Skip RSTAT Check
-	QBEQ(MCASP_TX_EVNT, R3.b1, PRU_MODE_TX_ONLY);
+	QBEQ(MCASP_TX_EVNT, suart_global.pru_rx_tx_mode, PRU_MODE_TX_ONLY);
 
 	// if the PRU is RX only mode, then check if the XSTAT is set. If so, raise event to PRU1 and proceed
-	QBNE(RX_TX_PROCESS, R3.b1, PRU_MODE_RX_ONLY);
+	QBNE(RX_TX_PROCESS, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
 	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	QBBC(RX_TX_PROCESS, scratch_reg1, 5);
 	MOV32(scratch_reg1, PRU0_TO_PRU1_EVENT);
@@ -1744,13 +1768,13 @@ int main(void) {
 	QBBS(RxInterruptServiceRequestHndlr, scratch_reg1, 5);
 	// Skip the check for XSTAT if we are not Rx/Tx PRU.
 	// We don't want the PRU to spin in a tight loop around the McASP register to introduce a delay
-	QBNE(CORE_LOOP, R3.b1, PRU_MODE_RX_TX_BOTH);
+	QBNE(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_RX_TX_BOTH);
 
 	LABEL(MCASP_TX_EVNT);
 	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_XSTAT, 4);
 	QBBS(TxInterruptServiceRequestHndlr, scratch_reg1, 5);
 	// If PRU is both TX/RX, then go back to Core-loop. Else delay to avoid McASP Spins
-	QBEQ(CORE_LOOP, R3.b1, PRU_MODE_RX_TX_BOTH);
+	QBEQ(CORE_LOOP, suart_global.pru_rx_tx_mode, PRU_MODE_RX_TX_BOTH);
 
 //******************************************** CORE LOOP: Ends ***********************************************
 
@@ -1765,41 +1789,41 @@ int main(void) {
 
 	LABEL(CHN_SEARCH);
 	MOV32(scratch_reg3, 0x1);
-	LSL(scratch_reg3, scratch_reg3, R3.b0);
+	LSL(scratch_reg3, scratch_reg3, suart_global.pru_id);
 	MOV32(scratch_reg1, SECR2_OFFSET);
 	SBCO(scratch_reg3, CONST_PRUSSINTC, scratch_reg1, 4);
 
 	// Read Global control register
-	LBBO(R2.w0, pZERO, SUART_GBL_CTRL_ADDR, 8);
+	LBBO(suart_global.intrMask, pZERO, SUART_GBL_CTRL_ADDR, 8);
 
 	// Retrieve the channel number and load the context base
-	LDI(R8, SUART_CH_BASE_ADDRESS);
-	LDI(R10.w0, SUART_CH_BASE_ADDRESS);
-	LDI(R10.b2, 0x00);
-	XOR(R13.w0, R13.w0, R13.w0);
-	XOR(R9, R9, R9);
+	LDI(suart_ch_info.curr_ch_base_addr, SUART_CH_BASE_ADDRESS);
+	LDI(suart_ch_info.curr_ch_offset, SUART_CH_BASE_ADDRESS);
+	LDI(suart_ch_info.ch_num, 0x00);
+	XOR(tx_context.buff_addr, tx_context.buff_addr, tx_context.buff_addr);
+	XOR(suart_ch_info.rx_context_addr, suart_ch_info.rx_context_addr, suart_ch_info.rx_context_addr);
 
-	LDI(R13.w0, 0x90);
-	LDI(R9, 0x90);
+	LDI(tx_context.buff_addr, 0x90);
+	LDI(suart_ch_info.rx_context_addr, 0x90);
 
 	LABEL(CHN_ACTIVE);
-	LBBO(R4.w0, R8, R10.w0, 2);
-	QBBS(CHN_SERACH_RTN, R4.w0, SUART_CTRL_SR_BIT);
-	ADD(R10.w0, R10.w0, SUART_CH_REGS_SIZE);
-	ADD(R10.b2, R10.b2, 0x01);
-	ADD(R13.w0, R13.w0, 0x2C);
-	ADD(R9, R9, 0x20);
+	LBBO(suart_ch_regs.Chn_Cntrl.u16, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, 2);
+	QBBS(CHN_SERACH_RTN, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_SR_BIT);
+	ADD(suart_ch_info.curr_ch_offset, suart_ch_info.curr_ch_offset, SUART_CH_REGS_SIZE);
+	ADD(suart_ch_info.ch_num, suart_ch_info.ch_num, 0x01);
+	ADD(tx_context.buff_addr, tx_context.buff_addr, 0x2C);
+	ADD(suart_ch_info.rx_context_addr, suart_ch_info.rx_context_addr, 0x20);
 
 	// None of the channel has service request, go back to MainLoop
 	// check to be verified to boundary condition
-	QBLT(MCASP_EVENT, R10.b2, NUM_OF_CHANNELS);
+	QBLT(MCASP_EVENT, suart_ch_info.ch_num, NUM_OF_CHANNELS);
 	JMP(CHN_ACTIVE);
 
 	LABEL(CHN_SERACH_RTN);
-	LBBO(R4.w0, R8, R10.w0, 16);
-	ADD(R8, R8, R10.w0);
+	LBBO(suart_ch_regs.Chn_Cntrl.u16, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, 16);
+	ADD(suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset);
 
-	AND(scratch_reg1.w0, R4.w0, SUART_CTRL_MODE_MASK);
+	AND(scratch_reg1.w0, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_MODE_MASK);
 	QBEQ(TxServiceRequestHndlr, scratch_reg1.w0, SUART_CH_TX_MODE);
 	QBEQ(RxServiceRequestHndlr, scratch_reg1.w0, SUART_CH_RX_MODE);
 	JMP(CORE_LOOP);
@@ -1839,8 +1863,8 @@ int main(void) {
 	LABEL(PRU_TO_HOST_INTERRUPT);
 	LDI(scratch_reg1, 0);
 
-	QBEQ(EVTOUT_PRU0_EVENTS, R3.b0, 0);
-	QBEQ(EVTOUT_PRU1_EVENTS, R3.b0, 1);
+	QBEQ(EVTOUT_PRU0_EVENTS, suart_global.pru_id, 0);
+	QBEQ(EVTOUT_PRU1_EVENTS, suart_global.pru_id, 1);
 
 	LABEL(EVTOUT_PRU0_EVENTS);
 	//storing the counter value
@@ -1851,7 +1875,7 @@ int main(void) {
 	ADD(scratch_reg1, scratch_reg1, SYS_EVT_42);
 
 	LABEL(EVTOUT_SYSEVT_INIT);
-	ADD(scratch_reg1, scratch_reg1, R10.b2);
+	ADD(scratch_reg1, scratch_reg1, suart_ch_info.ch_num);
 
 	LABEL(EVTOUT_GEN);
 	// Clear SYS_EVTn
@@ -1893,69 +1917,70 @@ int main(void) {
 	LBBO(MAX_RX_TIMEOUT_TRIES, pZERO, MAX_RX_TIMEOUT_TRIES_OFFSET, 2);
 
 	// read interrupt status regsiter
-	LBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 
-	CLR(R2.w2, R2.w2, R10.b2);
+	CLR(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
 
 	// write interrupt status regsiter
-	SBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 
 	//Clear Service Request
-	CLR(R4.w0, R4.w0, SUART_CTRL_SR_BIT);
-	SBBO(R4.w0, R8, SUART_CH_CTRL_OFFSET, 2);
+	CLR(suart_ch_regs.Chn_Cntrl.u16, suart_ch_regs.Chn_Cntrl.u16, SUART_CTRL_SR_BIT);
+	SBBO(suart_ch_regs.Chn_Cntrl.u16, suart_ch_info.curr_ch_base_addr, SUART_CH_CTRL_OFFSET, 2);
 
 	// clear timeout flag
-	CLR(R5.b2, R5.b2, SUART_RX_TIMEOUT_BIT);
+	CLR(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_TIMEOUT_BIT);
 
 	// Set the TXRX_READY_BIT
-	SET(R5.b2, R5.b2, SUART_TXRX_READY_BIT);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
 
 	// update the RX Status Register
-	SBBO(R5.b2, R8, SUART_CH_TXRXSTATUS_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, 1);
 
 	// Set the SUART_CH_TXRXCHNSTATUS_BIT to indicate the channel being active
-	SET(R5.b3, R5.b3, SUART_CH_TXRXCHNSTATUS_BIT);
-	SBBO(R5.b3, R8, SUART_CH_TXRXCHNSTATUS_OFFSET, 1);
+	SET(suart_ch_regs.Chn_Status, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
+	SBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXCHNSTATUS_OFFSET, 1);
 
 	LABEL(RX_CONTEXT_INIT);
-	QBEQ(PRUxxx_MODE_RX_ONLY, R3.b1, PRU_MODE_RX_ONLY);
+	QBEQ(PRUxxx_MODE_RX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
 
 	// Load RX Context Base Address corresponding to Active RX Channel
 	JAL(JMP_CALL_reg, LOAD_RX_CONTEXT_ADDRESS);
 
 	LABEL(PRUxxx_MODE_RX_ONLY);
 	// Calculating the specific SRCTL and R_BUF register offset.
-	AND(scratch_reg1, R4.b1, SUART_CTRL_SERIALIZER_MASK);
+	AND(scratch_reg1, suart_ch_regs.Chn_Cntrl.u8.b1, SUART_CTRL_SERIALIZER_MASK);
 	LSL(scratch_reg1, scratch_reg1, SUART_CTRL_SRCTL_BIT_SHIFT);
+
 	// Storing SRCTL register address in RX Context Area Region
-	MOV32(R12, MCASP_SRCTL_BASE);
-	ADD(R12, R12, scratch_reg1);
+	MOV32(rx_context.asp_rsrctl_reg.u16, MCASP_SRCTL_BASE);
+	ADD(rx_context.asp_rsrctl_reg.u32, rx_context.asp_rsrctl_reg.u32, scratch_reg1);
 
 	//storing asp_rsrctl_reg in RX Context Address Region
-	SBBO(R12, R9, SUART_CH_ASP_RSRCTL_REG, 4);
+	SBBO(rx_context.asp_rsrctl_reg.u32, suart_ch_info.rx_context_addr, SUART_CH_ASP_RSRCTL_REG, 4);
 
 	// Store RBuf Address in RX Context Region
-	MOV32(R11, MCASP_RBUF_BASE);
-	ADD(R11, R11, scratch_reg1);
+	MOV32(rx_context.asp_rbuf_reg.u16, MCASP_RBUF_BASE);
+	ADD(rx_context.asp_rbuf_reg.u32, rx_context.asp_rbuf_reg.u32, scratch_reg1);
 
 	// storing asp_rbuf_reg in RX context  adress region
-	SBBO(R11, R9, SUART_CH_ASP_RBUF_REG, 4);
+	SBBO(rx_context.asp_rbuf_reg.u32, suart_ch_info.rx_context_addr, SUART_CH_ASP_RBUF_REG, 4);
 
 	// Load the Context info specific to Current RX channel from memory to registers
 	//	LBBO   	rx_context, suart_ch_info.rx_context_addr, 0, SIZE (rx_context)
 
 	// Clear the RX timeout counter
-	XOR(R16.w0, R16.w0, R16.w0);
-	SBBO(R16.w0, R9, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
+	XOR(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr);
+	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
 
 	// Activate RX serializer
-	LBBO(scratch_reg2, R12, 0, 4);
+	LBBO(scratch_reg2, rx_context.asp_rsrctl_reg.u32, 0, 4);
 	AND(scratch_reg2, scratch_reg2, 0x3);
 	// Check if Serializer is Already Active as Rx if ,yes skip activation
 	QBEQ(CLR_RSTAT, scratch_reg2, 0x2);
 	//  Activate serializer as Receiver
 	MOV32(scratch_reg2, 0x000E);
-	SBBO(scratch_reg2, R12, 0, 4);
+	SBBO(scratch_reg2, rx_context.asp_rsrctl_reg.u32, 0, 4);
 
 	LABEL(CLR_RSTAT);
 	// Clear the RSTAT  (Overrun, etc)
@@ -1979,69 +2004,69 @@ int main(void) {
 	LABEL(RxInterruptServiceRequestHndlr);
 	// Retrieve the channel number and load the RX context base info corressponding to serializer address in scratch_reg1 and serializer number  in scratch_reg4
 	// Load the SUART CHANNEL BASE ADDRESS
-	LDI(R8, SUART_CH_BASE_ADDRESS);
+	LDI(suart_ch_info.curr_ch_base_addr, SUART_CH_BASE_ADDRESS);
 
-	QBEQ(PRUx_MODE_RX_ONLY, R3.b1, PRU_MODE_RX_ONLY);
+	QBEQ(PRUx_MODE_RX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
 
 	// Since the Rx Channel are 1,3,5,7 Load the suart_ch_regs for Rx channel 1 as it is first channel
-	ADD(R10.w0, pZERO.w0, SUART_CH_REGS_SIZE);
+	ADD(suart_ch_info.curr_ch_offset, pZERO.w0, SUART_CH_REGS_SIZE);
 
-	LDI(R10.b2, 0x01);
+	LDI(suart_ch_info.ch_num, 0x01);
 
 	// Load the RX channel 1 context address to Ch_info register's rx_context_addr field
-	LDI(R9, SUART_CH1_RX_CONTEXT_ADDR);
+	LDI(suart_ch_info.rx_context_addr, SUART_CH1_RX_CONTEXT_ADDR);
 	JMP(SERCH_ACTIVE_RX_CHN_RX);
 
 	LABEL(PRUx_MODE_RX_ONLY);
 	// Since the Rx Channel are 1,3,5,7 Load the suart_ch_regs for Rx channel 1 as it is first channel
-	LDI(R10.w0, 0x00);
+	LDI(suart_ch_info.curr_ch_offset, 0x00);
 
-	LDI(R10.b2, 0x00);
+	LDI(suart_ch_info.ch_num, 0x00);
 
 	// Load the RX channel 1 context address to Ch_info register's rx_context_addr field
-	LDI(R9, 0x90);
+	LDI(suart_ch_info.rx_context_addr, 0x90);
 
 	LABEL(SERCH_ACTIVE_RX_CHN_RX);
-	ADD(scratch_reg1, R10.w0, SUART_CH_TXRXCHNSTATUS_OFFSET);
+	ADD(scratch_reg1, suart_ch_info.curr_ch_offset, SUART_CH_TXRXCHNSTATUS_OFFSET);
 	// Load the Channel Cntrl info from Memory to Register
-	LBBO(R5.b3, R8, scratch_reg1, 1);
-	QBBC(NEXT_RX_CHN, R5.b3, SUART_CH_TXRXCHNSTATUS_BIT);
+	LBBO(suart_ch_regs.Chn_Status, suart_ch_info.curr_ch_base_addr, scratch_reg1, 1);
+	QBBC(NEXT_RX_CHN, suart_ch_regs.Chn_Status, SUART_CH_TXRXCHNSTATUS_BIT);
 
-	LBBO(scratch_reg1, R9, SUART_CH_ASP_RSRCTL_REG, 4);
+	LBBO(scratch_reg1, suart_ch_info.rx_context_addr, SUART_CH_ASP_RSRCTL_REG, 4);
 	LBBO(scratch_reg2, scratch_reg1, 0, 4);
 	QBBS(ACTIVE_RX_CHN_FOUND, scratch_reg2, ASP_SRCTL_RRDY_BIT);
 
 	LABEL(NEXT_RX_CHN);
-	QBEQ(PRUxx_MODE_RX_ONLY, R3.b1, PRU_MODE_RX_ONLY);
+	QBEQ(PRUxx_MODE_RX_ONLY, suart_global.pru_rx_tx_mode, PRU_MODE_RX_ONLY);
 
 	// offset of RX suart_ch_regs
-	ADD(R10.w0, R10.w0, SUART_CH_REGS_SIZE2);
+	ADD(suart_ch_info.curr_ch_offset, suart_ch_info.curr_ch_offset, SUART_CH_REGS_SIZE2);
 	// Increament to Next Rx Channel number
-	ADD(R10.b2, R10.b2, 0x2);
+	ADD(suart_ch_info.ch_num, suart_ch_info.ch_num, 0x2);
 
 	// Increament rx_context_addr by RX_CONTEXT_OFFSET i.e. to next RX channel context address
-	ADD(R9, R9, RX_CONTEXT_OFFSET);
-	QBGE(SERCH_ACTIVE_RX_CHN_RX, R10.b2, NUM_OF_CHANNELS);
+	ADD(suart_ch_info.rx_context_addr, suart_ch_info.rx_context_addr, RX_CONTEXT_OFFSET);
+	QBGE(SERCH_ACTIVE_RX_CHN_RX, suart_ch_info.ch_num, NUM_OF_CHANNELS);
 	JMP(CORE_LOOP);
 
 	LABEL(PRUxx_MODE_RX_ONLY);
 	// offset of RX suart_ch_regs
-	ADD(R10.w0, R10.w0, SUART_CH_REGS_SIZE);
+	ADD(suart_ch_info.curr_ch_offset, suart_ch_info.curr_ch_offset, SUART_CH_REGS_SIZE);
 	// Increamnet to Next Rx ChanneL number
-	ADD(R10.b2, R10.b2, 0x1);
+	ADD(suart_ch_info.ch_num, suart_ch_info.ch_num, 0x1);
 	// Increamnet rx_context_addr by RX_CONTEXT_OFFSET i.e. to next RX channel context address
-	ADD(R9, R9, 0x20);
-	QBGE(SERCH_ACTIVE_RX_CHN_RX, R10.b2, NUM_OF_CHANNELS);
+	ADD(suart_ch_info.rx_context_addr, suart_ch_info.rx_context_addr, 0x20);
+	QBGE(SERCH_ACTIVE_RX_CHN_RX, suart_ch_info.ch_num, NUM_OF_CHANNELS);
 	JMP(CORE_LOOP);
 
 	LABEL(ACTIVE_RX_CHN_FOUND);
 	// Load the suart_ch_regs from Memory to Register
-	LBBO(R4.w0, R8, R10.w0, 16);
+	LBBO(suart_ch_regs.Chn_Cntrl.u16, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset, 16);
 
 	// Load the Context info specific to current RX Channel from memory to registers
-	LBBO(R11, R9, 0, 24);
+	LBBO(rx_context, suart_ch_info.rx_context_addr, 0, 24);
 
-	ADD(R8, R8, R10.w0);
+	ADD(suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_base_addr, suart_ch_info.curr_ch_offset);
 
 	// Clear the RSTAT  (Overrun, etc) for Errors
 	LBCO(scratch_reg1, MCASP_CONTROL, MCASP_RSTAT, 4);
@@ -2054,51 +2079,51 @@ int main(void) {
 	LABEL(RX_PROCESSING_INIT);
 	XOR(mcasp_rbuf_val, mcasp_rbuf_val, mcasp_rbuf_val);
 	// Read the content of RBUF
-	LBBO(scratch_reg1, R11, 0, 4);
+	LBBO(scratch_reg1, rx_context.asp_rbuf_reg.u32, 0, 4);
 	OR(mcasp_rbuf_val, mcasp_rbuf_val, scratch_reg1);
 
 	// If start condition is already received then go to reading next bit  otherwise look for start condition
-	QBLT(READ_CURRENT, R7.b1, 0);
+	QBLT(READ_CURRENT, suart_ch_regs.Chn_TxRxBitsDoneCtr, 0);
 
 	// check Chn_TxRxRepeatDoneCtr, if it is not zero, jump to READ_CURRENT to prescale the start condition
-	QBLT(READ_CURRENT, R7.w2, 0);
+	QBLT(READ_CURRENT, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0);
 
 	// If sampling point i.e. sampling_bit_pos is equal to greater than 16 (INVALID_SAMPLING_POINT),
 	// start bit transition edge is being detected, fall through to calculate sampling point,
 	// otherwise, sampling point is already calculated JUMP to READ_CURRENT
-	QBGE(READ_CURRENT, R16.b2, INVALID_SAMPLING_POINT);
+	QBGE(READ_CURRENT, rx_context.sampling_bit_pos, INVALID_SAMPLING_POINT);
 
 	// Extract timing information by detecting start transition (first left most zero)
 	LMBD(scratch_reg4, scratch_reg1, 0);
 	// branch if zero: start bit transition detected
 	QBGT(START_BIT_TRANSITION, scratch_reg4, ZERO_BIT_NOT_DETECTED);
-	LDI(R16.b2, 0xff);
-	SBBO(R16.b2, R9, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
+	LDI(rx_context.sampling_bit_pos, 0xff);
+	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
 
 	// RX time out logic
-	QBBC(RxInterruptServiceRequestHndlr, R4.w2, RX_TIMEOUT_INTR_MASK);
-	QBBC(RxInterruptServiceRequestHndlr, R5.b2, SUART_TXRX_READY_BIT);
-	QBEQ(RxInterruptServiceRequestHndlr, R7.b0, 0);
+	QBBC(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_Config1, RX_TIMEOUT_INTR_MASK);
+	QBBC(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
+	QBEQ(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 0);
 
 	// Read the request count to be received
-	LSR(scratch_reg1, R5.w0, SUART_CH_CONFIG2_DATALEN_SHIFT);
+	LSR(scratch_reg1, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_DATALEN_SHIFT);
 	AND(scratch_reg1, scratch_reg1, SUART_CH_CONFIG2_DATALEN_MASK);
 	// Since fifo size is 16
 	ADD(scratch_reg1, scratch_reg1, 0x01);
-	QBEQ(RxInterruptServiceRequestHndlr, R7.b0, scratch_reg1);
+	QBEQ(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_TxRxBytesDoneCtr, scratch_reg1);
 
 	// check if time-out is enabled, if yes increament the timeout counter and check if count is equal to MAX_RX_TIMEOUT_TRIES
 	// if yes raise the interrupt for time out.
-	ADD(R16.w0, R16.w0, 1);
-	SBBO(R16.w0, R9, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
-	QBGE(RxInterruptServiceRequestHndlr, R16.w0, MAX_RX_TIMEOUT_TRIES);
-	SET(R5.b2, R5.b2, SUART_RX_TIMEOUT_BIT);
-	CLR(R4.w2, R4.w2, RX_TIMEOUT_INTR_MASK);
-	SBBO(R4.w2, R8, SUART_CH_CONFIG1_OFFSET, 2);
+	ADD(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, 1);
+	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
+	QBGE(RxInterruptServiceRequestHndlr, rx_context.rx_timeout_cntr, MAX_RX_TIMEOUT_TRIES);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_TIMEOUT_BIT);
+	CLR(suart_ch_regs.Chn_Config1, suart_ch_regs.Chn_Config1, RX_TIMEOUT_INTR_MASK);
+	SBBO(suart_ch_regs.Chn_Config1, suart_ch_info.curr_ch_base_addr, SUART_CH_CONFIG1_OFFSET, 2);
 
 	// Clear the RX timeout counter
-	XOR(R16.w0, R16.w0, R16.w0);
-	SBBO(R16.w0, R9, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
+	XOR(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr);
+	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
 	JMP(RX_CHN_INTR);
 
 	// Calculate the sampling bit position based on the start bit position
@@ -2107,11 +2132,11 @@ int main(void) {
 
 	LABEL(START_BIT_TRANSITION);
 	// clear the rx time out counter
-	XOR(R16.w0, R16.w0, R16.w0);
-	SBBO(R16.w0, R9, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
+	XOR(rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr, rx_context.rx_timeout_cntr);
+	SBBO(rx_context.rx_timeout_cntr, suart_ch_info.rx_context_addr, SUART_CH_RX_TIMEOUT_CNTR_OFFSET, 2);
 
 	// determine the over-sampling rate
-	LSR(scratch_reg2, R4.w2, SUART_CH_CONFIG1_OVS_BIT_SHIFT);
+	LSR(scratch_reg2, suart_ch_regs.Chn_Config1, SUART_CH_CONFIG1_OVS_BIT_SHIFT);
 	AND(scratch_reg2, scratch_reg2, SUART_CH_CONFIG1_OVS_BIT_MASK);
 
 	// OVER_SAMPLE
@@ -2122,10 +2147,10 @@ int main(void) {
 	// Calaulate sampling bit position for 8 bit over sampling
 	LABEL(OVER_SAMPLE_SIZE8BIT);
 	// start bit possition - center
-	SUB(R16.b2, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
+	SUB(rx_context.sampling_bit_pos, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
 	// sampling point
-	AND(R16.b2, R16.b2, SAMPING_MASK_8_BIT_OVRSAMPLNG);
-	SBBO(R16.b2, R9, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
+	AND(rx_context.sampling_bit_pos, rx_context.sampling_bit_pos, SAMPING_MASK_8_BIT_OVRSAMPLNG);
+	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
 	// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
 	QBLE(READ_CURRENT, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
 	JMP(RxInterruptServiceRequestHndlr);
@@ -2133,10 +2158,10 @@ int main(void) {
 	// Calaulate sampling bit position for 16 bit over sampling
 	LABEL(OVER_SAMPLE_SIZE16BIT);
 	// start bit possition - center
-	SUB(R16.b2, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
+	SUB(rx_context.sampling_bit_pos, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
 	// samplimg point
-	AND(R16.b2, R16.b2, SAMPING_MASK_16_BIT_OVRSAMPLNG);
-	SBBO(R16.b2, R9, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
+	AND(rx_context.sampling_bit_pos, rx_context.sampling_bit_pos, SAMPING_MASK_16_BIT_OVRSAMPLNG);
+	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
 	// if Start bit position is eqaul to/greater than centre, sample the start bit in current read, otherwise in next read
 	QBLE(READ_CURRENT, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
 	JMP(RxInterruptServiceRequestHndlr);
@@ -2145,49 +2170,49 @@ int main(void) {
 	// scratch_8bit_reg2 holds the information if bit detected is zero if scratch_8bit_reg2= 0, or one if scratch_8bit_reg2 = 1
 	XOR(scratch_8bit_reg2, scratch_8bit_reg2, scratch_8bit_reg2);
 	// if bit at sampling point is zero jump to READ_ZERO
-	QBBC(READ_ZERO, scratch_reg1, R16.b2);
+	QBBC(READ_ZERO, scratch_reg1, rx_context.sampling_bit_pos);
 	// otherwise increament scratch_8bit_reg2 by one as bit detected is one
 	ADD(scratch_8bit_reg2, scratch_8bit_reg2, 1);
 
 	LABEL(READ_ZERO);
 	// We have read the data bit here...
 	// If start bit is being received already, then skip the start condition processing.
-	QBLT(RX_BIT_RECVD, R7.b1, 0);
+	QBLT(RX_BIT_RECVD, suart_ch_regs.Chn_TxRxBitsDoneCtr, 0);
 
 	//(Chn_TxRxBitsDoneCtr == 0)            //No bit is being Recieved, check if it is start bit
 	// if DataBit == 0, i.e. scratch_8bit_reg2 == 0, Jump to Start Condition, else error fall through
 	QBEQ(START_CONDITION, scratch_8bit_reg2, 0);
 
-	QBEQ(START_CONDITION, R7.w2, 0);
+	QBEQ(START_CONDITION, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0);
 
 	// Broken start condition or false alarm, Reset repeat counter		//if DataBit == 1, instead of zero
-	XOR(R7.w2, R7.w2, R7.w2);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// else part for NO_REPEAT_DONE  DataBit == 0
 	LABEL(START_CONDITION);
 	// Increament Repeat Done Counter by One, write back to memory
-	ADD(R7.w2, R7.w2, 1);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	// Read Pre Scaler
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
-	AND(scratch_reg2, scratch_reg2, R4.w2);
+	AND(scratch_reg2, scratch_reg2, suart_ch_regs.Chn_Config1);
 
 	// if Repeat Done count is greater than or equal to prescaler, start bit is received, jump to START_BIT_RECIVED,
-	QBGE(START_BIT_RECIVED, scratch_reg2, R7.w2);
+	QBGE(START_BIT_RECIVED, scratch_reg2, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// Start bit is condition Detected properly
 	LABEL(START_BIT_RECIVED);
 	// Increament Bit Count by One, and write it to memory
-	ADD(R7.b1, R7.b1, 1);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Reset Repeat Counter, and write it to memory
-	XOR(R7.w2, R7.w2, R7.w2);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// Start Bit has been detected Already, Now the data bit is being received
@@ -2202,18 +2227,18 @@ int main(void) {
 
 	LABEL(RX_DATA_BIT_ZERO);
 	// if (Chn_TxRxRepeatDoneCntr < 32), check if reapeat done counter is less than 32, if yes Jump to RX_REPEAT_DONE_CNTR_LT_32
-	QBGE(RX_REPEAT_DONE_CNTR_LT_32, R7.w2, 0x20);
+	QBGE(RX_REPEAT_DONE_CNTR_LT_32, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0x20);
 
 	// repeat done counter is Greater than 32, Read Chn_RxDataBitsHoldRegHigh reg, Copy the Received bit to Chn_RxDataBitsHoldRegHigh register
 	// else part : (Chn_TxRxRepeatDoneCntr is Greater than or equal to 32 )
 	LABEL(RX_REPEAT_DONE_CNTR_GT_32);
 	// Calculate the offset for bit in Chn_RxDataBitsHoldRegHigh regsiter
-	RSB(scratch_reg2, R7.w2, 0x20);
+	RSB(scratch_reg2, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 0x20);
 	// Shift Received bit by above calculated of set i.e Chn_TxRxRepeatDoneCntr - 20
 	LSL(scratch_reg1, scratch_reg1, scratch_reg2);
-	LBBO(R15, R9, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
-	OR(R15, scratch_reg1, R15);
-	SBBO(R15, R9, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
+	LBBO(rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
+	OR(rx_context.Chn_RxDataBitsHoldRegHigh, scratch_reg1, rx_context.Chn_RxDataBitsHoldRegHigh);
+	SBBO(rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
 	JMP(RX_REPEAT_COUNT_LESS_THAN_PRESCALR);
 
 	// repeat done counter is less than OR equal to 32, Read the Chn_RxDataBitsHoldRegLow, Copy the Received bit to Chn_RxDataBitsHoldRegLow register
@@ -2221,23 +2246,23 @@ int main(void) {
 	// if for (Chn_TxRxRepeatDoneCntr < 32)
 	LABEL(RX_REPEAT_DONE_CNTR_LT_32);
 	// Shift Received bit by Repeat Done Counter
-	LSL(scratch_reg1, scratch_reg1, R7.w2);
-	LBBO(R14, R9, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
-	OR(R14, scratch_reg1, R14);
-	SBBO(R14, R9, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
+	LSL(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	LBBO(rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
+	OR(rx_context.Chn_RxDataBitsHoldRegLow, scratch_reg1, rx_context.Chn_RxDataBitsHoldRegLow);
+	SBBO(rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
 
 	// Increament Chn_TxRxRepeatDoneCntr by one and Check if Repeat Done Counter is equal to Prescalar,
 	// if yes jump to PROCESS_RX_DATA_BIT, otherewise again sample RBuf for same bit
 	LABEL(RX_REPEAT_COUNT_LESS_THAN_PRESCALR);
-	ADD(R7.w2, R7.w2, 1);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	// Read Pre Scaler
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
-	AND(scratch_reg2, scratch_reg2, R4.w2);
+	AND(scratch_reg2, scratch_reg2, suart_ch_regs.Chn_Config1);
 
 	// check if number of bits sampled (Chn_TxRxRepeatDoneCtr) is equal to prescaler (scratch_reg2), if yes jump to PROCESS_RX_DATA_BIT
-	QBGE(PROCESS_RX_DATA_BIT, scratch_reg2, R7.w2);
+	QBGE(PROCESS_RX_DATA_BIT, scratch_reg2, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// Scan Chn_RxDataBitsHoldRegLow, Chn_RxDataBitsHoldRegHigh, to check if BIT received is one or zero and write to Chn_RxDataHoldReg
@@ -2246,7 +2271,7 @@ int main(void) {
 	// Get the Presaclar
 	LDI(scratch_reg3, SUART_CTRL_PRE_SCALAR_MASK);
 	// scratch_reg3 hold prescalar
-	AND(scratch_reg3, scratch_reg3, R4.w2);
+	AND(scratch_reg3, scratch_reg3, suart_ch_regs.Chn_Config1);
 
 	// Initialize the register to zero required for copying data bit received in rxdata_buf
 	// keep count of number of ONE scanned
@@ -2261,7 +2286,7 @@ int main(void) {
 	XOR(scratch_reg1, scratch_reg1, scratch_reg1);
 
 	// scratch_reg4 holds the data from Chn_RxDataBitsHoldRegLow
-	LBBO(scratch_reg4, R9, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
+	LBBO(scratch_reg4, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
 	// if Pre Scalar is less than or equal to 32, JMP to BIT_CHK_LOOP
 	QBGE(BIT_CHK_LOOP, scratch_reg3, 0x20);
 
@@ -2294,7 +2319,7 @@ int main(void) {
 
 	// Load the Chn_RxDataBitsHoldRegHigh to scratch_reg4
 	LABEL(LOAD_RXDATABITS_HOLDREGHIGH);
-	LBBO(scratch_reg4, R9, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
+	LBBO(scratch_reg4, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
 	// Reset the scratch_reg1, so that starts from bit 0 for Chn_RxDataBitsHoldRegHigh
 	XOR(scratch_reg1, scratch_reg1, scratch_reg1);
 	// Reset the scratch_reg2, so that only jump to label LOAD_RXDATABITS_HOLDREGHIGH done one's only
@@ -2324,42 +2349,42 @@ int main(void) {
 	// Write the Received Data bit (in scratch_reg1) to Chn_RxDataHoldReg
 	LABEL(WRITE_RCVD_BIT_TO_RX_DATAHOLDREG);
 	// Shift the bit received by Chn_TxRxBitsDoneCtr
-	LSL(scratch_reg1, scratch_reg1, R7.b1);
+	LSL(scratch_reg1, scratch_reg1, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 
 	// Read the Chn_RxDataHoldReg from Memory
-	LBBO(R13.w2, R9, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
+	LBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
 
 	// Write the bit received to Chn_RxDataHoldReg
-	OR(R13.w2, R13.w2, scratch_reg1);
+	OR(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, scratch_reg1);
 
 	// Write updated Chn_RxDataHoldReg to memory
-	SBBO(R13.w2, R9, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
+	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
 
 	// Increment the Data bit Counter
-	ADD(R7.b1, R7.b1, 1);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Reset the Repeat Done Counter
-	XOR(R7.w2, R7.w2, R7.w2);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	// initialize Chn_RxDataBitsHoldRegLow
-	XOR(R14, R14, R14);
-	SBBO(R14, R9, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
+	XOR(rx_context.Chn_RxDataBitsHoldRegLow, rx_context.Chn_RxDataBitsHoldRegLow, rx_context.Chn_RxDataBitsHoldRegLow);
+	SBBO(rx_context.Chn_RxDataBitsHoldRegLow, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGLOW_OFFSET, 4);
 
 	// initialize Chn_RxDataBitsHoldRegHigh
-	XOR(R15, R15, R15);
-	SBBO(R15, R9, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
+	XOR(rx_context.Chn_RxDataBitsHoldRegHigh, rx_context.Chn_RxDataBitsHoldRegHigh, rx_context.Chn_RxDataBitsHoldRegHigh);
+	SBBO(rx_context.Chn_RxDataBitsHoldRegHigh, suart_ch_info.rx_context_addr, SUART_CH_RXDATABITSHOLDREGHIGH_OFFSET, 4);
 
 	// Read Bit Per Charater
-	AND(scratch_reg2, R5.w0, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK);
+	AND(scratch_reg2, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK);
 
 	// check is (N-1) bit is being received for current data frame, if yes jump to CHK_RECVD_DATA_FRAME
 	// if all N bits has been Received Jump to RESET_BITS_CNTR, otherwise receive remaining bits.
 	// (Chn_TxRxBitsDoneCntr >= Chn_Config2.BitsPerChar)
-	QBGE(RESET_BITS_CNTR, scratch_reg2, R7.b1);
+	QBGE(RESET_BITS_CNTR, scratch_reg2, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	SUB(scratch_reg2, scratch_reg2, 1);
-	QBEQ(CHK_RECVD_DATA_FRAME, scratch_reg2, R7.b1);
+	QBEQ(CHK_RECVD_DATA_FRAME, scratch_reg2, suart_ch_regs.Chn_TxRxBitsDoneCtr);
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// if all bits received, verify the Received data frame
@@ -2376,23 +2401,23 @@ int main(void) {
 	LSR(scratch_reg1, scratch_reg1, scratch_reg2);
 
 	// Read the Data hold Reg
-	LBBO(R13.w2, R9, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
+	LBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
 	// Insert the ZERO's in bits that do  not  corresponds to Data Bits
-	AND(R13.w2, R13.w2, scratch_reg1);
-	SBBO(R13.w2, R9, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
+	AND(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, scratch_reg1);
+	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
 
 	// removing start bit
-	LSR(R13.w2, R13.w2, 1);
+	LSR(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, 1);
 
 	// load the arm memory lacation address where data is to be written
-	LBBO(R6, R8, SUART_CH_TXRXDATA_OFFSET, 4);
+	LBBO(suart_ch_regs.ch_TxRxData, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXDATA_OFFSET, 4);
 
 	// Read Bits Per Character
-	AND(scratch_reg4, R5.w0, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK);
+	AND(scratch_reg4, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_BITS_PER_CHAR_MASK);
 	SUB(scratch_reg4, scratch_reg4, 2);
 
 	// Load the Bytes Done counter
-	MOV(scratch_reg1, R7.b0);
+	MOV(scratch_reg1, suart_ch_regs.Chn_TxRxBytesDoneCtr);
 
 	// check, if two byte offset is required (bits per character greater than 8)
 	QBGE(WRITE_RX_CHAR_TO_MEM, scratch_reg4, SUART_CH_CONFIG2_8BITS_PER_CHAR);
@@ -2402,22 +2427,22 @@ int main(void) {
 
 	LABEL(WRITE_RX_CHAR_TO_MEM);
 	// Write the actual data to ARM Memory
-	SBBO(R13.w2, R6, scratch_reg1, 2);
+	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_regs.ch_TxRxData, scratch_reg1, 2);
 
 	JMP(RxInterruptServiceRequestHndlr);
 
 	LABEL(RESET_BITS_CNTR);
 	// Check for Framing Error Framing Error
-	SUB(scratch_reg3, R7.b1, 1);
+	SUB(scratch_reg3, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
 
 	// Reset bits done counter
-	XOR(R7.b1, R7.b1, R7.b1);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	XOR(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
 	// Get the Prescalar
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
 	//scratch_reg2 hold prescalar
-	AND(scratch_reg2, scratch_reg2, R4.w2);
+	AND(scratch_reg2, scratch_reg2, suart_ch_regs.Chn_Config1);
 
 	// Extract timing information by detecting start transition (first left most zero)
 	LMBD(scratch_reg4, mcasp_rbuf_val, 0);
@@ -2425,7 +2450,7 @@ int main(void) {
 	QBEQ(INVALID_SAMPLING_PNT, scratch_reg4, ZERO_BIT_NOT_DETECTED);
 
 	// determine the over-sampling rate
-	LSR(scratch_reg1, R4.w2, SUART_CH_CONFIG1_OVS_BIT_SHIFT);
+	LSR(scratch_reg1, suart_ch_regs.Chn_Config1, SUART_CH_CONFIG1_OVS_BIT_SHIFT);
 	// OVER_SAMPLE
 	AND(scratch_reg1, scratch_reg1, SUART_CH_CONFIG1_OVS_BIT_MASK);
 	// 16 bit over sampling
@@ -2438,9 +2463,9 @@ int main(void) {
 
 	LABEL(CAL_SAMPL_PNT8);
 	// start bit position - center
-	SUB(R16.b2, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
+	SUB(rx_context.sampling_bit_pos, scratch_reg4, OVR_SAMPL_8BIT_MID_DATA_BIT);
 	// sampling point
-	AND(R16.b2, R16.b2, SAMPING_MASK_8_BIT_OVRSAMPLNG);
+	AND(rx_context.sampling_bit_pos, rx_context.sampling_bit_pos, SAMPING_MASK_8_BIT_OVRSAMPLNG);
 	QBGT(UPDATE_SAMPLING_PNT, scratch_reg4, 4);
 	JMP(NXT_FRAME_SAMPLING_PNT);
 
@@ -2451,76 +2476,76 @@ int main(void) {
 
 	LABEL(CAL_SAMPL_PNT16);
 	// start bit position - center
-	SUB(R16.b2, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
+	SUB(rx_context.sampling_bit_pos, scratch_reg4, OVR_SAMPL_16BIT_MID_DATA_BIT);
 	// sampling point
-	AND(R16.b2, R16.b2, SAMPING_MASK_16_BIT_OVRSAMPLNG);
+	AND(rx_context.sampling_bit_pos, rx_context.sampling_bit_pos, SAMPING_MASK_16_BIT_OVRSAMPLNG);
 	QBGT(UPDATE_SAMPLING_PNT, scratch_reg4, 8);
 
 	LABEL(NXT_FRAME_SAMPLING_PNT);
 	// Increament Repeat Done Counter by One, write back to memory
-	ADD(R7.w2, R7.w2, 1);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	ADD(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 
 	// Read Pre Scaler
 	LDI(scratch_reg2, SUART_CTRL_PRE_SCALAR_MASK);
-	AND(scratch_reg2, scratch_reg2, R4.w2);
+	AND(scratch_reg2, scratch_reg2, suart_ch_regs.Chn_Config1);
 
 	// if Repeat Done count is greater than or equal to prescaler, start bit is received, jump to START_BIT
-	QBLT(UPDATE_SAMPLING_PNT, scratch_reg2, R7.w2);
+	QBLT(UPDATE_SAMPLING_PNT, scratch_reg2, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
 
 	// Start bit is condition Detected properly
 	LABEL(START_BIT);
 	// Increament Bit Count by One, and write it to memory
-	ADD(R7.b1, R7.b1, 1);
-	SBBO(R7.b1, R8, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
+	ADD(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_regs.Chn_TxRxBitsDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBitsDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBITSDONECTR_OFFSET, 1);
 
-	XOR(R7.w2, R7.w2, R7.w2);
-	SBBO(R7.w2, R8, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
+	XOR(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_regs.Chn_TxRxRepeatDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxRepeatDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXREPEATDONECTR_OFFSET, 2);
 	JMP(UPDATE_SAMPLING_PNT);
 
 	LABEL(INVALID_SAMPLING_PNT);
 	// Reset the Sampling Point
-	LDI(R16.b2, 0xff);
+	LDI(rx_context.sampling_bit_pos, 0xff);
 
 	LABEL(UPDATE_SAMPLING_PNT);
-	SBBO(R16.b2, R9, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
+	SBBO(rx_context.sampling_bit_pos, suart_ch_info.rx_context_addr, SUART_CH_SAMPLING_BIT_POS_OFFSET, 1);
 
 	// read interrupt mask regsiter
-	LBBO(R2.w0, pZERO, SUART_GBL_INT_MASK_ADDR, 2);
+	LBBO(suart_global.intrMask, pZERO, SUART_GBL_INT_MASK_ADDR, 2);
 
 	//read interrupt status regsiter
-	LBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	LBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 
 	// check for error in received data frame
 	// Check for Break Condiotion Error
-	QBGE(RX_DATA_ZERO, R13.w2, 0);
+	QBGE(RX_DATA_ZERO, rx_context.Chn_RxDataHoldReg, 0);
 
 	// Framing Error: Check if the Bit at Chn_TxRxBitsDoneCtr Bit Position in the Chn_RxDataHoldReg is set
-	QBBC(BIT_CLEARD, R13.w2, scratch_reg3);
+	QBBC(BIT_CLEARD, rx_context.Chn_RxDataHoldReg, scratch_reg3);
 
 	// increament Chn_TxRxBytesDoneCtr by one
-	ADD(R7.b0, R7.b0, 1);
-	SBBO(R7.b0, R8, 12, 1);
+	ADD(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, 1);
+	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
 
 	// Reset the Data Hold Reg
-	XOR(R13.w2, R13.w2, R13.w2);
-	SBBO(R13.w2, R9, 10, 2);
+	XOR(rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg, rx_context.Chn_RxDataHoldReg);
+	SBBO(rx_context.Chn_RxDataHoldReg, suart_ch_info.rx_context_addr, SUART_CH_RXDATAHOLDREG_OFFSET, 2);
 
 	// Read the request count to be received
-	LSR(scratch_reg1, R5.w0, SUART_CH_CONFIG2_DATALEN_SHIFT);
+	LSR(scratch_reg1, suart_ch_regs.Chn_Config2.u16, SUART_CH_CONFIG2_DATALEN_SHIFT);
 	AND(scratch_reg1, scratch_reg1, SUART_CH_CONFIG2_DATALEN_MASK);
 	ADD(scratch_reg1, scratch_reg1, 0x01);
 
 	// Read the bytes done counter
-	MOV(scratch_reg2, R7.b0);
+	MOV(scratch_reg2, suart_ch_regs.Chn_TxRxBytesDoneCtr);
 
 	// check if bytes done counter is less than or equal to data len,
 	// if yes go to CHK_RX_CMPL_INT and check for raise RX complete intr
-	QBGE(CHK_RX_CMPL_INT, R7.b0, scratch_reg1);
+	QBGE(CHK_RX_CMPL_INT, suart_ch_regs.Chn_TxRxBytesDoneCtr, scratch_reg1);
 
 	// if bytes done counter is greater than data len subtract data len from it and
 	// check if differnce is data len, if yes raise RX complete intr
-	SUB(scratch_reg2, R7.b0, scratch_reg1);
+	SUB(scratch_reg2, suart_ch_regs.Chn_TxRxBytesDoneCtr, scratch_reg1);
 
 	LABEL(CHK_RX_CMPL_INT);
 	// check if all data frame received or not, if RX request if complete, else receive next data frame
@@ -2529,76 +2554,76 @@ int main(void) {
 	// All requested frame received raise interrupt to ARM/DSP, set SUART_RX_FIFO_INDX_BIT, clear SUART_TXRX_READY_BIT
 	LABEL(RX_COMPLETE);
 	// RX Data is in lower half of Fifo, if bytes done counter is equal to data len
-	CLR(R5.b2, R5.b2, SUART_RX_FIFO_INDX_BIT);
+	CLR(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_FIFO_INDX_BIT);
 
 	// Raise the RX interrupt if Chn_TxRxBytesDoneCtr is equal to data len otherwise reset Chn_TxRxBytesDoneCtr and raise Rx interrupt
-	QBEQ(CHK_RX_OVERRUN, R7.b0, scratch_reg1);
+	QBEQ(CHK_RX_OVERRUN, suart_ch_regs.Chn_TxRxBytesDoneCtr, scratch_reg1);
 
 	// reset Chn_TxRxBytesDoneCtr if Chn_TxRxBytesDoneCtr is equal to twice the data len
-	XOR(R7.b0, R7.b0, R7.b0);
-	SBBO(R7.b0, R8, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
+	XOR(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_regs.Chn_TxRxBytesDoneCtr);
+	SBBO(suart_ch_regs.Chn_TxRxBytesDoneCtr, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXBYTESDONECTR_OFFSET, 1);
 
 	// RX data is in upper half of Fifo,if bytes done counter is equal to twice the data len
-	SET(R5.b2, R5.b2, SUART_RX_FIFO_INDX_BIT);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_FIFO_INDX_BIT);
 
 	LABEL(CHK_RX_OVERRUN);
-	MOV32(scratch_reg2, 0x284);
+	MOV32(scratch_reg2, SECR2_OFFSET);
 	LBCO(scratch_reg1, CONST_PRUSSINTC, scratch_reg2, 4);
-	ADD(scratch_reg2, R10.b2, 2);
-	ADD(scratch_reg2, R10.b2, 2);
+	ADD(scratch_reg2, suart_ch_info.ch_num, 2);
+	ADD(scratch_reg2, suart_ch_info.ch_num, 2);
 
 	LABEL(OVER_RUN_ERR);
 	QBBC(CHK_RX_READY_BIT, scratch_reg1, scratch_reg2);
-	QBBC(CHK_RX_READY_BIT, R4.w2, RX_OVER_RUN_MASK);
-	SET(R5.b2, R5.b2, SUART_TXRX_RUNER_BIT);
-	SET(R5.b2, R5.b2, SUART_TXRX_ERROR_BIT);
+	QBBC(CHK_RX_READY_BIT, suart_ch_regs.Chn_Config1, RX_OVER_RUN_MASK);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_RUNER_BIT);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_ERROR_BIT);
 
 	LABEL(CHK_RX_READY_BIT);
 	// If the receive is not activated from the host, then don't dump the data
-	QBBC(RxInterruptServiceRequestHndlr, R5.b2, SUART_TXRX_READY_BIT);
+	QBBC(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_READY_BIT);
 	JMP(RX_CHN_INTR);
 
 	// Framing Error Detected, interrupt are masked go to DEACTIVATE_SERIALIZER, other wise update status reg
 	LABEL(BIT_CLEARD);
-	SET(R5.b2, R5.b2, SUART_RX_FE_BIT);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_FE_BIT);
 	JMP(SET_RX_ERR_STAT);
 
 	// Break Condiotion Error detected, interrupt are masked go to DEACTIVATE_SERIALIZER, other wise update status reg
 	LABEL(RX_DATA_ZERO);
-	SET(R5.b2, R5.b2, SUART_RX_BI_BIT);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_RX_BI_BIT);
 
 	// Update the Global and Channel Error Status Registers
 	LABEL(SET_RX_ERR_STAT);
-	SET(R2.w2, R2.w2, GLOBAL_ERR_INTR);
-	SET(R5.b2, R5.b2, SUART_TXRX_ERROR_BIT);
+	SET(suart_global.intrStatus, suart_global.intrStatus, GLOBAL_ERR_INTR);
+	SET(suart_ch_regs.Chn_TxRxStatus, suart_ch_regs.Chn_TxRxStatus, SUART_TXRX_ERROR_BIT);
 
 	// if global Error interrupt is clear do not raise interrupt
-	QBBC(RxInterruptServiceRequestHndlr, R2.w0, GLOBAL_ERR_INTR);
+	QBBC(RxInterruptServiceRequestHndlr, suart_global.intrMask, GLOBAL_ERR_INTR);
 
 	// if Framing error status bit for channel is clear look for Break Condiotion Error
-	QBBC(BREAK_COND_ERR, R5.b2, SUART_RX_FE_BIT);
+	QBBC(BREAK_COND_ERR, suart_ch_regs.Chn_TxRxStatus, SUART_RX_FE_BIT);
 
 	// Framming Error Occurred, if Framing Error mask is not set jum to RxInterruptServiceRequestHndlr
 	LABEL(FRAMING_ERR);
-	QBBS(RX_CHN_INTR, R4.w2, FE_ERR_INTR_MASK);
+	QBBS(RX_CHN_INTR, suart_ch_regs.Chn_Config1, FE_ERR_INTR_MASK);
 	JMP(RxInterruptServiceRequestHndlr);
 
 	// if Break Error Mask not set jump to RxInterruptServiceRequestHndlr
 	LABEL(BREAK_COND_ERR);
-	QBBC(RxInterruptServiceRequestHndlr, R4.w2, BI_ERR_INTR_MASK);
+	QBBC(RxInterruptServiceRequestHndlr, suart_ch_regs.Chn_Config1, BI_ERR_INTR_MASK);
 
 	// Set the Global interrupt status register
 	LABEL(RX_CHN_INTR);
-	SET(R2.w2, R2.w2, R10.b2);
+	SET(suart_global.intrStatus, suart_global.intrStatus, suart_ch_info.ch_num);
 
 	// write interrupt status regsiter
-	SBBO(R2.w2, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
+	SBBO(suart_global.intrStatus, pZERO, SUART_GBL_INT_STATUS_ADDR, 2);
 
 	// Update tx rx status regsiter status
-	SBBO(R5.b2, R8, SUART_CH_TXRXSTATUS_OFFSET, 1);
+	SBBO(suart_ch_regs.Chn_TxRxStatus, suart_ch_info.curr_ch_base_addr, SUART_CH_TXRXSTATUS_OFFSET, 1);
 
 	// if interrupt are masked for channel then go to RxInterruptServiceRequestHndlr, otherwise raise the interrupt
-	QBBC(RxInterruptServiceRequestHndlr, R2.w0, R10.b2);
+	QBBC(RxInterruptServiceRequestHndlr, suart_global.intrMask, suart_ch_info.ch_num);
 
 	// Raise the interrupt to ARM/DSP
 	JMP(PRU_TO_HOST_INTERRUPT);
@@ -2610,26 +2635,26 @@ int main(void) {
 //******************************************** LOAD_RX_CONTEXT_ADDRESS: Start*********************************
 
 	LABEL(LOAD_RX_CONTEXT_ADDRESS);
-	QBEQ(RX_CONTEXT_CH1_ADDR, R10.b2, 1);
-	QBEQ(RX_CONTEXT_CH3_ADDR, R10.b2, 3);
-	QBEQ(RX_CONTEXT_CH5_ADDR, R10.b2, 5);
-	QBEQ(RX_CONTEXT_CH7_ADDR, R10.b2, 7);
+	QBEQ(RX_CONTEXT_CH1_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_1);
+	QBEQ(RX_CONTEXT_CH3_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_3);
+	QBEQ(RX_CONTEXT_CH5_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_5);
+	QBEQ(RX_CONTEXT_CH7_ADDR, suart_ch_info.ch_num, SUART_CHANNEL_7);
 	JMP(JMP_CALL_reg);
 
 	LABEL(RX_CONTEXT_CH1_ADDR);
-	LDI(R9, SUART_CH1_RX_CONTEXT_ADDR);
+	LDI(suart_ch_info.rx_context_addr, SUART_CH1_RX_CONTEXT_ADDR);
 	JMP(JMP_CALL_reg);
 
 	LABEL(RX_CONTEXT_CH3_ADDR);
-	LDI(R9, SUART_CH3_RX_CONTEXT_ADDR);
+	LDI(suart_ch_info.rx_context_addr, SUART_CH3_RX_CONTEXT_ADDR);
 	JMP(JMP_CALL_reg);
 
 	LABEL(RX_CONTEXT_CH5_ADDR);
-	LDI(R9, SUART_CH5_RX_CONTEXT_ADDR);
+	LDI(suart_ch_info.rx_context_addr, SUART_CH5_RX_CONTEXT_ADDR);
 	JMP(JMP_CALL_reg);
 
 	LABEL(RX_CONTEXT_CH7_ADDR);
-	LDI(R9, SUART_CH7_RX_CONTEXT_ADDR);
+	LDI(suart_ch_info.rx_context_addr, SUART_CH7_RX_CONTEXT_ADDR);
 	JMP(JMP_CALL_reg);
 
 //******************************************** LOAD_RX_CONTEXT_ADDRESS Ends ***********************************
