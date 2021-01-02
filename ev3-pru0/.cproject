@@ -46,7 +46,6 @@
 								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.2.compilerID.DEFINE.102515399" name="Pre-define NAME (--define, -D)" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.2.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="${INHERITED_SYMBOLS}"/>
 									<listOptionValue builtIn="false" value="AM18XX"/>
-									<listOptionValue builtIn="false" value="MCASP0"/>
 								</option>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.2.compiler.inputType__C_SRCS.966816498" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.2.compiler.inputType__C_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.PRU_2.2.compiler.inputType__CPP_SRCS.729423748" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.2.compiler.inputType__CPP_SRCS"/>
@@ -127,7 +126,6 @@
 								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.DEFINE.555378802" name="Pre-define NAME (--define, -D)" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="${INHERITED_SYMBOLS}"/>
 									<listOptionValue builtIn="false" value="AM18XX"/>
-									<listOptionValue builtIn="false" value="MCASP0"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.SILICON_VERSION.1495508363" name="Silicon version (--silicon_version, -v)" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.SILICON_VERSION" value="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.SILICON_VERSION.1" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.DISPLAY_ERROR_NUMBER.333126393" name="Emit diagnostic identifier numbers (--display_error_number, -pden)" superClass="com.ti.ccstudio.buildDefinitions.PRU_2.3.compilerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>

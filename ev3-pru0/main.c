@@ -97,11 +97,9 @@
 
 #define CONST_PRUSSINTC C0
 
-#ifdef MCASP0
+#if CONFIG_MCASP == 0
 #define MCASP_CONTROL  C25
-#endif
-
-#ifdef MCASP1
+#elif CONFIG_MCASP == 1
 #define MCASP_CONTROL	C26
 #endif
 
@@ -239,12 +237,10 @@
 #define MCASP_RINTCTL		0x7C
 #define MCASP_RSTAT		0x80
 
-#ifdef MCASP0
+#if CONFIG_MCASP == 0
 #define MCASP_SRCTL_BASE	(0x01D00180)
-#endif
-
-#ifdef MCASP1
-#define MCASP_SRCTL_BASE	(0x01D04180)  // mcasp 1 omapl137
+#elif CONFIG_MCASP == 1
+#define MCASP_SRCTL_BASE	(0x01D04180)
 #endif
 
 #define MCASP_SRCTL0		0x00
@@ -265,12 +261,10 @@
 #define MCASP_SRCTL15		0x3C
 
 
-#ifdef MCASP0
+#if CONFIG_MCASP == 0
 #define MCASP_XBUF_BASE		(0x01D00200)
-#endif
-
-#ifdef MCASP1
-#define MCASP_XBUF_BASE		(0x01D04200)   //mcasp 1 omapl137
+#elif CONFIG_MCASP == 1
+#define MCASP_XBUF_BASE		(0x01D04200)
 #endif
 
 #define MCASP_XBUF0			0x00
@@ -290,12 +284,10 @@
 #define MCASP_XBUF14			0x38
 #define MCASP_XBUF15			0x3C
 
-#ifdef MCASP0
+#if CONFIG_MCASP == 0
 #define MCASP_RBUF_BASE		(0x01D00280)
-#endif
-
-#ifdef MCASP1
-#define MCASP_RBUF_BASE		(0x01D04280)   // mcasp1 omapl137
+#elif CONFIG_MCASP == 1
+#define MCASP_RBUF_BASE		(0x01D04280)
 #endif
 
 #define MCASP_RBUF0			0x00
