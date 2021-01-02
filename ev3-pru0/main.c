@@ -32,6 +32,11 @@
  * main.c - Soft UART emulation using PRU/McASP0
  *
  * Based on PRU_SUART_Emulation.[h]p in lms2012.
+ * Copyright (c) 2010 Texas Instruments, Inc
+ * author     Jitendra Kumar
+ *
+ * Adapted to clpru assembly.
+ * Copyright (c) 2021 David Lechner <david@lechnology.com>
  */
 
 //===========================================================================
@@ -94,6 +99,8 @@
 //
 // C A U T I O N:
 // This context information should be flush after completion of service request
+
+#include "resource_table.h"
 
 #define CONST_PRUSSINTC C0
 

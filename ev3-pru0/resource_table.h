@@ -36,28 +36,17 @@
 
 #include <stddef.h>
 
-#include <pru_virtio_ids.h>
 #include <rsc_types.h>
 
-/*
- * The feature bitmap for virtio rpmsg
- */
-#define VIRTIO_RPMSG_F_NS	0	//name service notifications
+// Resources are dynamic, and so managed by device tree. Still need an empty
+// resource table to keep the Linux rproc driver from complaining.
 
-/* This firmware supports name service notifications as one of its features */
-#define RPMSG_FEATURES		(1 << VIRTIO_RPMSG_F_NS)
-
-#define NUM_RESOURCES		1
+#define NUM_RESOURCES		0
 
 struct custom_resource_table {
 	struct resource_table base;
 
 	uint32_t offset[NUM_RESOURCES];
-
-	/* resource 0 */
-	struct fw_rsc_vdev rpmsg_vdev;
-	struct fw_rsc_vdev_vring vring0;
-	struct fw_rsc_vdev_vring vring1;
 };
 
 #pragma DATA_SECTION(resource_table, ".resource_table")
@@ -67,34 +56,6 @@ struct custom_resource_table resource_table = {
 		.ver = 1,
 		.num = NUM_RESOURCES,
 		.reserved = { 0, 0 },
-	},
-	.offset = {
-		offsetof(struct custom_resource_table, rpmsg_vdev),
-	},
-	.rpmsg_vdev = {
-		.type = TYPE_VDEV,
-		.id = VIRTIO_ID_RPMSG,
-		.notifyid = 0,
-		.dfeatures = RPMSG_FEATURES,
-		.gfeatures = 0,	//will be populated by host
-		.config_len = 0,
-		.status = 0,
-		.num_of_vrings = 2,
-		.reserved = { 0, 0 },
-	},
-	.vring0 = {
-		.da       = FW_RSC_ADDR_ANY, //will be populated by host
-		.align    = 16,
-		.num      = 16,	// must be power of 2
-		.notifyid = 0,	//will be populated by host
-		.reserved = 0,
-	},
-	.vring1 = {
-		.da       = FW_RSC_ADDR_ANY, //will be populated by host
-		.align    = 16,
-		.num      = 16,	// must be power of 2
-		.notifyid = 0,	//will be populated by host
-		.reserved = 0,
 	},
 };
 
