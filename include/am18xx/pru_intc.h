@@ -145,9 +145,9 @@ typedef struct {
 			unsigned NONE : 1;		// 31
 		} GLBLPRIIDX_bit;
 	};	// 0x80
+} pru_intc;
 
-	uint32_t RESERVED_84[95];	// 0x84 - 0x1FC
-
+typedef struct {
 	union {
 		volatile uint32_t STATESETINT0;
 
@@ -682,8 +682,8 @@ typedef struct {
 		} HOSTINTEN_bit;
 	};	// 0x1500
 
-} pru_intc;
+} pru_intc_ext;
 
-volatile __far pru_intc PRU_INTC __attribute__((cregister("PRU_INTC", far), peripheral));
+volatile __far pru_intc PRU_INTC __attribute__((cregister("PRU_INTC", near), peripheral));
 
 #endif /* _PRU_INTC_H_ */

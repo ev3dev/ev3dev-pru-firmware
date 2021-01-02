@@ -644,7 +644,9 @@ typedef struct {
             unsigned RESERVED_1 : 31;
         } XEVTCTL_bit;
     }; // 0xcc
-    volatile uint32_t RESERVED_D0[12]; // 0xd0 - 0xfc
+} mcasp;
+
+typedef struct {
     union {
         volatile uint32_t DITCSRA0;
     }; // 0x100
@@ -976,8 +978,8 @@ typedef struct {
     union {
         volatile uint32_t RBUF15;
     }; // 0x2bc
-} mcasp;
+} mcasp_ext;
 
-volatile __far mcasp MCASP0 __attribute__((cregister("MCASP0_CTL", far), peripheral));
+volatile __far mcasp MCASP0 __attribute__((cregister("MCASP0_CTL", near), peripheral));
 
 #endif /* _AM18XX_SYS_MCASP_H_ */
